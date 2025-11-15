@@ -5,33 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sahyadri Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
-    <link href="images/logo.png" rel="icon">
-    <style>
-        body { font-family: 'Montserrat', sans-serif; background-color: #f4f7f9; margin: 0; }
-        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f7f9; display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box;}
-        .dashboard-layout { display: flex; min-height: 100vh; }
-        .sidebar { width: 220px; background-color: #2c3e50; color: white; display: flex; flex-direction: column; flex-shrink: 0; }
-        .sidebar-header { text-align: center; padding: 20px; border-bottom: 1px solid #34495e; }
-        .sidebar-header h1 { font-size: 20px; margin: 0; }
-        .sidebar-nav { flex-grow: 1; }
-        .sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
-        .sidebar-nav li { padding: 15px 25px; cursor: pointer; border-left: 4px solid transparent; transition: all 0.2s; }
-        .sidebar-nav li:hover { background-color: #34495e; }
-        .sidebar-nav li.active { background-color: #34495e; border-left-color: #3498db; }
-        .main-content { flex-grow: 1; padding: 30px; overflow-x: auto; }
-        .page { display: none; } .page.active { display: block; }
-        .content-box { background: #fff; padding: 30px 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        h2 { font-size: 24px; color: #333; border-bottom: 2px solid #8D6E63; padding-bottom: 8px; margin-top: 0; margin-bottom: 25px;}
-        label { font-weight: 600; font-size: 14px; color: #555; display: block; margin-bottom: 8px; }
-        input[type="text"], input[type="url"], input[type="password"], textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; margin-bottom: 15px; font-family: 'Montserrat', sans-serif;}
-        .link-input-group { display: flex; align-items: center; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 15px; } .link-prefix { padding: 12px; background-color: #f7f7f7; color: #666; font-size: 14px; border-right: 1px solid #ddd; white-space: nowrap; } #c-cta-path { border: none; flex-grow: 1; margin-bottom: 0; }
-        textarea { height: 120px; resize: vertical; }
-        .button-group { display: flex; gap: 10px; margin-top: 25px; }
-        button { flex-grow: 1; padding: 12px; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; } button:disabled { background-color: #ccc; cursor: not-allowed; } .btn-primary { background-color: #8D6E63; } .btn-primary:hover:not(:disabled) { background-color: #795548; } .btn-secondary { background-color: #607D8B; } .btn-secondary:hover:not(:disabled) { background-color: #546E7A; } .btn-info { background-color: #03A9F4; } .btn-info:hover:not(:disabled) { background-color: #0288D1; }
-        .status-message { text-align: center; margin-top: 15px; font-size: 14px; font-weight: 600; padding: 10px; border-radius: 5px; display: none; word-break: break-word; } .status-message.success { color: #2e6b2e; background-color: #dff0d8; } .status-message.error { color: #a94442; background-color: #f2dede; }
-        .loader { text-align: center; margin-top: 15px; font-weight: 600; color: #555; display: none; }
-        .segment-container { border: 1px solid #ddd; border-radius: 5px; padding: 15px; max-height: 120px; overflow-y: auto; background-color: #fafafa; } .checkbox-item { display: block; position: relative; padding-left: 30px; margin-bottom: 10px; cursor: pointer; user-select: none; } .checkbox-item:last-child { margin-bottom: 0; } .checkbox-item input { position: absolute; opacity: 0; cursor: pointer; } .checkmark { position: absolute; top: 0; left: 0; height: 20px; width: 20px; background-color: #eee; border: 1px solid #ccc; border-radius: 3px; } .checkbox-item input:checked ~ .checkmark { background-color: #8D6E63; } .checkmark:after { content: ""; position: absolute; display: none; left: 7px; top: 3px; width: 5px; height: 10px; border: solid white; border-width: 0 3px 3px 0; transform: rotate(45deg); } .checkbox-item input:checked ~ .checkmark:after { display: block; }
-        #customer-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; } #customer-table th, #customer-table td { border: 1px solid #ddd; padding: 10px; text-align: left; white-space: nowrap; } #customer-table th { background-color: #f8f8f8; position: sticky; top: 0; } #customer-table tbody tr:nth-child(even) { background-color: #f9f9f9; }
+    <style> /* ... CSS has no changes ... */ body { font-family: 'Montserrat', sans-serif; background-color: #f4f7f9; margin: 0; } .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f7f9; display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box;} .dashboard-layout { display: flex; min-height: 100vh; } .sidebar { width: 220px; background-color: #2c3e50; color: white; display: flex; flex-direction: column; flex-shrink: 0; } .sidebar-header { text-align: center; padding: 20px; border-bottom: 1px solid #34495e; } .sidebar-header h1 { font-size: 20px; margin: 0; } .sidebar-nav { flex-grow: 1; } .sidebar-nav ul { list-style: none; padding: 0; margin: 0; } .sidebar-nav li { padding: 15px 25px; cursor: pointer; border-left: 4px solid transparent; transition: all 0.2s; } .sidebar-nav li:hover { background-color: #34495e; } .sidebar-nav li.active { background-color: #34495e; border-left-color: #3498db; } .main-content { flex-grow: 1; padding: 30px; overflow-x: auto; } .page { display: none; } .page.active { display: block; } .content-box { background: #fff; padding: 30px 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); } h2 { font-size: 24px; color: #333; border-bottom: 2px solid #8D6E63; padding-bottom: 8px; margin-top: 0; margin-bottom: 25px;} label { font-weight: 600; font-size: 14px; color: #555; display: block; margin-bottom: 8px; } input[type="text"], input[type="url"], input[type="password"], textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; margin-bottom: 15px; font-family: 'Montserrat', sans-serif;} .link-input-group { display: flex; align-items: center; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 15px; } .link-prefix { padding: 12px; background-color: #f7f7f7; color: #666; font-size: 14px; border-right: 1px solid #ddd; white-space: nowrap; } #c-cta-path { border: none; flex-grow: 1; margin-bottom: 0; } textarea { height: 120px; resize: vertical; } .button-group { display: flex; gap: 10px; margin-top: 25px; } button { flex-grow: 1; padding: 12px; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; } button:disabled { background-color: #ccc; cursor: not-allowed; } .btn-primary { background-color: #8D6E63; } .btn-primary:hover:not(:disabled) { background-color: #795548; } .btn-secondary { background-color: #607D8B; } .btn-secondary:hover:not(:disabled) { background-color: #546E7A; } .btn-info { background-color: #03A9F4; } .btn-info:hover:not(:disabled) { background-color: #0288D1; } .status-message { text-align: center; margin-top: 15px; font-size: 14px; font-weight: 600; padding: 10px; border-radius: 5px; display: none; word-break: break-word; } .status-message.success { color: #2e6b2e; background-color: #dff0d8; } .status-message.error { color: #a94442; background-color: #f2dede; } .loader { text-align: center; margin-top: 15px; font-weight: 600; color: #555; display: none; } .segment-container { border: 1px solid #ddd; border-radius: 5px; padding: 15px; max-height: 120px; overflow-y: auto; background-color: #fafafa; } .checkbox-item { display: block; position: relative; padding-left: 30px; margin-bottom: 10px; cursor: pointer; user-select: none; } .checkbox-item:last-child { margin-bottom: 0; } .checkbox-item input { position: absolute; opacity: 0; cursor: pointer; } .checkmark { position: absolute; top: 0; left: 0; height: 20px; width: 20px; background-color: #eee; border: 1px solid #ccc; border-radius: 3px; } .checkbox-item input:checked ~ .checkmark { background-color: #8D6E63; } .checkmark:after { content: ""; position: absolute; display: none; left: 7px; top: 3px; width: 5px; height: 10px; border: solid white; border-width: 0 3px 3px 0; transform: rotate(45deg); } .checkbox-item input:checked ~ .checkmark:after { display: block; } #customer-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; } #customer-table th, #customer-table td { border: 1px solid #ddd; padding: 10px; text-align: left; white-space: nowrap; } #customer-table th { background-color: #f8f8f8; position: sticky; top: 0; } #customer-table tbody tr:nth-child(even) { background-color: #f9f9f9; }
     </style>
 </head>
 <body>
@@ -46,110 +20,25 @@
             </form>
         </div>
     </div>
-
     <div class="dashboard-layout" id="dashboard-layout" style="display: none;">
-        <div class="sidebar">
-            <div class="sidebar-header"><h1>Admin Panel</h1></div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li id="nav-promotions" class="active" data-page="page-promotions">Promotions</li>
-                    <li id="nav-customers" data-page="page-customers">Customers</li>
-                </ul>
-            </nav>
-        </div>
-        <div class="main-content">
-            <div id="page-promotions" class="page active">
-                <div class="content-box">
-                    <form id="campaign-form">
-                        <h2>Compose Promotion</h2>
-                        <label for="c-subject">Email Subject</label><input type="text" id="c-subject" required>
-                        <label for="c-headline">Headline</label><input type="text" id="c-headline" required>
-                        <label for="c-image-list">Main Image</label><select id="c-image-list" required><option value="" disabled selected>Loading...</option></select>
-                        <label for="c-body">Body Text</label><textarea id="c-body" required></textarea>
-                        <label for="c-cta-text">Button Text</label><input type="text" id="c-cta-text" value="Learn More" required>
-                        <label for="c-cta-path">Button Link</label><div class="link-input-group"><span class="link-prefix">https://nags-p.github.io/sahyadriconsanddev.web/</span><input type="text" id="c-cta-path" required></div>
-                        <h2>Select Segments</h2>
-                        <div id="segment-container"></div>
-                        <div class="button-group"><button type="button" id="btn-preview" class="btn-info">Preview</button><button type="button" id="btn-send-test" class="btn-secondary">Send Test</button><button type="submit" id="btn-send-campaign" class="btn-primary">Send Campaign</button></div>
-                        <div class="loader" id="campaign-loader"></div><div id="campaign-status" class="status-message"></div>
-                    </form>
-                </div>
-            </div>
-            <div id="page-customers" class="page">
-                <div class="content-box">
-                    <h2>Customer Management</h2>
-                    <input type="text" id="customer-search" placeholder="Search by any field..." style="margin-bottom: 15px;">
-                    <div style="overflow-x: auto;">
-                        <table id="customer-table">
-                            <thead></thead>
-                            <tbody><tr><td colspan="4">Loading...</td></tr></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- ... Sidebar and Main Content HTML has no changes ... -->
+        <div class="sidebar"> <div class="sidebar-header"><h1>Admin Panel</h1></div> <nav class="sidebar-nav"> <ul> <li id="nav-promotions" class="active" data-page="page-promotions">Promotions</li> <li id="nav-customers" data-page="page-customers">Customers</li> </ul> </nav> </div> <div class="main-content"> <div id="page-promotions" class="page active"> <div class="content-box"> <form id="campaign-form"> <h2>Compose Promotion</h2> <label for="c-subject">Email Subject</label><input type="text" id="c-subject" required> <label for="c-headline">Headline</label><input type="text" id="c-headline" required> <label for="c-image-list">Main Image</label><select id="c-image-list" required><option value="" disabled selected>Loading...</option></select> <label for="c-body">Body Text</label><textarea id="c-body" required></textarea> <label for="c-cta-text">Button Text</label><input type="text" id="c-cta-text" value="Learn More" required> <label for="c-cta-path">Button Link</label><div class="link-input-group"><span class="link-prefix">https://nags-p.github.io/sahyadriconsanddev.web/</span><input type="text" id="c-cta-path" required></div> <h2>Select Segments</h2> <div id="segment-container"></div> <div class="button-group"><button type="button" id="btn-preview" class="btn-info">Preview</button><button type="button" id="btn-send-test" class="btn-secondary">Send Test</button><button type="submit" id="btn-send-campaign" class="btn-primary">Send Campaign</button></div> <div class="loader" id="campaign-loader"></div><div id="campaign-status" class="status-message"></div> </form> </div> </div> <div id="page-customers" class="page"> <div class="content-box"> <h2>Customer Management</h2> <input type="text" id="customer-search" placeholder="Search by any field..." style="margin-bottom: 15px;"> <div style="overflow-x: auto;"> <table id="customer-table"> <thead></thead> <tbody><tr><td colspan="4">Loading...</td></tr></tbody> </table> </div> </div> </div> </div>
     </div>
 <script>
-    // --- CONFIG & STATE ---
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzHWHxwxmT9ingtPTj4apLf7qpghOKexMtmhvfvSYBm2LZaqmXrwFyhRY6vTMib2Yy/exec';
-    const IMAGE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/images/promotion/';
-    const WEBSITE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/';
-    let masterTemplateHtml = '', allCustomers = [], customerHeaders = [];
+    // ... other constants have no changes ...
+    const IMAGE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/images/promotion/'; const WEBSITE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/'; let masterTemplateHtml = '', allCustomers = [], customerHeaders = [];
+    const dom = { loginOverlay: document.getElementById('login-overlay'), dashboardLayout: document.getElementById('dashboard-layout'), loginForm: document.getElementById('login-form'), campaignForm: document.getElementById('campaign-form'), loginStatus: document.getElementById('login-status'), campaignStatus: document.getElementById('campaign-status'), campaignLoader: document.getElementById('campaign-loader'), segmentContainer: document.getElementById('segment-container'), imageList: document.getElementById('c-image-list'), btnPreview: document.getElementById('btn-preview'), btnSendTest: document.getElementById('btn-send-test'), btnSendCampaign: document.getElementById('btn-send-campaign'), customerTableBody: document.querySelector('#customer-table tbody'), customerTableHead: document.querySelector('#customer-table thead'), customerSearch: document.getElementById('customer-search') }; const navItems = document.querySelectorAll('.sidebar-nav li');
     
-    // --- DOM ELEMENTS ---
-    const dom = { loginOverlay: document.getElementById('login-overlay'), dashboardLayout: document.getElementById('dashboard-layout'), loginForm: document.getElementById('login-form'), campaignForm: document.getElementById('campaign-form'), loginStatus: document.getElementById('login-status'), campaignStatus: document.getElementById('campaign-status'), campaignLoader: document.getElementById('campaign-loader'), segmentContainer: document.getElementById('segment-container'), imageList: document.getElementById('c-image-list'), btnPreview: document.getElementById('btn-preview'), btnSendTest: document.getElementById('btn-send-test'), btnSendCampaign: document.getElementById('btn-send-campaign'), customerTableBody: document.querySelector('#customer-table tbody'), customerTableHead: document.querySelector('#customer-table thead'), customerSearch: document.getElementById('customer-search') };
-    const navItems = document.querySelectorAll('.sidebar-nav li');
-
-    // --- CORE API & UI FUNCTIONS ---
-    function callApi(action, payload, callback) { setLoading(true); const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random()); window[callbackName] = function(data) { setLoading(false); callback(data); document.body.removeChild(document.getElementById(callbackName)); delete window[callbackName]; }; const scriptTag = document.createElement('script'); scriptTag.id = callbackName; scriptTag.src = `${SCRIPT_URL}?action=${action}&payload=${encodeURIComponent(JSON.stringify(payload))}&callback=${callbackName}`; scriptTag.onerror = () => { setLoading(false); callback({success: false, message: "Network Error: Failed to contact the API."}); }; document.body.appendChild(scriptTag); }
-    function setLoading(isLoading) { Object.values(dom).filter(el => el && el.tagName === 'BUTTON').forEach(btn => btn.disabled = isLoading); dom.campaignLoader.style.display = isLoading ? 'block' : 'none'; }
-
-    // --- PAGE NAVIGATION ---
-    function showPage(pageId) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-        navItems.forEach(n => n.classList.remove('active'));
-        document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
-        if (pageId === 'page-customers' && allCustomers.length === 0) {
-            dom.campaignLoader.textContent = 'Fetching customer list...';
-            callApi('getCustomers', {}, response => {
-                if (response.success) {
-                    allCustomers = response.customers;
-                    customerHeaders = response.headers;
-                    renderCustomerTable(allCustomers);
-                } else { dom.customerTableBody.innerHTML = `<tr><td colspan="${(customerHeaders && customerHeaders.length) || 4}">Error: ${response.message}</td></tr>`; }
-            });
-        }
-    }
-    
-    // --- CUSTOMER MANAGEMENT ---
-    function renderCustomerTable(customers) {
-        const tBody = dom.customerTableBody, tHead = dom.customerTableHead;
-        tBody.innerHTML = ''; tHead.innerHTML = '';
-        if (customers.length === 0) { tBody.innerHTML = `<tr><td colspan="${customerHeaders.length || 4}">No customers match your search.</td></tr>`; return; }
-        const headerRow = document.createElement('tr');
-        customerHeaders.forEach(header => { const th = document.createElement('th'); th.textContent = header; headerRow.appendChild(th); });
-        tHead.appendChild(headerRow);
-        customers.forEach(customer => {
-            const row = document.createElement('tr');
-            customerHeaders.forEach(header => { const td = document.createElement('td'); td.textContent = customer[header] || ''; row.appendChild(td); });
-            tBody.appendChild(row);
-        });
-    }
-
-    // --- PROMOTIONS PAGE HELPERS ---
-    function populateCheckboxes(segments = []) { dom.segmentContainer.innerHTML = ''; createCheckbox('All', 'All Customers', true); if (segments.length > 0) { segments.forEach(segment => createCheckbox(segment, segment)); } dom.segmentContainer.addEventListener('change', handleSegmentChange); }
-    function createCheckbox(value, text, checked = false) { const label = document.createElement('label'); label.className = 'checkbox-item'; const input = document.createElement('input'); input.type = 'checkbox'; input.value = value; input.checked = checked; const span = document.createElement('span'); span.className = 'checkmark'; label.appendChild(input); label.appendChild(document.createTextNode(` ${text}`)); label.appendChild(span); dom.segmentContainer.appendChild(label); }
-    function populateImages(images = []) { const list = dom.imageList; list.innerHTML = ''; if (images.length === 0) { list.innerHTML = '<option value="" disabled selected>No images found.</option>'; } else { images.forEach(img => { const opt = document.createElement('option'); opt.value = img; opt.textContent = img; list.appendChild(opt); }); } }
-    function handleSegmentChange(e) { const allCheckbox = dom.segmentContainer.querySelector('input[value="All"]'); const otherCheckboxes = Array.from(dom.segmentContainer.querySelectorAll('input:not([value="All"])')); if (e.target.value === 'All') { otherCheckboxes.forEach(cb => cb.checked = e.target.checked); } else { allCheckbox.checked = otherCheckboxes.length > 0 && otherCheckboxes.every(cb => cb.checked); } }
-    function getSelectedSegments() { if (dom.segmentContainer.querySelector('input[value="All"]').checked) { return ['All']; } return Array.from(dom.segmentContainer.querySelectorAll('input:not([value="All"]):checked')).map(cb => cb.value); }
-    function getCampaignData() { return { subject: document.getElementById('c-subject').value, headline: document.getElementById('c-headline').value, image_filename: dom.imageList.value, body_text: document.getElementById('c-body').value, cta_text: document.getElementById('c-cta-text').value, cta_path: document.getElementById('c-cta-path').value }; }
-
-    // --- EVENT LISTENERS ---
+    // --- LOGIN EVENT LISTENER (WITH DIAGNOSTIC ALERT) ---
     dom.loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         dom.campaignLoader.textContent = 'Logging in...';
         callApi('checkPassword', { password: password.value }, response => {
+            // =============================================================
+            // --- THIS IS THE NEW DIAGNOSTIC TOOL ---
+            alert("API Version check: " + response.version); 
+            // =============================================================
             if (response.success) {
                 dom.loginOverlay.style.display = 'none';
                 dom.dashboardLayout.style.display = 'flex';
@@ -165,16 +54,19 @@
         });
     });
 
+    // --- All other functions have no changes ---
+    function callApi(action, payload, callback) { setLoading(true); const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random()); window[callbackName] = function(data) { setLoading(false); callback(data); document.body.removeChild(document.getElementById(callbackName)); delete window[callbackName]; }; const scriptTag = document.createElement('script'); scriptTag.id = callbackName; scriptTag.src = `${SCRIPT_URL}?action=${action}&payload=${encodeURIComponent(JSON.stringify(payload))}&callback=${callbackName}`; scriptTag.onerror = () => { setLoading(false); callback({success: false, message: "Network Error: Failed to contact the API."}); }; document.body.appendChild(scriptTag); }
+    function setLoading(isLoading) { Object.values(dom).filter(el => el && el.tagName === 'BUTTON').forEach(btn => btn.disabled = isLoading); dom.campaignLoader.style.display = isLoading ? 'block' : 'none'; }
+    function showPage(pageId) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(pageId).classList.add('active'); navItems.forEach(n => n.classList.remove('active')); document.querySelector(`[data-page="${pageId}"]`).classList.add('active'); if (pageId === 'page-customers' && allCustomers.length === 0) { dom.campaignLoader.textContent = 'Fetching customer list...'; callApi('getCustomers', {}, response => { if (response.success) { allCustomers = response.customers; customerHeaders = response.headers; renderCustomerTable(allCustomers); } else { dom.customerTableBody.innerHTML = `<tr><td colspan="${(customerHeaders && customerHeaders.length) || 4}">Error: ${response.message}</td></tr>`; } }); } }
+    function renderCustomerTable(customers) { const tBody = dom.customerTableBody, tHead = dom.customerTableHead; tBody.innerHTML = ''; tHead.innerHTML = ''; if (customers.length === 0) { tBody.innerHTML = `<tr><td colspan="${customerHeaders.length || 4}">No customers match your search.</td></tr>`; return; } const headerRow = document.createElement('tr'); customerHeaders.forEach(header => { const th = document.createElement('th'); th.textContent = header; headerRow.appendChild(th); }); tHead.appendChild(headerRow); customers.forEach(customer => { const row = document.createElement('tr'); customerHeaders.forEach(header => { const td = document.createElement('td'); td.textContent = customer[header] || ''; row.appendChild(td); }); tBody.appendChild(row); }); }
+    function populateCheckboxes(segments = []) { dom.segmentContainer.innerHTML = ''; createCheckbox('All', 'All Customers', true); if (segments.length > 0) { segments.forEach(segment => createCheckbox(segment, segment)); } dom.segmentContainer.addEventListener('change', handleSegmentChange); }
+    function createCheckbox(value, text, checked = false) { const label = document.createElement('label'); label.className = 'checkbox-item'; const input = document.createElement('input'); input.type = 'checkbox'; input.value = value; input.checked = checked; const span = document.createElement('span'); span.className = 'checkmark'; label.appendChild(input); label.appendChild(document.createTextNode(` ${text}`)); label.appendChild(span); dom.segmentContainer.appendChild(label); }
+    function populateImages(images = []) { const list = dom.imageList; list.innerHTML = ''; if (images.length === 0) { list.innerHTML = '<option value="" disabled selected>No images found.</option>'; } else { images.forEach(img => { const opt = document.createElement('option'); opt.value = img; opt.textContent = img; list.appendChild(opt); }); } }
+    function handleSegmentChange(e) { const allCheckbox = dom.segmentContainer.querySelector('input[value="All"]'); const otherCheckboxes = Array.from(dom.segmentContainer.querySelectorAll('input:not([value="All"])')); if (e.target.value === 'All') { otherCheckboxes.forEach(cb => cb.checked = e.target.checked); } else { allCheckbox.checked = otherCheckboxes.length > 0 && otherCheckboxes.every(cb => cb.checked); } }
+    function getSelectedSegments() { if (dom.segmentContainer.querySelector('input[value="All"]').checked) { return ['All']; } return Array.from(dom.segmentContainer.querySelectorAll('input:not([value="All"]):checked')).map(cb => cb.value); }
+    function getCampaignData() { return { subject: document.getElementById('c-subject').value, headline: document.getElementById('c-headline').value, image_filename: dom.imageList.value, body_text: document.getElementById('c-body').value, cta_text: document.getElementById('c-cta-text').value, cta_path: document.getElementById('c-cta-path').value }; }
     navItems.forEach(item => item.addEventListener('click', () => showPage(item.dataset.page)));
-    
-    dom.customerSearch.addEventListener('keyup', () => {
-        const searchTerm = dom.customerSearch.value.toLowerCase();
-        const filteredCustomers = allCustomers.filter(customer => 
-            Object.values(customer).some(val => String(val).toLowerCase().includes(searchTerm))
-        );
-        renderCustomerTable(filteredCustomers);
-    });
-    
+    dom.customerSearch.addEventListener('keyup', () => { const searchTerm = dom.customerSearch.value.toLowerCase(); const filteredCustomers = allCustomers.filter(customer => Object.values(customer).some(val => String(val).toLowerCase().includes(searchTerm))); renderCustomerTable(filteredCustomers); });
     dom.btnPreview.addEventListener('click', () => { if (!dom.campaignForm.checkValidity()) { dom.campaignForm.reportValidity(); return; } if (!masterTemplateHtml) return; const cData = getCampaignData(); const composedHtml = masterTemplateHtml.replace(/{{headline}}/g, cData.headline).replace(/{{image_url}}/g, IMAGE_BASE_URL + cData.image_filename).replace(/{{body_text}}/g, cData.body_text.replace(/\n/g, '<br>')).replace(/{{cta_text}}/g, cData.cta_text).replace(/{{cta_link}}/g, WEBSITE_BASE_URL + cData.cta_path).replace(/{{unsubscribe_link_text}}/g, 'Preview mode.'); const pWin = window.open('', '_blank'); pWin.document.write(composedHtml); pWin.document.close(); });
     dom.btnSendTest.addEventListener('click', () => { if (!dom.campaignForm.checkValidity()) { dom.campaignForm.reportValidity(); return; } const cData = getCampaignData(); dom.campaignStatus.style.display = 'none'; dom.campaignLoader.textContent = 'Sending test...'; callApi('sendTest', { campaignData: cData }, r => { dom.campaignStatus.textContent = r.message; dom.campaignStatus.className = r.success ? 'status-message success' : 'status-message error'; dom.campaignStatus.style.display = 'block'; }); });
     dom.campaignForm.addEventListener('submit', e => { e.preventDefault(); const segs = getSelectedSegments(); if (segs.length === 0) { alert('Select a segment.'); return; } const cData = getCampaignData(); const segText = segs.includes('All') ? "All Customers" : `${segs.length} segment(s)`; if (!confirm(`Send campaign to ${segText}?`)) return; dom.campaignStatus.style.display = 'none'; dom.campaignLoader.textContent = 'Sending campaign...'; callApi('runCampaign', { campaignData: cData, segments: segs }, r => { dom.campaignStatus.textContent = r.message; dom.campaignStatus.className = r.success ? 'status-message success' : 'status-message error'; dom.campaignStatus.style.display = 'block'; }); });
