@@ -11,33 +11,326 @@
     </style>
 </head>
 <body>
-    <div id="login-overlay" class="login-overlay"> <div class="content-box" style="max-width: 400px; width: 100%;"> <h1>Admin Login</h1> <form id="login-form"> <label for="password">Password</label> <input type="password" id="password" required> <div class="button-group" style="margin-top:10px;"><button type="submit" class="btn-primary">Login</button></div> <div id="login-status" class="status-message"></div> </form> </div> </div>
-    <div class="dashboard-layout" id="dashboard-layout" style="display: none;"> <div class="sidebar"> <div class="sidebar-header"><h1>Admin Panel</h1></div> <nav class="sidebar-nav"> <ul> <li id="nav-promotions" class="active" data-page="page-promotions">Promotions</li> <li id="nav-customers" data-page="page-customers">Customers</li> </ul> </nav> </div> <div class="main-content"> <div id="page-promotions" class="page active"> <div class="content-box"> <form id="campaign-form"> <h2>Compose Promotion</h2> <label for="c-subject">Email Subject</label><input type="text" id="c-subject" required> <label for="c-headline">Headline</label><input type="text" id="c-headline" required> <label for="c-image-list">Main Image</label><select id="c-image-list" required><option value="" disabled selected>Loading...</option></select> <label for="c-body">Body Text</label><textarea id="c-body" required></textarea> <label for="c-cta-text">Button Text</label><input type="text" id="c-cta-text" value="Learn More" required> <label for="c-cta-path">Button Link</label><div class="link-input-group"><span class="link-prefix">https://nags-p.github.io/sahyadriconsanddev.web/</span><input type="text" id="c-cta-path" required></div> <h2>Select Segments</h2> <div id="segment-container"></div> <div class="button-group"><button type="button" id="btn-preview" class="btn-info">Preview</button><button type="button" id="btn-send-test" class="btn-secondary">Send Test</button><button type="submit" id="btn-send-campaign" class="btn-primary">Send Campaign</button></div> <div class="loader" id="campaign-loader"></div><div id="campaign-status" class="status-message"></div> </form> </div> </div> <div id="page-customers" class="page"> <div class="content-box"> <h2>Customer Management</h2> <input type="text" id="customer-search" placeholder="Search by any field..." style="margin-bottom: 15px;"> <div style="overflow-x: auto;"> <table id="customer-table"> <thead></thead> <tbody><tr><td colspan="4">Loading...</td></tr></tbody> </table> </div> </div> </div> </div> </div>
+    <div id="login-overlay" class="login-overlay">
+        <div class="content-box" style="max-width: 400px; width: 100%;">
+            <h1>Admin Login</h1>
+            <form id="login-form">
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+                <div class="button-group" style="margin-top:10px;"><button type="submit" class="btn-primary">Login</button></div>
+                <div id="login-status" class="status-message"></div>
+            </form>
+        </div>
+    </div>
+    <div class="dashboard-layout" id="dashboard-layout" style="display: none;">
+        <div class="sidebar">
+            <div class="sidebar-header"><h1>Admin Panel</h1></div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li id="nav-promotions" class="active" data-page="page-promotions">Promotions</li>
+                    <li id="nav-customers" data-page="page-customers">Customers</li>
+                </ul>
+            </nav>
+        </div>
+        <div class="main-content">
+            <div id="page-promotions" class="page active">
+                <div class="content-box">
+                    <form id="campaign-form">
+                        <h2>Compose Promotion</h2>
+                        <label for="c-subject">Email Subject</label><input type="text" id="c-subject" required>
+                        <label for="c-headline">Headline</label><input type="text" id="c-headline" required>
+                        <label for="c-image-list">Main Image</label><select id="c-image-list" required><option value="" disabled selected>Loading...</option></select>
+                        <label for="c-body">Body Text</label><textarea id="c-body" required></textarea>
+                        <label for="c-cta-text">Button Text</label><input type="text" id="c-cta-text" value="Learn More" required>
+                        <label for="c-cta-path">Button Link</label><div class="link-input-group"><span class="link-prefix">https://nags-p.github.io/sahyadriconsanddev.web/</span><input type="text" id="c-cta-path" required></div>
+
+                        <h2>Select Segments</h2>
+                        <div id="segment-container"></div>
+
+                        <div class="button-group">
+                            <button type="button" id="btn-preview" class="btn-info">Preview</button>
+                            <button type="button" id="btn-send-test" class="btn-secondary">Send Test</button>
+                            <button type="submit" id="btn-send-campaign" class="btn-primary">Send Campaign</button>
+                        </div>
+                        <div class="loader" id="campaign-loader"></div>
+                        <div id="campaign-status" class="status-message"></div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="page-customers" class="page">
+                <div class="content-box">
+                    <h2>Customer Management</h2>
+                    <input type="text" id="customer-search" placeholder="Search by any field..." style="margin-bottom: 15px;">
+                    <div style="overflow-x: auto;">
+                        <table id="customer-table">
+                            <thead></thead>
+                            <tbody><tr><td colspan="4">Loading...</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzHWHxwxmT9ingtPTj4apLf7qpghOKexMtmhvfvSYBm2LZaqmXrwFyhRY6vTMib2Yy/exec';
     const IMAGE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/images/promotion/';
     const WEBSITE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/';
     let masterTemplateHtml = '', allCustomers = [], customerHeaders = [];
-    const dom = { loginOverlay: document.getElementById('login-overlay'), dashboardLayout: document.getElementById('dashboard-layout'), loginForm: document.getElementById('login-form'), campaignForm: document.getElementById('campaign-form'), loginStatus: document.getElementById('login-status'), campaignStatus: document.getElementById('campaign-status'), campaignLoader: document.getElementById('campaign-loader'), segmentContainer: document.getElementById('segment-container'), imageList: document.getElementById('c-image-list'), btnPreview: document.getElementById('btn-preview'), btnSendTest: document.getElementById('btn-send-test'), btnSendCampaign: document.getElementById('btn-send-campaign'), customerTableBody: document.querySelector('#customer-table tbody'), customerTableHead: document.querySelector('#customer-table thead'), customerSearch: document.getElementById('customer-search') };
+    const dom = {
+        loginOverlay: document.getElementById('login-overlay'),
+        dashboardLayout: document.getElementById('dashboard-layout'),
+        loginForm: document.getElementById('login-form'),
+        campaignForm: document.getElementById('campaign-form'),
+        loginStatus: document.getElementById('login-status'),
+        campaignStatus: document.getElementById('campaign-status'),
+        campaignLoader: document.getElementById('campaign-loader'),
+        segmentContainer: document.getElementById('segment-container'),
+        imageList: document.getElementById('c-image-list'),
+        btnPreview: document.getElementById('btn-preview'),
+        btnSendTest: document.getElementById('btn-send-test'),
+        btnSendCampaign: document.getElementById('btn-send-campaign'),
+        customerTableBody: document.querySelector('#customer-table tbody'),
+        customerTableHead: document.querySelector('#customer-table thead'),
+        customerSearch: document.getElementById('customer-search')
+    };
     const navItems = document.querySelectorAll('.sidebar-nav li');
     
     // --- All functions are unchanged from the previous correct version ---
-    function callApi(action, payload, callback) { setLoading(true); const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random()); window[callbackName] = function(data) { setLoading(false); callback(data); document.body.removeChild(document.getElementById(callbackName)); delete window[callbackName]; }; const scriptTag = document.createElement('script'); scriptTag.id = callbackName; scriptTag.src = `${SCRIPT_URL}?action=${action}&payload=${encodeURIComponent(JSON.stringify(payload))}&callback=${callbackName}`; scriptTag.onerror = () => { setLoading(false); callback({success: false, message: "Network Error: Failed to contact the API."}); }; document.body.appendChild(scriptTag); }
-    function setLoading(isLoading) { Object.values(dom).filter(el => el && el.tagName === 'BUTTON').forEach(btn => btn.disabled = isLoading); dom.campaignLoader.style.display = isLoading ? 'block' : 'none'; }
-    function showPage(pageId) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(pageId).classList.add('active'); navItems.forEach(n => n.classList.remove('active')); document.querySelector(`[data-page="${pageId}"]`).classList.add('active'); if (pageId === 'page-customers' && allCustomers.length === 0) { dom.campaignLoader.textContent = 'Fetching customer list...'; callApi('getCustomers', {}, response => { if (response.success) { allCustomers = response.customers; customerHeaders = response.headers; renderCustomerTable(allCustomers); } else { dom.customerTableBody.innerHTML = `<tr><td colspan="${(customerHeaders && customerHeaders.length) || 4}">Error: ${response.message}</td></tr>`; } }); } }
-    function renderCustomerTable(customers) { const tBody = dom.customerTableBody, tHead = dom.customerTableHead; tBody.innerHTML = ''; tHead.innerHTML = ''; if (customers.length === 0) { tBody.innerHTML = `<tr><td colspan="${customerHeaders.length || 4}">No customers match your search.</td></tr>`; return; } const headerRow = document.createElement('tr'); customerHeaders.forEach(header => { const th = document.createElement('th'); th.textContent = header; headerRow.appendChild(th); }); tHead.appendChild(headerRow); customers.forEach(customer => { const row = document.createElement('tr'); customerHeaders.forEach(header => { const td = document.createElement('td'); td.textContent = customer[header] || ''; row.appendChild(td); }); tBody.appendChild(row); }); }
-    function populateCheckboxes(segments = []) { dom.segmentContainer.innerHTML = ''; createCheckbox('All', 'All Customers', true); if (segments.length > 0) { segments.forEach(segment => createCheckbox(segment, segment)); } dom.segmentContainer.addEventListener('change', handleSegmentChange); }
-    function createCheckbox(value, text, checked = false) { const label = document.createElement('label'); label.className = 'checkbox-item'; const input = document.createElement('input'); input.type = 'checkbox'; input.value = value; input.checked = checked; const span = document.createElement('span'); span.className = 'checkmark'; label.appendChild(input); label.appendChild(document.createTextNode(` ${text}`)); label.appendChild(span); dom.segmentContainer.appendChild(label); }
-    function populateImages(images = []) { const list = dom.imageList; list.innerHTML = ''; if (images.length === 0) { list.innerHTML = '<option value="" disabled selected>No images found.</option>'; } else { images.forEach(img => { const opt = document.createElement('option'); opt.value = img; opt.textContent = img; list.appendChild(opt); }); } }
-    function handleSegmentChange(e) { const allCheckbox = dom.segmentContainer.querySelector('input[value="All"]'); const otherCheckboxes = Array.from(dom.segmentContainer.querySelectorAll('input:not([value="All"])')); if (e.target.value === 'All') { otherCheckboxes.forEach(cb => cb.checked = e.target.checked); } else { allCheckbox.checked = otherCheckboxes.length > 0 && otherCheckboxes.every(cb => cb.checked); } }
-    function getSelectedSegments() { if (dom.segmentContainer.querySelector('input[value="All"]').checked) { return ['All']; } return Array.from(dom.segmentContainer.querySelectorAll('input:not([value="All"]):checked')).map(cb => cb.value); }
-    function getCampaignData() { return { subject: document.getElementById('c-subject').value, headline: document.getElementById('c-headline').value, image_filename: dom.imageList.value, body_text: document.getElementById('c-body').value, cta_text: document.getElementById('c-cta-text').value, cta_path: document.getElementById('c-cta-path').value }; }
-    dom.loginForm.addEventListener('submit', function(e) { e.preventDefault(); dom.campaignLoader.textContent = 'Logging in...'; callApi('checkPassword', { password: password.value }, response => { if (response.success) { dom.loginOverlay.style.display = 'none'; dom.dashboardLayout.style.display = 'flex'; dom.campaignLoader.textContent = 'Fetching promotions data...'; callApi('getDashboardData', {}, data => { if (data.success) { masterTemplateHtml = data.templateHtml; populateCheckboxes(data.segments); populateImages(data.images); } else { alert('Error fetching promotions data: ' + data.message); } }); } else { dom.loginStatus.textContent = 'Incorrect password.'; dom.loginStatus.className = 'status-message error'; dom.loginStatus.style.display = 'block'; } }); });
+    function callApi(action, payload, callback) {
+        setLoading(true);
+        const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+        window[callbackName] = function(data) {
+            setLoading(false);
+            callback(data);
+            document.body.removeChild(document.getElementById(callbackName));
+            delete window[callbackName];
+        };
+        const scriptTag = document.createElement('script');
+        scriptTag.id = callbackName;
+        scriptTag.src = `${SCRIPT_URL}?action=${action}&payload=${encodeURIComponent(JSON.stringify(payload))}&callback=${callbackName}`;
+        scriptTag.onerror = () => {
+            setLoading(false);
+            callback({success: false, message: "Network Error: Failed to contact the API."});
+        };
+        document.body.appendChild(scriptTag);
+    }
+
+    function setLoading(isLoading) {
+        // Disable all buttons to prevent double submissions during API calls
+        Object.values(dom).filter(el => el && el.tagName === 'BUTTON').forEach(btn => btn.disabled = isLoading);
+        dom.campaignLoader.style.display = isLoading ? 'block' : 'none';
+    }
+
+    function showPage(pageId) {
+        // Hide all pages and deactivate all nav items
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        navItems.forEach(n => n.classList.remove('active'));
+        document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+
+        // Load customers only when navigating to the customers page for the first time
+        if (pageId === 'page-customers' && allCustomers.length === 0) {
+            dom.campaignLoader.textContent = 'Fetching customer list...'; // Use campaignLoader for customer page too
+            callApi('getCustomers', {}, response => {
+                if (response.success) {
+                    allCustomers = response.customers;
+                    customerHeaders = response.headers; // Store headers for rendering
+                    renderCustomerTable(allCustomers);
+                } else {
+                    dom.customerTableBody.innerHTML = `<tr><td colspan="${(customerHeaders && customerHeaders.length) || 4}">Error: ${response.message}</td></tr>`;
+                }
+            });
+        }
+    }
+
+    function renderCustomerTable(customers) {
+        const tBody = dom.customerTableBody;
+        const tHead = dom.customerTableHead;
+        tBody.innerHTML = '';
+        tHead.innerHTML = ''; // Clear existing headers
+
+        if (customers.length === 0) {
+            tBody.innerHTML = `<tr><td colspan="${customerHeaders.length || 4}">No customers match your search.</td></tr>`;
+            return;
+        }
+
+        // Render headers
+        const headerRow = document.createElement('tr');
+        customerHeaders.forEach(header => {
+            const th = document.createElement('th');
+            th.textContent = header;
+            headerRow.appendChild(th);
+        });
+        tHead.appendChild(headerRow);
+
+        // Render customer data
+        customers.forEach(customer => {
+            const row = document.createElement('tr');
+            customerHeaders.forEach(header => { // Use stored headers to ensure order and completeness
+                const td = document.createElement('td');
+                td.textContent = customer[header] || ''; // Use customer object with header keys
+                row.appendChild(td);
+            });
+            tBody.appendChild(row);
+        });
+    }
+
+    function populateCheckboxes(segments = []) {
+        dom.segmentContainer.innerHTML = '';
+        createCheckbox('All', 'All Customers', true); // Add 'All Customers' checkbox
+        if (segments.length > 0) {
+            segments.forEach(segment => createCheckbox(segment, segment));
+        }
+        dom.segmentContainer.addEventListener('change', handleSegmentChange);
+    }
+
+    function createCheckbox(value, text, checked = false) {
+        const label = document.createElement('label');
+        label.className = 'checkbox-item';
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.value = value;
+        input.checked = checked;
+        const span = document.createElement('span');
+        span.className = 'checkmark';
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(` ${text}`)); // Text node for label
+        label.appendChild(span);
+        dom.segmentContainer.appendChild(label);
+    }
+
+    function handleSegmentChange(e) {
+        const allCheckbox = dom.segmentContainer.querySelector('input[value="All"]');
+        const otherCheckboxes = Array.from(dom.segmentContainer.querySelectorAll('input:not([value="All"])'));
+
+        if (e.target.value === 'All') {
+            // If 'All' is checked/unchecked, apply to all others
+            otherCheckboxes.forEach(cb => cb.checked = e.target.checked);
+        } else {
+            // If any other checkbox changes, update 'All' status
+            allCheckbox.checked = otherCheckboxes.length > 0 && otherCheckboxes.every(cb => cb.checked);
+        }
+    }
+
+    function getSelectedSegments() {
+        if (dom.segmentContainer.querySelector('input[value="All"]').checked) {
+            return ['All']; // If 'All Customers' is checked, just return 'All'
+        }
+        // Otherwise, return values of all other checked checkboxes
+        return Array.from(dom.segmentContainer.querySelectorAll('input:not([value="All"]):checked')).map(cb => cb.value);
+    }
+
+    function getCampaignData() {
+        return {
+            subject: document.getElementById('c-subject').value,
+            headline: document.getElementById('c-headline').value,
+            image_filename: dom.imageList.value,
+            body_text: document.getElementById('c-body').value,
+            cta_text: document.getElementById('c-cta-text').value,
+            cta_path: document.getElementById('c-cta-path').value
+        };
+    }
+
+    // --- Event Listeners ---
+    dom.loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        dom.campaignLoader.textContent = 'Logging in...'; // Use campaignLoader for login too
+        callApi('checkPassword', { password: password.value }, response => {
+            if (response.success) {
+                dom.loginOverlay.style.display = 'none';
+                dom.dashboardLayout.style.display = 'flex'; // Show the dashboard
+
+                dom.campaignLoader.textContent = 'Fetching promotions data...'; // Indicate loading for promotions
+                callApi('getDashboardData', {}, data => {
+                    if (data.success) {
+                        masterTemplateHtml = data.templateHtml;
+                        populateCheckboxes(data.segments);
+                        populateImages(data.images);
+                    } else {
+                        alert('Error fetching promotions data: ' + data.message);
+                    }
+                });
+            } else {
+                dom.loginStatus.textContent = 'Incorrect password.';
+                dom.loginStatus.className = 'status-message error';
+                dom.loginStatus.style.display = 'block';
+            }
+        });
+    });
+
     navItems.forEach(item => item.addEventListener('click', () => showPage(item.dataset.page)));
-    dom.customerSearch.addEventListener('keyup', () => { const searchTerm = dom.customerSearch.value.toLowerCase(); const filteredCustomers = allCustomers.filter(customer => Object.values(customer).some(val => String(val).toLowerCase().includes(searchTerm))); renderCustomerTable(filteredCustomers); });
-    dom.btnPreview.addEventListener('click', () => { if (!dom.campaignForm.checkValidity()) { dom.campaignForm.reportValidity(); return; } if (!masterTemplateHtml) return; const cData = getCampaignData(); const composedHtml = masterTemplateHtml.replace(/{{headline}}/g, cData.headline).replace(/{{image_url}}/g, IMAGE_BASE_URL + cData.image_filename).replace(/{{body_text}}/g, cData.body_text.replace(/\n/g, '<br>')).replace(/{{cta_text}}/g, cData.cta_text).replace(/{{cta_link}}/g, WEBSITE_BASE_URL + cData.cta_path).replace(/{{unsubscribe_link_text}}/g, 'Preview mode.'); const pWin = window.open('', '_blank'); pWin.document.write(composedHtml); pWin.document.close(); });
-    dom.btnSendTest.addEventListener('click', () => { if (!dom.campaignForm.checkValidity()) { dom.campaignForm.reportValidity(); return; } const cData = getCampaignData(); dom.campaignStatus.style.display = 'none'; dom.campaignLoader.textContent = 'Sending test...'; callApi('sendTest', { campaignData: cData }, r => { dom.campaignStatus.textContent = r.message; dom.campaignStatus.className = r.success ? 'status-message success' : 'status-message error'; dom.campaignStatus.style.display = 'block'; }); });
-    dom.campaignForm.addEventListener('submit', e => { e.preventDefault(); const segs = getSelectedSegments(); if (segs.length === 0) { alert('Select a segment.'); return; } const cData = getCampaignData(); const segText = segs.includes('All') ? "All Customers" : `${segs.length} segment(s)`; if (!confirm(`Send campaign to ${segText}?`)) return; dom.campaignStatus.style.display = 'none'; dom.campaignLoader.textContent = 'Sending campaign...'; callApi('runCampaign', { campaignData: cData, segments: segs }, r => { dom.campaignStatus.textContent = r.message; dom.campaignStatus.className = r.success ? 'status-message success' : 'status-message error'; dom.campaignStatus.style.display = 'block'; }); });
+
+    dom.customerSearch.addEventListener('keyup', () => {
+        const searchTerm = dom.customerSearch.value.toLowerCase();
+        const filteredCustomers = allCustomers.filter(customer =>
+            Object.values(customer).some(val => String(val).toLowerCase().includes(searchTerm))
+        );
+        renderCustomerTable(filteredCustomers);
+    });
+
+    dom.btnPreview.addEventListener('click', () => {
+        if (!dom.campaignForm.checkValidity()) {
+            dom.campaignForm.reportValidity(); // Show native browser validation messages
+            return;
+        }
+        if (!masterTemplateHtml) return; // Prevent preview if template not loaded
+
+        const cData = getCampaignData();
+
+        // Basic replacement for preview - full logic is on server for sending
+        const composedHtml = masterTemplateHtml
+            .replace(/{{headline}}/g, cData.headline)
+            .replace(/{{image_url}}/g, IMAGE_BASE_URL + cData.image_filename)
+            .replace(/{{body_text}}/g, cData.body_text.replace(/\n/g, '<br>')) // Convert newlines to <br> for HTML
+            .replace(/{{cta_text}}/g, cData.cta_text)
+            .replace(/{{cta_link}}/g, WEBSITE_BASE_URL + cData.cta_path)
+            .replace(/{{unsubscribe_link_text}}/g, 'Preview mode.'); // Indicate preview mode for unsubscribe link
+
+        const pWin = window.open('', '_blank');
+        pWin.document.write(composedHtml);
+        pWin.document.close();
+    });
+
+    dom.btnSendTest.addEventListener('click', () => {
+        if (!dom.campaignForm.checkValidity()) {
+            dom.campaignForm.reportValidity();
+            return;
+        }
+        const cData = getCampaignData();
+        dom.campaignStatus.style.display = 'none'; // Hide previous status
+        dom.campaignLoader.textContent = 'Sending test...';
+        callApi('sendTest', { campaignData: cData }, r => {
+            dom.campaignStatus.textContent = r.message;
+            dom.campaignStatus.className = r.success ? 'status-message success' : 'status-message error';
+            dom.campaignStatus.style.display = 'block';
+        });
+    });
+
+    dom.campaignForm.addEventListener('submit', e => {
+        e.preventDefault(); // Prevent default form submission
+
+        const segs = getSelectedSegments();
+        if (segs.length === 0) {
+            alert('Select at least one segment to send the campaign.');
+            return;
+        }
+
+        const cData = getCampaignData();
+        const segText = segs.includes('All') ? "All Customers" : `${segs.length} segment(s)`;
+
+        if (!confirm(`Are you sure you want to send this campaign to ${segText}?`)) {
+            return; // User cancelled
+        }
+
+        dom.campaignStatus.style.display = 'none'; // Hide previous status
+        dom.campaignLoader.textContent = 'Sending campaign...';
+        callApi('runCampaign', { campaignData: cData, segments: segs }, r => {
+            dom.campaignStatus.textContent = r.message;
+            dom.campaignStatus.className = r.success ? 'status-message success' : 'status-message error';
+            dom.campaignStatus.style.display = 'block';
+        });
+    });
 </script>
 </body>
 </html>
