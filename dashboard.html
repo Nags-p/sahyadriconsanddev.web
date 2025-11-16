@@ -6,8 +6,122 @@
     <title>Sahyadri Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        /* ... CSS is unchanged ... */
-        body { font-family: 'Montserrat', sans-serif; background-color: #f4f7f9; margin: 0; } .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f7f9; display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box;} .dashboard-layout { display: flex; min-height: 100vh; } .sidebar { width: 220px; background-color: #2c3e50; color: white; display: flex; flex-direction: column; flex-shrink: 0; } .sidebar-header { text-align: center; padding: 20px; border-bottom: 1px solid #34495e; } .sidebar-header h1 { font-size: 20px; margin: 0; } .sidebar-nav { flex-grow: 1; } .sidebar-nav ul { list-style: none; padding: 0; margin: 0; } .sidebar-nav li { padding: 15px 25px; cursor: pointer; border-left: 4px solid transparent; transition: all 0.2s; } .sidebar-nav li:hover { background-color: #34495e; } .sidebar-nav li.active { background-color: #34495e; border-left-color: #3498db; } .main-content { flex-grow: 1; padding: 30px; overflow-x: auto; } .page { display: none; } .page.active { display: block; } .content-box { background: #fff; padding: 30px 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); } h2 { font-size: 24px; color: #333; border-bottom: 2px solid #8D6E63; padding-bottom: 8px; margin-top: 0; margin-bottom: 25px;} label { font-weight: 600; font-size: 14px; color: #555; display: block; margin-bottom: 8px; } input[type="text"], input[type="url"], input[type="password"], textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; margin-bottom: 15px; font-family: 'Montserrat', sans-serif;} .link-input-group { display: flex; align-items: center; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 15px; } .link-prefix { padding: 12px; background-color: #f7f7f7; color: #666; font-size: 14px; border-right: 1px solid #ddd; white-space: nowrap; } #c-cta-path { border: none; flex-grow: 1; margin-bottom: 0; } textarea { height: 120px; resize: vertical; } .button-group { display: flex; gap: 10px; margin-top: 25px; } button { flex-grow: 1; padding: 12px; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; } button:disabled { background-color: #ccc; cursor: not-allowed; } .btn-primary { background-color: #8D6E63; } .btn-primary:hover:not(:disabled) { background-color: #795548; } .btn-secondary { background-color: #607D8B; } .btn-secondary:hover:not(:disabled) { background-color: #546E7A; } .btn-info { background-color: #03A9F4; } .btn-info:hover:not(:disabled) { background-color: #0288D1; } .status-message { text-align: center; margin-top: 15px; font-size: 14px; font-weight: 600; padding: 10px; border-radius: 5px; display: none; word-break: break-word; } .status-message.success { color: #2e6b2e; background-color: #dff0d8; } .status-message.error { color: #a94442; background-color: #f2dede; } .loader { text-align: center; margin-top: 15px; font-weight: 600; color: #555; display: none; } .segment-container { border: 1px solid #ddd; border-radius: 5px; padding: 15px; max-height: 120px; overflow-y: auto; background-color: #fafafa; } .checkbox-item { display: block; position: relative; padding-left: 30px; margin-bottom: 10px; cursor: pointer; user-select: none; } .checkbox-item:last-child { margin-bottom: 0; } .checkbox-item input { position: absolute; opacity: 0; cursor: pointer; } .checkmark { position: absolute; top: 0; left: 0; height: 20px; width: 20px; background-color: #eee; border: 1px solid #ccc; border-radius: 3px; } .checkbox-item input:checked ~ .checkmark { background-color: #8D6E63; } .checkmark:after { content: ""; position: absolute; display: none; left: 7px; top: 3px; width: 5px; height: 10px; border: solid white; border-width: 0 3px 3px 0; transform: rotate(45deg); } .checkbox-item input:checked ~ .checkmark:after { display: block; } #customer-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; } #customer-table th, #customer-table td { border: 1px solid #ddd; padding: 10px; text-align: left; white-space: nowrap; } #customer-table th { background-color: #f8f8f8; position: sticky; top: 0; } #customer-table tbody tr:nth-child(even) { background-color: #f9f9f9; }
+        body { font-family: 'Montserrat', sans-serif; background-color: #f4f7f9; margin: 0; }
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f7f9; display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box;}
+        .dashboard-layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 220px; background-color: #2c3e50; color: white; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-header { text-align: center; padding: 20px; border-bottom: 1px solid #34495e; }
+        .sidebar-header h1 { font-size: 20px; margin: 0; }
+        .sidebar-nav { flex-grow: 1; }
+        .sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
+        .sidebar-nav li { padding: 15px 25px; cursor: pointer; border-left: 4px solid transparent; transition: all 0.2s; }
+        .sidebar-nav li:hover { background-color: #34495e; }
+        .sidebar-nav li.active { background-color: #34495e; border-left-color: #3498db; }
+        .main-content { flex-grow: 1; padding: 30px; overflow-x: auto; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .content-box { background: #fff; padding: 30px 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h2 { font-size: 24px; color: #333; border-bottom: 2px solid #8D6E63; padding-bottom: 8px; margin-top: 0; margin-bottom: 25px;}
+        label { font-weight: 600; font-size: 14px; color: #555; display: block; margin-bottom: 8px; }
+        input[type="text"], input[type="url"], input[type="password"], textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; margin-bottom: 15px; font-family: 'Montserrat', sans-serif;}
+        .link-input-group { display: flex; align-items: center; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 15px; }
+        .link-prefix { padding: 12px; background-color: #f7f7f7; color: #666; font-size: 14px; border-right: 1px solid #ddd; white-space: nowrap; }
+        #c-cta-path { border: none; flex-grow: 1; margin-bottom: 0; }
+        textarea { height: 120px; resize: vertical; }
+        .button-group { display: flex; gap: 10px; margin-top: 25px; }
+        button { flex-grow: 1; padding: 12px; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        .btn-primary { background-color: #8D6E63; }
+        .btn-primary:hover:not(:disabled) { background-color: #795548; }
+        .btn-secondary { background-color: #607D8B; }
+        .btn-secondary:hover:not(:disabled) { background-color: #546E7A; }
+        .btn-info { background-color: #03A9F4; }
+        .btn-info:hover:not(:disabled) { background-color: #0288D1; }
+        .btn-danger { background-color: #e74c3c; } /* New danger button for delete */
+        .btn-danger:hover:not(:disabled) { background-color: #c0392b; }
+        .btn-icon { /* Style for icon buttons */
+            flex-grow: 0;
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px; /* For icons */
+        }
+        .status-message { text-align: center; margin-top: 15px; font-size: 14px; font-weight: 600; padding: 10px; border-radius: 5px; display: none; word-break: break-word; }
+        .status-message.success { color: #2e6b2e; background-color: #dff0d8; }
+        .status-message.error { color: #a94442; background-color: #f2dede; }
+        .loader { text-align: center; margin-top: 15px; font-weight: 600; color: #555; display: none; }
+        .segment-container { border: 1px solid #ddd; border-radius: 5px; padding: 15px; max-height: 120px; overflow-y: auto; background-color: #fafafa; }
+        .checkbox-item { display: block; position: relative; padding-left: 30px; margin-bottom: 10px; cursor: pointer; user-select: none; }
+        .checkbox-item:last-child { margin-bottom: 0; }
+        .checkbox-item input { position: absolute; opacity: 0; cursor: pointer; }
+        .checkmark { position: absolute; top: 0; left: 0; height: 20px; width: 20px; background-color: #eee; border: 1px solid #ccc; border-radius: 3px; }
+        .checkbox-item input:checked ~ .checkmark { background-color: #8D6E63; }
+        .checkmark:after { content: ""; position: absolute; display: none; left: 7px; top: 3px; width: 5px; height: 10px; border: solid white; border-width: 0 3px 3px 0; transform: rotate(45deg); }
+        .checkbox-item input:checked ~ .checkmark:after { display: block; }
+        #customer-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        #customer-table th, #customer-table td { border: 1px solid #ddd; padding: 10px; text-align: left; white-space: nowrap; }
+        #customer-table th { background-color: #f8f8f8; position: sticky; top: 0; }
+        #customer-table tbody tr:nth-child(even) { background-color: #f9f9f9; }
+        .action-buttons { display: flex; gap: 5px; } /* For actions column */
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001; /* Above login overlay */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 90%;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 22px;
+            color: #333;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
+            padding: 5px;
+        }
+        .modal-close:hover {
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -22,6 +136,7 @@
             </form>
         </div>
     </div>
+
     <div class="dashboard-layout" id="dashboard-layout" style="display: none;">
         <div class="sidebar">
             <div class="sidebar-header"><h1>Admin Panel</h1></div>
@@ -68,15 +183,41 @@
                             <tbody><tr><td colspan="4">Loading...</td></tr></tbody>
                         </table>
                     </div>
+                    <div id="customer-status" class="status-message"></div> <!-- Status message for customer ops -->
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Edit Customer Modal (NEW) -->
+    <div id="edit-customer-modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Customer</h3>
+                <button type="button" class="modal-close" id="edit-modal-close">&times;</button>
+            </div>
+            <form id="edit-customer-form">
+                <!-- Inputs will be dynamically generated based on headers -->
+                <input type="hidden" id="edit-customer-rowid">
+                <div id="edit-customer-fields">
+                    <!-- Dynamic fields here -->
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn-secondary" id="edit-modal-cancel">Cancel</button>
+                    <button type="submit" class="btn-primary" id="edit-modal-save">Save Changes</button>
+                </div>
+                <div id="edit-customer-status" class="status-message"></div>
+            </form>
+        </div>
+    </div>
+
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyc0J8Pu0YVvFHLfPE3BfE5YaJ0Y-82cvyrlSpAUemi2GiOUrM02u1qcHB_xWScQj0w/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzHWHxwxmT9ingtPTj4apLf7qpghOKexMtmhvfvSYBm2LZaqmXrwFyhRY6vTMib2Yy/exec'; // <<-- UPDATE THIS WITH YOUR DEPLOYED SCRIPT URL
     const IMAGE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/images/promotion/';
     const WEBSITE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/';
-    let masterTemplateHtml = '', allCustomers = [], customerHeaders = [];
+    let masterTemplateHtml = '', allCustomers = [], customerHeaders = [], availableSegments = []; // Added availableSegments
+    let currentCustomerToEdit = null; // To store customer data when modal is open
+
     const dom = {
         loginOverlay: document.getElementById('login-overlay'),
         dashboardLayout: document.getElementById('dashboard-layout'),
@@ -86,19 +227,35 @@
         campaignStatus: document.getElementById('campaign-status'),
         campaignLoader: document.getElementById('campaign-loader'),
         segmentContainer: document.getElementById('segment-container'),
-        imageList: document.getElementById('c-image-list'), // <-- This is the element
+        imageList: document.getElementById('c-image-list'),
         btnPreview: document.getElementById('btn-preview'),
         btnSendTest: document.getElementById('btn-send-test'),
         btnSendCampaign: document.getElementById('btn-send-campaign'),
         customerTableBody: document.querySelector('#customer-table tbody'),
         customerTableHead: document.querySelector('#customer-table thead'),
-        customerSearch: document.getElementById('customer-search')
+        customerSearch: document.getElementById('customer-search'),
+        customerStatus: document.getElementById('customer-status'), // New for customer ops
+
+        // New DOM elements for edit modal
+        editCustomerModalOverlay: document.getElementById('edit-customer-modal-overlay'),
+        editCustomerForm: document.getElementById('edit-customer-form'),
+        editCustomerRowId: document.getElementById('edit-customer-rowid'),
+        editCustomerFields: document.getElementById('edit-customer-fields'),
+        editModalClose: document.getElementById('edit-modal-close'),
+        editModalCancel: document.getElementById('edit-modal-cancel'),
+        editCustomerStatus: document.getElementById('edit-customer-status')
     };
     const navItems = document.querySelectorAll('.sidebar-nav li');
     
     // --- All functions are unchanged from the previous correct version ---
-    function callApi(action, payload, callback) {
+    function callApi(action, payload, callback, errorElementId = 'campaign-status') { // Added errorElementId
         setLoading(true);
+        // Clear status message for the relevant section
+        const statusElement = document.getElementById(errorElementId);
+        if (statusElement) {
+            statusElement.style.display = 'none';
+        }
+
         const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
         window[callbackName] = function(data) {
             setLoading(false);
@@ -111,6 +268,14 @@
         scriptTag.src = `${SCRIPT_URL}?action=${action}&payload=${encodeURIComponent(JSON.stringify(payload))}&callback=${callbackName}`;
         scriptTag.onerror = () => {
             setLoading(false);
+            const errorStatusElement = document.getElementById(errorElementId);
+            if (errorStatusElement) {
+                errorStatusElement.textContent = "Network Error: Failed to contact the API.";
+                errorStatusElement.className = 'status-message error';
+                errorStatusElement.style.display = 'block';
+            } else {
+                alert("Network Error: Failed to contact the API.");
+            }
             callback({success: false, message: "Network Error: Failed to contact the API."});
         };
         document.body.appendChild(scriptTag);
@@ -119,6 +284,9 @@
     function setLoading(isLoading) {
         Object.values(dom).filter(el => el && el.tagName === 'BUTTON').forEach(btn => btn.disabled = isLoading);
         dom.campaignLoader.style.display = isLoading ? 'block' : 'none';
+        // Also control modal buttons separately
+        const modalButtons = dom.editCustomerModalOverlay.querySelectorAll('button');
+        modalButtons.forEach(btn => btn.disabled = isLoading);
     }
 
     function showPage(pageId) {
@@ -127,36 +295,70 @@
         navItems.forEach(n => n.classList.remove('active'));
         document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
 
-        if (pageId === 'page-customers' && allCustomers.length === 0) {
-            dom.campaignLoader.textContent = 'Fetching customer list...';
-            callApi('getCustomers', {}, response => {
-                if (response.success) {
-                    allCustomers = response.customers;
-                    customerHeaders = response.headers;
-                    renderCustomerTable(allCustomers);
-                } else {
-                    dom.customerTableBody.innerHTML = `<tr><td colspan="${(customerHeaders && customerHeaders.length) || 4}">Error: ${response.message}</td></tr>`;
-                }
-            });
+        // Only load customers if on the customers page AND they haven't been loaded yet
+        // Or if we need to force a refresh (e.g., after edit/delete)
+        if (pageId === 'page-customers' && allCustomers.length === 0) { // Removed condition to only load if empty
+             fetchCustomerData(); // Always fetch fresh data when navigating to customer tab
+        } else if (pageId === 'page-customers') {
+            // If already loaded, just ensure the table is rendered
+            renderCustomerTable(allCustomers);
         }
     }
+
+    // New function to fetch customer data
+    function fetchCustomerData() {
+        dom.campaignLoader.textContent = 'Fetching customer list...';
+        dom.campaignLoader.style.display = 'block'; // Ensure loader is visible
+        dom.customerTableBody.innerHTML = `<tr><td colspan="${(customerHeaders && customerHeaders.length) || 4}">Loading...</td></tr>`;
+        callApi('getCustomers', {}, response => {
+            dom.campaignLoader.style.display = 'none'; // Hide loader
+            if (response.success) {
+                allCustomers = response.customers;
+                customerHeaders = response.headers;
+                renderCustomerTable(allCustomers);
+            } else {
+                dom.customerTableBody.innerHTML = `<tr><td colspan="${(customerHeaders && customerHeaders.length) || 4}">Error: ${response.message}</td></tr>`;
+                showStatusMessage(dom.customerStatus, `Error loading customers: ${response.message}`, false);
+            }
+        }, 'customer-status'); // Pass customer-status for error messages
+        
+        // Also fetch segments for the edit modal dropdown
+        callApi('getSegments', {}, response => {
+            if (response.success) {
+                availableSegments = response.segments;
+            } else {
+                console.error('Failed to load available segments:', response.message);
+                // Optionally show error to user
+            }
+        });
+    }
+
 
     function renderCustomerTable(customers) {
         const tBody = dom.customerTableBody;
         const tHead = dom.customerTableHead;
         tBody.innerHTML = '';
         tHead.innerHTML = '';
+
         if (customers.length === 0) {
-            tBody.innerHTML = `<tr><td colspan="${customerHeaders.length || 4}">No customers match your search.</td></tr>`;
+            tBody.innerHTML = `<tr><td colspan="${(customerHeaders.length || 1) + 1}">No customers match your search.</td></tr>`; // +1 for Actions column
             return;
         }
+
+        // Render headers
         const headerRow = document.createElement('tr');
         customerHeaders.forEach(header => {
             const th = document.createElement('th');
             th.textContent = header;
             headerRow.appendChild(th);
         });
+        // Add new 'Actions' header
+        const actionsTh = document.createElement('th');
+        actionsTh.textContent = 'Actions';
+        headerRow.appendChild(actionsTh);
         tHead.appendChild(headerRow);
+
+        // Render customer data
         customers.forEach(customer => {
             const row = document.createElement('tr');
             customerHeaders.forEach(header => {
@@ -164,6 +366,27 @@
                 td.textContent = customer[header] || '';
                 row.appendChild(td);
             });
+            // Add action buttons
+            const actionsTd = document.createElement('td');
+            actionsTd.className = 'action-buttons';
+            const editBtn = document.createElement('button');
+            editBtn.textContent = 'Edit';
+            editBtn.className = 'btn-info btn-icon';
+            editBtn.title = 'Edit Customer';
+            editBtn.dataset.rowId = customer.rowId; // Store rowId for editing
+            editBtn.addEventListener('click', () => openEditCustomerModal(customer));
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.className = 'btn-danger btn-icon';
+            deleteBtn.title = 'Delete Customer';
+            deleteBtn.dataset.rowId = customer.rowId; // Store rowId for deleting
+            deleteBtn.addEventListener('click', () => deleteCustomerPrompt(customer.rowId, customer.Name || customer.Email)); // Pass name/email for confirmation
+
+            actionsTd.appendChild(editBtn);
+            actionsTd.appendChild(deleteBtn);
+            row.appendChild(actionsTd);
+
             tBody.appendChild(row);
         });
     }
@@ -193,27 +416,22 @@
     }
 
     function populateImages(images = []) {
-        console.log("populateImages called with:", images); // Add this line for debugging
         const list = dom.imageList;
         if (!list) {
             console.error("Error: dom.imageList element not found!");
             return;
         }
-        list.innerHTML = '';
+        list.innerHTML = ''; // Clear existing options
         if (images.length === 0) {
             list.innerHTML = '<option value="" disabled selected>No images found.</option>';
-            console.log("No images found, set default option.");
         } else {
             images.forEach(img => {
                 const opt = document.createElement('option');
                 opt.value = img;
                 opt.textContent = img;
                 list.appendChild(opt);
-                console.log("Added option:", img); // Add this line for debugging
             });
-            // Select the first image automatically if available
-            list.selectedIndex = 0; 
-            console.log("Images populated successfully. First item selected.");
+            list.selectedIndex = 0; // Select the first image automatically
         }
     }
 
@@ -245,6 +463,80 @@
         };
     }
 
+    function showStatusMessage(element, message, isSuccess) {
+        element.textContent = message;
+        element.className = isSuccess ? 'status-message success' : 'status-message error';
+        element.style.display = 'block';
+    }
+
+
+    // --- NEW CUSTOMER MANAGEMENT FUNCTIONS (Client-Side) ---
+
+    function openEditCustomerModal(customer) {
+        currentCustomerToEdit = customer;
+        dom.editCustomerRowId.value = customer.rowId;
+        dom.editCustomerFields.innerHTML = ''; // Clear previous fields
+        dom.editCustomerStatus.style.display = 'none'; // Hide previous status
+
+        customerHeaders.forEach(header => {
+            if (header === 'rowId') return; // Skip rowId as it's a hidden input
+
+            const label = document.createElement('label');
+            label.textContent = header;
+            label.htmlFor = `edit-${header.toLowerCase().replace(/\s/g, '-')}`;
+            dom.editCustomerFields.appendChild(label);
+
+            if (header === 'Segment') { // Special handling for Segment as a dropdown
+                const select = document.createElement('select');
+                select.id = `edit-${header.toLowerCase().replace(/\s/g, '-')}`;
+                select.name = header;
+                // Add an empty option
+                const emptyOpt = document.createElement('option');
+                emptyOpt.value = '';
+                emptyOpt.textContent = 'Select Segment';
+                select.appendChild(emptyOpt);
+
+                availableSegments.forEach(segment => {
+                    const opt = document.createElement('option');
+                    opt.value = segment;
+                    opt.textContent = segment;
+                    select.appendChild(opt);
+                });
+                select.value = customer[header] || ''; // Set current value
+                dom.editCustomerFields.appendChild(select);
+            } else { // Default to text input for other fields
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = `edit-${header.toLowerCase().replace(/\s/g, '-')}`;
+                input.name = header; // Use header name for easy data collection
+                input.value = customer[header] || '';
+                dom.editCustomerFields.appendChild(input);
+            }
+        });
+
+        dom.editCustomerModalOverlay.classList.add('active');
+    }
+
+    function closeEditCustomerModal() {
+        dom.editCustomerModalOverlay.classList.remove('active');
+        currentCustomerToEdit = null;
+    }
+
+    function deleteCustomerPrompt(rowId, customerIdentifier) {
+        if (confirm(`Are you sure you want to delete ${customerIdentifier || 'this customer'}? This action cannot be undone.`)) {
+            callApi('deleteCustomer', { rowId: rowId }, response => {
+                if (response.success) {
+                    showStatusMessage(dom.customerStatus, response.message, true);
+                    fetchCustomerData(); // Refresh table after deletion
+                } else {
+                    showStatusMessage(dom.customerStatus, response.message, false);
+                }
+            }, 'customer-status');
+        }
+    }
+
+
+    // --- Event Listeners ---
     dom.loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         dom.campaignLoader.textContent = 'Logging in...';
@@ -254,11 +546,11 @@
                 dom.dashboardLayout.style.display = 'flex';
                 dom.campaignLoader.textContent = 'Fetching promotions data...';
                 callApi('getDashboardData', {}, data => {
-                    console.log("Received getDashboardData response:", data); // Add this line
                     if (data.success) {
                         masterTemplateHtml = data.templateHtml;
                         populateCheckboxes(data.segments);
                         populateImages(data.images);
+                        availableSegments = data.segments; // Store segments for edit modal
                     } else {
                         alert('Error fetching promotions data: ' + data.message);
                     }
@@ -270,12 +562,17 @@
             }
         });
     });
+
     navItems.forEach(item => item.addEventListener('click', () => showPage(item.dataset.page)));
+
     dom.customerSearch.addEventListener('keyup', () => {
         const searchTerm = dom.customerSearch.value.toLowerCase();
-        const filteredCustomers = allCustomers.filter(customer => Object.values(customer).some(val => String(val).toLowerCase().includes(searchTerm)));
+        const filteredCustomers = allCustomers.filter(customer =>
+            Object.values(customer).some(val => String(val).toLowerCase().includes(searchTerm))
+        );
         renderCustomerTable(filteredCustomers);
     });
+
     dom.btnPreview.addEventListener('click', () => {
         if (!dom.campaignForm.checkValidity()) {
             dom.campaignForm.reportValidity();
@@ -283,11 +580,18 @@
         }
         if (!masterTemplateHtml) return;
         const cData = getCampaignData();
-        const composedHtml = masterTemplateHtml.replace(/{{headline}}/g, cData.headline).replace(/{{image_url}}/g, IMAGE_BASE_URL + cData.image_filename).replace(/{{body_text}}/g, cData.body_text.replace(/\n/g, '<br>')).replace(/{{cta_text}}/g, cData.cta_text).replace(/{{cta_link}}/g, WEBSITE_BASE_URL + cData.cta_path).replace(/{{unsubscribe_link_text}}/g, 'Preview mode.');
+        const composedHtml = masterTemplateHtml
+            .replace(/{{headline}}/g, cData.headline)
+            .replace(/{{image_url}}/g, IMAGE_BASE_URL + cData.image_filename)
+            .replace(/{{body_text}}/g, cData.body_text.replace(/\n/g, '<br>'))
+            .replace(/{{cta_text}}/g, cData.cta_text)
+            .replace(/{{cta_link}}/g, WEBSITE_BASE_URL + cData.cta_path)
+            .replace(/{{unsubscribe_link_text}}/g, 'Preview mode.');
         const pWin = window.open('', '_blank');
         pWin.document.write(composedHtml);
         pWin.document.close();
     });
+
     dom.btnSendTest.addEventListener('click', () => {
         if (!dom.campaignForm.checkValidity()) {
             dom.campaignForm.reportValidity();
@@ -302,16 +606,19 @@
             dom.campaignStatus.style.display = 'block';
         });
     });
+
     dom.campaignForm.addEventListener('submit', e => {
         e.preventDefault();
         const segs = getSelectedSegments();
         if (segs.length === 0) {
-            alert('Select a segment.');
+            alert('Select at least one segment to send the campaign.');
             return;
         }
         const cData = getCampaignData();
         const segText = segs.includes('All') ? "All Customers" : `${segs.length} segment(s)`;
-        if (!confirm(`Send campaign to ${segText}?`)) return;
+        if (!confirm(`Are you sure you want to send this campaign to ${segText}?`)) {
+            return;
+        }
         dom.campaignStatus.style.display = 'none';
         dom.campaignLoader.textContent = 'Sending campaign...';
         callApi('runCampaign', { campaignData: cData, segments: segs }, r => {
@@ -319,6 +626,44 @@
             dom.campaignStatus.className = r.success ? 'status-message success' : 'status-message error';
             dom.campaignStatus.style.display = 'block';
         });
+    });
+
+    // Event listeners for edit modal
+    dom.editModalClose.addEventListener('click', closeEditCustomerModal);
+    dom.editModalCancel.addEventListener('click', closeEditCustomerModal);
+    dom.editCustomerForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const rowId = dom.editCustomerRowId.value;
+        const updatedCustomerData = {};
+        customerHeaders.forEach(header => {
+            // Exclude rowId from data being sent to server for update
+            if (header === 'rowId' || header === 'Timestamp') return; // Timestamp is usually auto-generated/managed
+
+            const inputElement = document.getElementById(`edit-${header.toLowerCase().replace(/\s/g, '-')}`);
+            if (inputElement) {
+                updatedCustomerData[header] = inputElement.value;
+            }
+        });
+
+        callApi('editCustomer', { rowId: rowId, customerData: updatedCustomerData }, response => {
+            if (response.success) {
+                showStatusMessage(dom.editCustomerStatus, response.message, true);
+                fetchCustomerData(); // Refresh table after edit
+                // Optionally close modal after a short delay
+                setTimeout(closeEditCustomerModal, 1500);
+            } else {
+                showStatusMessage(dom.editCustomerStatus, response.message, false);
+            }
+        }, 'edit-customer-status'); // Pass modal's status element
+    });
+
+    // Initial customer data fetch when dashboard layout becomes visible (after login)
+    // This listener ensures customers are loaded once after successful login
+    // and also handles subsequent navigation.
+    document.addEventListener('DOMContentLoaded', () => {
+        // We defer initial customer load to after login in the loginForm listener
+        // But need to ensure segments are available if navigating to customers for first time.
+        // The getDashboardData call will get availableSegments initially.
     });
 </script>
 </body>
