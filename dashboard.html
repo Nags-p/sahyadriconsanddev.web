@@ -73,7 +73,7 @@
         </div>
     </div>
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx8AN3cP9GTOLoPnaz0-Iw6ah6PIUuoNLYoAw33LbMT22hRP-tAdqwo-g09kaVACvpw/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzHWHxwxmT9ingtPTj4apLf7qpghOKexMtmhvfvSYBm2LZaqmXrwFyhRY6vTMib2Yy/exec';
     const IMAGE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/images/promotion/';
     const WEBSITE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/';
     let masterTemplateHtml = '', allCustomers = [], customerHeaders = [];
@@ -86,7 +86,7 @@
         campaignStatus: document.getElementById('campaign-status'),
         campaignLoader: document.getElementById('campaign-loader'),
         segmentContainer: document.getElementById('segment-container'),
-        imageList: document.getElementById('c-image-list'),
+        imageList: document.getElementById('c-image-list'), // <-- This is the element
         btnPreview: document.getElementById('btn-preview'),
         btnSendTest: document.getElementById('btn-send-test'),
         btnSendCampaign: document.getElementById('btn-send-campaign'),
@@ -117,25 +117,22 @@
     }
 
     function setLoading(isLoading) {
-        // Disable all buttons to prevent double submissions during API calls
         Object.values(dom).filter(el => el && el.tagName === 'BUTTON').forEach(btn => btn.disabled = isLoading);
         dom.campaignLoader.style.display = isLoading ? 'block' : 'none';
     }
 
     function showPage(pageId) {
-        // Hide all pages and deactivate all nav items
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
         navItems.forEach(n => n.classList.remove('active'));
         document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
 
-        // Load customers only when navigating to the customers page for the first time
         if (pageId === 'page-customers' && allCustomers.length === 0) {
-            dom.campaignLoader.textContent = 'Fetching customer list...'; // Use campaignLoader for customer page too
+            dom.campaignLoader.textContent = 'Fetching customer list...';
             callApi('getCustomers', {}, response => {
                 if (response.success) {
                     allCustomers = response.customers;
-                    customerHeaders = response.headers; // Store headers for rendering
+                    customerHeaders = response.headers;
                     renderCustomerTable(allCustomers);
                 } else {
                     dom.customerTableBody.innerHTML = `<tr><td colspan="${(customerHeaders && customerHeaders.length) || 4}">Error: ${response.message}</td></tr>`;
@@ -148,14 +145,11 @@
         const tBody = dom.customerTableBody;
         const tHead = dom.customerTableHead;
         tBody.innerHTML = '';
-        tHead.innerHTML = ''; // Clear existing headers
-
+        tHead.innerHTML = '';
         if (customers.length === 0) {
             tBody.innerHTML = `<tr><td colspan="${customerHeaders.length || 4}">No customers match your search.</td></tr>`;
             return;
         }
-
-        // Render headers
         const headerRow = document.createElement('tr');
         customerHeaders.forEach(header => {
             const th = document.createElement('th');
@@ -163,13 +157,11 @@
             headerRow.appendChild(th);
         });
         tHead.appendChild(headerRow);
-
-        // Render customer data
         customers.forEach(customer => {
             const row = document.createElement('tr');
-            customerHeaders.forEach(header => { // Use stored headers to ensure order and completeness
+            customerHeaders.forEach(header => {
                 const td = document.createElement('td');
-                td.textContent = customer[header] || ''; // Use customer object with header keys
+                td.textContent = customer[header] || '';
                 row.appendChild(td);
             });
             tBody.appendChild(row);
@@ -178,7 +170,7 @@
 
     function populateCheckboxes(segments = []) {
         dom.segmentContainer.innerHTML = '';
-        createCheckbox('All', 'All Customers', true); // Add 'All Customers' checkbox
+        createCheckbox('All', 'All Customers', true);
         if (segments.length > 0) {
             segments.forEach(segment => createCheckbox(segment, segment));
         }
@@ -195,29 +187,50 @@
         const span = document.createElement('span');
         span.className = 'checkmark';
         label.appendChild(input);
-        label.appendChild(document.createTextNode(` ${text}`)); // Text node for label
+        label.appendChild(document.createTextNode(` ${text}`));
         label.appendChild(span);
         dom.segmentContainer.appendChild(label);
+    }
+
+    function populateImages(images = []) {
+        console.log("populateImages called with:", images); // Add this line for debugging
+        const list = dom.imageList;
+        if (!list) {
+            console.error("Error: dom.imageList element not found!");
+            return;
+        }
+        list.innerHTML = '';
+        if (images.length === 0) {
+            list.innerHTML = '<option value="" disabled selected>No images found.</option>';
+            console.log("No images found, set default option.");
+        } else {
+            images.forEach(img => {
+                const opt = document.createElement('option');
+                opt.value = img;
+                opt.textContent = img;
+                list.appendChild(opt);
+                console.log("Added option:", img); // Add this line for debugging
+            });
+            // Select the first image automatically if available
+            list.selectedIndex = 0; 
+            console.log("Images populated successfully. First item selected.");
+        }
     }
 
     function handleSegmentChange(e) {
         const allCheckbox = dom.segmentContainer.querySelector('input[value="All"]');
         const otherCheckboxes = Array.from(dom.segmentContainer.querySelectorAll('input:not([value="All"])'));
-
         if (e.target.value === 'All') {
-            // If 'All' is checked/unchecked, apply to all others
             otherCheckboxes.forEach(cb => cb.checked = e.target.checked);
         } else {
-            // If any other checkbox changes, update 'All' status
             allCheckbox.checked = otherCheckboxes.length > 0 && otherCheckboxes.every(cb => cb.checked);
         }
     }
 
     function getSelectedSegments() {
         if (dom.segmentContainer.querySelector('input[value="All"]').checked) {
-            return ['All']; // If 'All Customers' is checked, just return 'All'
+            return ['All'];
         }
-        // Otherwise, return values of all other checked checkboxes
         return Array.from(dom.segmentContainer.querySelectorAll('input:not([value="All"]):checked')).map(cb => cb.value);
     }
 
@@ -232,17 +245,16 @@
         };
     }
 
-    // --- Event Listeners ---
     dom.loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        dom.campaignLoader.textContent = 'Logging in...'; // Use campaignLoader for login too
+        dom.campaignLoader.textContent = 'Logging in...';
         callApi('checkPassword', { password: password.value }, response => {
             if (response.success) {
                 dom.loginOverlay.style.display = 'none';
-                dom.dashboardLayout.style.display = 'flex'; // Show the dashboard
-
-                dom.campaignLoader.textContent = 'Fetching promotions data...'; // Indicate loading for promotions
+                dom.dashboardLayout.style.display = 'flex';
+                dom.campaignLoader.textContent = 'Fetching promotions data...';
                 callApi('getDashboardData', {}, data => {
+                    console.log("Received getDashboardData response:", data); // Add this line
                     if (data.success) {
                         masterTemplateHtml = data.templateHtml;
                         populateCheckboxes(data.segments);
@@ -258,47 +270,31 @@
             }
         });
     });
-
     navItems.forEach(item => item.addEventListener('click', () => showPage(item.dataset.page)));
-
     dom.customerSearch.addEventListener('keyup', () => {
         const searchTerm = dom.customerSearch.value.toLowerCase();
-        const filteredCustomers = allCustomers.filter(customer =>
-            Object.values(customer).some(val => String(val).toLowerCase().includes(searchTerm))
-        );
+        const filteredCustomers = allCustomers.filter(customer => Object.values(customer).some(val => String(val).toLowerCase().includes(searchTerm)));
         renderCustomerTable(filteredCustomers);
     });
-
     dom.btnPreview.addEventListener('click', () => {
         if (!dom.campaignForm.checkValidity()) {
-            dom.campaignForm.reportValidity(); // Show native browser validation messages
+            dom.campaignForm.reportValidity();
             return;
         }
-        if (!masterTemplateHtml) return; // Prevent preview if template not loaded
-
+        if (!masterTemplateHtml) return;
         const cData = getCampaignData();
-
-        // Basic replacement for preview - full logic is on server for sending
-        const composedHtml = masterTemplateHtml
-            .replace(/{{headline}}/g, cData.headline)
-            .replace(/{{image_url}}/g, IMAGE_BASE_URL + cData.image_filename)
-            .replace(/{{body_text}}/g, cData.body_text.replace(/\n/g, '<br>')) // Convert newlines to <br> for HTML
-            .replace(/{{cta_text}}/g, cData.cta_text)
-            .replace(/{{cta_link}}/g, WEBSITE_BASE_URL + cData.cta_path)
-            .replace(/{{unsubscribe_link_text}}/g, 'Preview mode.'); // Indicate preview mode for unsubscribe link
-
+        const composedHtml = masterTemplateHtml.replace(/{{headline}}/g, cData.headline).replace(/{{image_url}}/g, IMAGE_BASE_URL + cData.image_filename).replace(/{{body_text}}/g, cData.body_text.replace(/\n/g, '<br>')).replace(/{{cta_text}}/g, cData.cta_text).replace(/{{cta_link}}/g, WEBSITE_BASE_URL + cData.cta_path).replace(/{{unsubscribe_link_text}}/g, 'Preview mode.');
         const pWin = window.open('', '_blank');
         pWin.document.write(composedHtml);
         pWin.document.close();
     });
-
     dom.btnSendTest.addEventListener('click', () => {
         if (!dom.campaignForm.checkValidity()) {
             dom.campaignForm.reportValidity();
             return;
         }
         const cData = getCampaignData();
-        dom.campaignStatus.style.display = 'none'; // Hide previous status
+        dom.campaignStatus.style.display = 'none';
         dom.campaignLoader.textContent = 'Sending test...';
         callApi('sendTest', { campaignData: cData }, r => {
             dom.campaignStatus.textContent = r.message;
@@ -306,24 +302,17 @@
             dom.campaignStatus.style.display = 'block';
         });
     });
-
     dom.campaignForm.addEventListener('submit', e => {
-        e.preventDefault(); // Prevent default form submission
-
+        e.preventDefault();
         const segs = getSelectedSegments();
         if (segs.length === 0) {
-            alert('Select at least one segment to send the campaign.');
+            alert('Select a segment.');
             return;
         }
-
         const cData = getCampaignData();
         const segText = segs.includes('All') ? "All Customers" : `${segs.length} segment(s)`;
-
-        if (!confirm(`Are you sure you want to send this campaign to ${segText}?`)) {
-            return; // User cancelled
-        }
-
-        dom.campaignStatus.style.display = 'none'; // Hide previous status
+        if (!confirm(`Send campaign to ${segText}?`)) return;
+        dom.campaignStatus.style.display = 'none';
         dom.campaignLoader.textContent = 'Sending campaign...';
         callApi('runCampaign', { campaignData: cData, segments: segs }, r => {
             dom.campaignStatus.textContent = r.message;
