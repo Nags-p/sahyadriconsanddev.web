@@ -145,6 +145,7 @@ function fetchCampaignArchive(dom) {
     }, 'customer-status');
 }
 
+// --- UPDATED FUNCTION ---
 function renderCampaignArchive(campaigns, dom) {
     const tBody = dom.archiveTableBody;
     const tHead = dom.archiveTableHead;
@@ -165,19 +166,34 @@ function renderCampaignArchive(campaigns, dom) {
         const actionsTd = document.createElement('td');
         actionsTd.className = 'action-buttons';
         
+        // --- NEW BUTTON ADDED HERE ---
+        if (campaign.template_html) {
+            const viewTemplateBtn = document.createElement('button');
+            viewTemplateBtn.textContent = 'View Template';
+            viewTemplateBtn.className = 'btn-info';
+            viewTemplateBtn.style.flexGrow = '0';
+            viewTemplateBtn.addEventListener('click', () => {
+                const pWin = window.open('', '_blank');
+                pWin.document.write(campaign.template_html);
+                pWin.document.close();
+            });
+            actionsTd.appendChild(viewTemplateBtn);
+        }
+        
         if (campaign.recipients && campaign.recipients.length > 0) {
-            const viewBtn = document.createElement('button');
-            viewBtn.textContent = 'View List';
-            viewBtn.className = 'btn-secondary';
-            viewBtn.style.flexGrow = '0';
-            viewBtn.addEventListener('click', () => openRecipientsModal(campaign.recipients, campaign.subject, dom));
-            actionsTd.appendChild(viewBtn);
+            const viewListBtn = document.createElement('button');
+            viewListBtn.textContent = 'View List';
+            viewListBtn.className = 'btn-secondary';
+            viewListBtn.style.flexGrow = '0';
+            viewListBtn.addEventListener('click', () => openRecipientsModal(campaign.recipients, campaign.subject, dom));
+            actionsTd.appendChild(viewListBtn);
         }
         
         row.appendChild(actionsTd);
         tBody.appendChild(row);
     });
 }
+
 
 // ===================================================================
 // --- 4. MODAL & FORM HANDLING ---
