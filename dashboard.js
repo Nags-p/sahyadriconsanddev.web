@@ -1,7 +1,7 @@
 // ===================================================================
 // --- 1. CONFIGURATION ---
 // ===================================================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwH6jjQUFksqe6lI8dOHvOPOr2LuWZzQKRVxAYMVb-TRoe7de0cQxPxH-FLNaqkvEq4/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxF_LOUhrM2L0YxaG8XjpHj6UHOdRcgOvqLqdCzfC3qC9UFyTOgjj3vXyC9dgwZ2DDtvA/exec'; 
 const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
 
 // --- DERIVED CONFIG ---
@@ -288,24 +288,24 @@ function getCampaignData() {
 // --- 5. INITIALIZATION & EVENT LISTENERS ---
 // ===================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Cache all DOM elements once the document is ready
+    // Cache all DOM elements
     const dom = {
+        loginOverlay: document.getElementById('login-overlay'),
+        loginForm: document.getElementById('login-form'),
+        loginStatus: document.getElementById('login-status'),
         dashboardLayout: document.getElementById('dashboard-layout'),
         navItems: document.querySelectorAll('.sidebar-nav li'),
         campaignLoader: document.getElementById('campaign-loader'),
-        // Promotions Page
+        // ... all other dom elements from previous version
         campaignForm: document.getElementById('campaign-form'),
         campaignStatus: document.getElementById('campaign-status'),
         segmentContainer: document.getElementById('segment-container'),
-        // Customers Page
         customerTableBody: document.querySelector('#customer-table tbody'),
         customerTableHead: document.querySelector('#customer-table thead'),
         customerSearch: document.getElementById('customer-search'),
         customerStatus: document.getElementById('customer-status'),
-        // Archive Page
         archiveTableBody: document.querySelector('#archive-table tbody'),
         archiveTableHead: document.querySelector('#archive-table thead'),
-        // Edit Customer Modal
         editCustomerModalOverlay: document.getElementById('edit-customer-modal-overlay'),
         editCustomerForm: document.getElementById('edit-customer-form'),
         editCustomerRowId: document.getElementById('edit-customer-rowid'),
@@ -313,15 +313,23 @@ document.addEventListener('DOMContentLoaded', () => {
         editModalClose: document.getElementById('edit-modal-close'),
         editModalCancel: document.getElementById('edit-modal-cancel'),
         editCustomerStatus: document.getElementById('edit-customer-status'),
-        // Recipients Modal
         recipientsModalOverlay: document.getElementById('recipients-modal-overlay'),
         recipientsModalTitle: document.getElementById('recipients-modal-title'),
         recipientsModalClose: document.getElementById('recipients-modal-close'),
         recipientsList: document.getElementById('recipients-list')
     };
 
+    // --- NEW LOGIN LOGIC ---
+    // Make login screen visible by default
+    dom.loginOverlay.style.display = 'flex';
+    dom.dashboardLayout.style.display = 'none';
+
     function initializeDashboard() {
+        // Hide login and show dashboard
+        dom.loginOverlay.style.display = 'none';
         dom.dashboardLayout.style.display = 'flex';
+        
+        // Fetch initial data
         dom.campaignLoader.textContent = 'Fetching dashboard data...';
         callApi('getDashboardData', {}, data => {
             if (data.success) {
@@ -335,42 +343,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function populateCheckboxes(segments = []) {
-        dom.segmentContainer.innerHTML = '';
-        createCheckbox('All', 'All Customers', true);
-        segments.forEach(segment => createCheckbox(segment, segment));
-        dom.segmentContainer.addEventListener('change', (e) => handleSegmentChange(e, dom));
-    }
-
-    function createCheckbox(value, text, checked = false) {
-        const label = document.createElement('label'); label.className = 'checkbox-item';
-        const input = document.createElement('input'); input.type = 'checkbox'; input.value = value; input.checked = checked;
-        const span = document.createElement('span'); span.className = 'checkmark';
-        label.appendChild(input); label.appendChild(document.createTextNode(` ${text}`)); label.appendChild(span);
-        dom.segmentContainer.appendChild(label);
-    }
-    
-    function populateImages(images = []) {
-        const list = document.getElementById('c-image-list'); list.innerHTML = '';
-        if (images.length === 0) {
-            list.innerHTML = '<option value="" disabled selected>No images found in Storage.</option>';
-        } else {
-            images.forEach(img => { const opt = document.createElement('option'); opt.value = img; opt.textContent = img; list.appendChild(opt); });
-            list.selectedIndex = 0;
-        }
-    }
-    
-    function handleSegmentChange(e, dom) {
-        const allCheckbox = dom.segmentContainer.querySelector('input[value="All"]');
-        const otherCheckboxes = Array.from(dom.segmentContainer.querySelectorAll('input:not([value="All"])'));
-        if (e.target.value === 'All') {
-            otherCheckboxes.forEach(cb => cb.checked = e.target.checked);
-        } else {
-            allCheckbox.checked = otherCheckboxes.length > 0 && otherCheckboxes.every(cb => cb.checked);
-        }
-    }
-
-    initializeDashboard();
+    // Attach listener to the login form
+    dom.loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const passwordInput = document.getElementById('password');
+        dom.campaignLoader.textContent = 'Logging in...';
+        
+        callApi('checkPassword', { password: passwordInput.value }, response => {
+            if (response.success) {
+                initializeDashboard();
+            } else {
+                showStatusMessage(dom.loginStatus, 'Incorrect password.', false);
+                passwordInput.value = ''; // Clear password field
+            }
+        }, 'login-status');
+    });
 
     // --- Attach all event listeners ---
     dom.navItems.forEach(item => item.addEventListener('click', () => showPage(item.dataset.page, dom)));
