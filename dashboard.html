@@ -4,15 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sahyadri Admin Dashboard</title>
-    <!-- Link to external Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
-    <!-- Link to your new external CSS file -->
     <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
-    <!-- This overlay is no longer used for login, but can show a loading message -->
-    <div id="login-overlay" class="login-overlay" style="display: none;">
-        <h1>Loading Dashboard...</h1>
+    <!-- CORRECTED: Login overlay with form restored -->
+    <div id="login-overlay" class="login-overlay">
+        <div class="content-box" style="max-width: 400px; width: 100%;">
+            <h1>Admin Login</h1>
+            <form id="login-form">
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+                <div class="button-group" style="margin-top:10px;">
+                    <button type="submit" class="btn-primary">Login</button>
+                </div>
+                <div id="login-status" class="status-message"></div>
+            </form>
+        </div>
     </div>
 
     <div class="dashboard-layout" id="dashboard-layout" style="display: none;">
@@ -111,7 +119,6 @@
         </div>
     </div>
 
-    <!-- Link to your new external JavaScript file. 'defer' ensures it runs after the HTML is parsed. -->
     <script src="dashboard.js" defer></script>
 </body>
 </html>
