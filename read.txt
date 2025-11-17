@@ -1,0 +1,2 @@
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw5QZHHMbkKKEgH8Lx34RADYCWVxKSg_zHYhlSTLegn-FGOc11p2gBCQpcjjZnxGJim/exec'; 
+    const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co'; // PASTE YOUR SUPABASE URL

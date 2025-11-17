@@ -69,15 +69,13 @@
         .checkmark:after { content: ""; position: absolute; display: none; left: 7px; top: 3px; width: 5px; height: 10px; border: solid white; border-width: 0 3px 3px 0; transform: rotate(45deg); }
         .checkbox-item input:checked ~ .checkmark:after { display: block; }
         
-        /* Table Style Improvements */
         #customer-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
         #customer-table th, #customer-table td { border: 1px solid #ddd; padding: 12px 15px; text-align: left; white-space: nowrap; vertical-align: middle; }
         #customer-table th { background-color: #f8f8f8; font-weight: 600; color: #333; position: sticky; top: 0; }
         #customer-table tbody tr:nth-child(even) { background-color: #f9f9f9; }
-        #customer-table tbody tr:hover { background-color: #f1f1f1; transition: background-color 0.2s; } /* Row hover effect */
+        #customer-table tbody tr:hover { background-color: #f1f1f1; transition: background-color 0.2s; }
         .action-buttons { display: flex; gap: 8px; }
 
-        /* Modal Styles */
         .modal-overlay {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
@@ -100,7 +98,6 @@
     </style>
 </head>
 <body>
-    <!-- Login overlay is no longer used, but kept in DOM in case you want to re-enable it later -->
     <div id="login-overlay" class="login-overlay" style="display: none;">
         <h1>Loading Dashboard...</h1>
     </div>
@@ -146,7 +143,7 @@
                     <div style="overflow-x: auto;">
                         <table id="customer-table">
                             <thead></thead>
-                            <tbody><tr><td colspan="4">Loading...</td></tr></tbody>
+                            <tbody><tr><td colspan="5">Loading...</td></tr></tbody>
                         </table>
                     </div>
                     <div id="customer-status" class="status-message"></div>
@@ -178,7 +175,7 @@
     // --- 1. CONFIGURATION ---
     // ===================================================================
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw5QZHHMbkKKEgH8Lx34RADYCWVxKSg_zHYhlSTLegn-FGOc11p2gBCQpcjjZnxGJim/exec'; 
-    const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co'; // PASTE YOUR SUPABASE URL
+    const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
     
     // --- DERIVED CONFIG ---
     const IMAGE_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/promotional_images/`;
@@ -273,11 +270,12 @@
 
     function fetchCustomerData() {
         dom.campaignLoader.textContent = 'Fetching customer list...';
-        dom.customerTableBody.innerHTML = `<tr><td colspan="5">Loading...</td></tr>`;
+        dom.customerTableBody.innerHTML = `<tr><td colspan="6">Loading...</td></tr>`; // Changed to 6 to account for new phone column and actions
         callApi('getCustomers', {}, response => {
             if (response.success) {
                 allCustomers = response.customers;
-                customerHeaders = response.headers.filter(h => h !== 'id' && h !== 'created_at'); // Hide technical fields
+                // Filter out technical fields we don't want to show the user
+                customerHeaders = response.headers.filter(h => h !== 'id' && h !== 'created_at');
                 renderCustomerTable(allCustomers);
             } else {
                 showStatusMessage(dom.customerStatus, `Error: ${response.message}`, false);
@@ -299,7 +297,8 @@
         const headerRow = document.createElement('tr');
         customerHeaders.forEach(header => {
             const th = document.createElement('th');
-            th.textContent = header.charAt(0).toUpperCase() + header.slice(1); // Capitalize
+            // Capitalize header for display
+            th.textContent = header.charAt(0).toUpperCase() + header.slice(1);
             headerRow.appendChild(th);
         });
         const actionsTh = document.createElement('th');
@@ -378,16 +377,18 @@
             
             if (header === 'segment') {
                 const select = document.createElement('select'); select.name = header;
-                // Add a blank option
                 const blankOpt = document.createElement('option');
                 blankOpt.value = ''; blankOpt.textContent = 'No Segment';
                 select.appendChild(blankOpt);
-                // Add existing segments
                 availableSegments.forEach(s => { const opt = document.createElement('option'); opt.value = s; opt.textContent = s; select.appendChild(opt); });
                 select.value = customer[header] || '';
                 dom.editCustomerFields.appendChild(select);
             } else {
-                const input = document.createElement('input'); input.type = 'text'; input.name = header; input.value = customer[header] || '';
+                const input = document.createElement('input');
+                // Use type 'tel' for phone numbers for better mobile experience
+                input.type = header === 'phone' ? 'tel' : 'text'; 
+                input.name = header;
+                input.value = customer[header] || '';
                 dom.editCustomerFields.appendChild(input);
             }
         });
@@ -434,9 +435,9 @@
         callApi('getDashboardData', {}, data => {
             if (data.success) {
                 masterTemplateHtml = data.templateHtml;
+                availableSegments = data.segments;
                 populateCheckboxes(data.segments);
                 populateImages(data.images);
-                availableSegments = data.segments;
             } else {
                 alert('Critical Error: Could not fetch dashboard data. ' + data.message);
             }
