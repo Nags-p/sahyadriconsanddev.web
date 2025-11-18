@@ -19,6 +19,7 @@ function callApi(action, payload, callback, errorElementId = 'campaign-status') 
     const statusElement = document.getElementById(errorElementId);
     if (statusElement) statusElement.style.display = 'none';
     
+    
     const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
     window[callbackName] = function(data) {
         setLoading(false);
