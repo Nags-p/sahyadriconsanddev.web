@@ -1,7 +1,7 @@
 // ===================================================================
 // --- 1. CONFIGURATION ---
 // ===================================================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxF_LOUhrM2L0YxaG8XjpHj6UHOdRcgOvqLqdCzfC3qC9UFyTOgjj3vXyC9dgwZ2DDtvA/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4TXQG-RcLV2EDnyohgi21hRACdDgDbcHBdNnTVevgPP-979pABRtFV72PSB5OVO_p5g/exec'; 
 const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
 
 // --- DERIVED CONFIG ---
@@ -62,11 +62,85 @@ function showPage(pageId, dom) {
     
     if (pageId === 'page-customers') fetchCustomerData(dom);
     if (pageId === 'page-archive') fetchCampaignArchive(dom);
+    if (pageId === 'page-inquiries') fetchInquiries(dom);
 }
 
 // ===================================================================
 // --- 3. DATA HANDLING & RENDERING FUNCTIONS ---
 // ===================================================================
+function fetchInquiries(dom) {
+    dom.campaignLoader.textContent = 'Fetching inquiries...';
+    dom.inquiriesContainer.innerHTML = `<p>Loading...</p>`;
+    callApi('getInquiries', {}, response => {
+        if (response.success) {
+            renderInquiries(response.inquiries, dom);
+        } else {
+            dom.inquiriesContainer.innerHTML = `<p style="color: red;">Error: ${response.message}</p>`;
+        }
+    }, 'inquiries-status');
+}
+
+function renderInquiries(inquiries, dom) {
+    const container = dom.inquiriesContainer;
+    container.innerHTML = '';
+
+    if (inquiries.length === 0) {
+        container.innerHTML = '<p>No new inquiries at this time.</p>';
+        return;
+    }
+
+    inquiries.forEach(inquiry => {
+        const card = document.createElement('div');
+        card.className = 'inquiry-card';
+
+        const fileLink = inquiry.file_url ? `<a href="${inquiry.file_url}" target="_blank">View File</a>` : 'None';
+
+        card.innerHTML = `
+            <h4>${inquiry.name}</h4>
+            <p><strong>Email:</strong> ${inquiry.email}</p>
+            <p><strong>Phone:</strong> ${inquiry.phone}</p>
+            <p><strong>Location:</strong> ${inquiry.location}</p>
+            <p><strong>Project Type:</strong> ${inquiry.project_type}</p>
+            <p><strong>Budget:</strong> ${inquiry.budget_range || 'Not specified'}</p>
+            <p><strong>Start Date:</strong> ${inquiry.start_date || 'Not specified'}</p>
+            <p><strong>Attachment:</strong> ${fileLink}</p>
+            <p class="inquiry-message"><strong>Message:</strong><br>${inquiry.message}</p>
+        `;
+        
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'inquiry-actions';
+
+        const addBtn = document.createElement('button');
+        addBtn.textContent = 'Add to Customers';
+        addBtn.className = 'btn-primary';
+        addBtn.addEventListener('click', () => {
+            if (confirm(`Add ${inquiry.name} to the main customer list? This will remove the inquiry from this page.`)) {
+                callApi('addCustomerFromInquiry', { inquiryData: inquiry }, response => {
+                    showStatusMessage(dom.inquiriesStatus, response.message, response.success);
+                    if (response.success) fetchInquiries(dom); // Refresh the list
+                }, 'inquiries-status');
+            }
+        });
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete Inquiry';
+        deleteBtn.className = 'btn-danger';
+        deleteBtn.addEventListener('click', () => {
+            if (confirm(`Permanently delete this inquiry from ${inquiry.name}?`)) {
+                callApi('deleteInquiry', { inquiryId: inquiry.id }, response => {
+                    showStatusMessage(dom.inquiriesStatus, response.message, response.success);
+                    if (response.success) fetchInquiries(dom); // Refresh the list
+                }, 'inquiries-status');
+            }
+        });
+
+        actionsDiv.appendChild(addBtn);
+        actionsDiv.appendChild(deleteBtn);
+        card.appendChild(actionsDiv);
+        container.appendChild(card);
+    });
+}
+
 function fetchCustomerData(dom) {
     dom.campaignLoader.textContent = 'Fetching customer list...';
     dom.customerTableBody.innerHTML = `<tr><td colspan="6">Loading...</td></tr>`;
@@ -222,7 +296,7 @@ function openEditCustomerModal(customer, dom) {
             dom.editCustomerFields.appendChild(select);
         } else {
             const input = document.createElement('input'); 
-            input.type = header === 'phone' ? 'tel' : 'text'; 
+            input.type = (header === 'phone' || header === 'city') ? 'text' : (header === 'email' ? 'email' : 'text');
             input.name = header; 
             input.value = customer[header] || '';
             dom.editCustomerFields.appendChild(input);
@@ -285,7 +359,6 @@ function getCampaignData() {
 // --- 5. INITIALIZATION & EVENT LISTENERS ---
 // ===================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // CORRECTED: Cache all DOM elements comprehensively
     const dom = {
         loginOverlay: document.getElementById('login-overlay'),
         loginForm: document.getElementById('login-form'),
@@ -293,25 +366,15 @@ document.addEventListener('DOMContentLoaded', () => {
         dashboardLayout: document.getElementById('dashboard-layout'),
         navItems: document.querySelectorAll('.sidebar-nav li'),
         campaignLoader: document.getElementById('campaign-loader'),
-        
-        // Promotions Page
         campaignForm: document.getElementById('campaign-form'),
         campaignStatus: document.getElementById('campaign-status'),
         segmentContainer: document.getElementById('segment-container'),
-        btnPreview: document.getElementById('btn-preview'),
-        btnSendTest: document.getElementById('btn-send-test'),
-        
-        // Customers Page
         customerTableBody: document.querySelector('#customer-table tbody'),
         customerTableHead: document.querySelector('#customer-table thead'),
         customerSearch: document.getElementById('customer-search'),
         customerStatus: document.getElementById('customer-status'),
-        
-        // Archive Page
         archiveTableBody: document.querySelector('#archive-table tbody'),
         archiveTableHead: document.querySelector('#archive-table thead'),
-        
-        // Edit Customer Modal
         editCustomerModalOverlay: document.getElementById('edit-customer-modal-overlay'),
         editCustomerForm: document.getElementById('edit-customer-form'),
         editCustomerRowId: document.getElementById('edit-customer-rowid'),
@@ -319,15 +382,14 @@ document.addEventListener('DOMContentLoaded', () => {
         editModalClose: document.getElementById('edit-modal-close'),
         editModalCancel: document.getElementById('edit-modal-cancel'),
         editCustomerStatus: document.getElementById('edit-customer-status'),
-        
-        // Recipients Modal
         recipientsModalOverlay: document.getElementById('recipients-modal-overlay'),
         recipientsModalTitle: document.getElementById('recipients-modal-title'),
         recipientsModalClose: document.getElementById('recipients-modal-close'),
-        recipientsList: document.getElementById('recipients-list')
+        recipientsList: document.getElementById('recipients-list'),
+        inquiriesContainer: document.getElementById('inquiries-container'),
+        inquiriesStatus: document.getElementById('inquiries-status')
     };
 
-    // --- LOGIN LOGIC ---
     dom.loginOverlay.style.display = 'flex';
     dom.dashboardLayout.style.display = 'none';
 
@@ -342,13 +404,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 availableSegments = data.segments;
                 populateCheckboxes(data.segments);
                 populateImages(data.images);
+                showPage('page-inquiries', dom); // Show inquiries by default
             } else {
                 alert('Critical Error: Could not fetch dashboard data. ' + data.message);
             }
         });
     }
     
-    // Attach listener to the login form
     if (dom.loginForm) {
         dom.loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -366,8 +428,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
-    // --- ALL OTHER EVENT LISTENERS ---
     dom.navItems.forEach(item => item.addEventListener('click', () => showPage(item.dataset.page, dom)));
     
     dom.customerSearch.addEventListener('keyup', () => {
@@ -378,8 +438,9 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCustomerTable(filteredCustomers, dom);
     });
     
-    dom.btnPreview.addEventListener('click', () => {
-        if (!dom.campaignForm.checkValidity()) { dom.campaignForm.reportValidity(); return; }
+    document.getElementById('btn-preview').addEventListener('click', () => {
+        const campaignForm = document.getElementById('campaign-form');
+        if (!campaignForm.checkValidity()) { campaignForm.reportValidity(); return; }
         const cData = getCampaignData();
         const composedHtml = masterTemplateHtml
             .replace(/{{headline}}/g, cData.headline)
@@ -393,8 +454,9 @@ document.addEventListener('DOMContentLoaded', () => {
         pWin.document.close();
     });
 
-    dom.btnSendTest.addEventListener('click', () => {
-        if (!dom.campaignForm.checkValidity()) { dom.campaignForm.reportValidity(); return; }
+    document.getElementById('btn-send-test').addEventListener('click', () => {
+        const campaignForm = document.getElementById('campaign-form');
+        if (!campaignForm.checkValidity()) { campaignForm.reportValidity(); return; }
         callApi('sendTest', { campaignData: getCampaignData() }, r => showStatusMessage(dom.campaignStatus, r.message, r.success));
     });
 
@@ -427,7 +489,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 'edit-customer-status');
     });
 
-    // --- HELPER FUNCTIONS THAT NEED DOM ---
     function populateCheckboxes(segments = []) {
         dom.segmentContainer.innerHTML = '';
         createCheckbox('All', 'All Customers', true);

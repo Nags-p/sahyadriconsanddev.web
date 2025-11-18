@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
-    <!-- CORRECTED: Login overlay with form restored -->
     <div id="login-overlay" class="login-overlay">
         <div class="content-box" style="max-width: 400px; width: 100%;">
             <h1>Admin Login</h1>
@@ -28,15 +27,26 @@
             <div class="sidebar-header"><h1>Admin Panel</h1></div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li id="nav-promotions" class="active" data-page="page-promotions">Promotions</li>
+                    <li id="nav-inquiries" data-page="page-inquiries" class="active">Inquiries</li>
+                    <li id="nav-promotions" data-page="page-promotions">Promotions</li>
                     <li id="nav-customers" data-page="page-customers">Customers</li>
                     <li id="nav-archive" data-page="page-archive">Campaign History</li>
                 </ul>
             </nav>
         </div>
         <div class="main-content">
-            <!-- Promotions Page -->
-            <div id="page-promotions" class="page active">
+            <div id="page-inquiries" class="page active">
+                <div class="content-box">
+                    <h2>Website Inquiries</h2>
+                    <p>New leads from your website contact form appear here. Add them to your main customer list or delete them.</p>
+                    <div id="inquiries-container">
+                        <!-- Inquiries will be loaded here by JavaScript -->
+                    </div>
+                    <div id="inquiries-status" class="status-message"></div>
+                </div>
+            </div>
+
+            <div id="page-promotions" class="page">
                  <div class="content-box">
                     <form id="campaign-form">
                         <h2>Compose Promotion</h2>
@@ -59,7 +69,6 @@
                 </div>
             </div>
 
-            <!-- Customers Page -->
             <div id="page-customers" class="page">
                 <div class="content-box">
                     <h2>Customer Management</h2>
@@ -74,7 +83,6 @@
                 </div>
             </div>
 
-            <!-- Campaign History Page -->
             <div id="page-archive" class="page">
                 <div class="content-box">
                     <h2>Campaign History</h2>
@@ -89,7 +97,6 @@
         </div>
     </div>
 
-    <!-- Edit Customer Modal -->
     <div id="edit-customer-modal-overlay" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -108,7 +115,6 @@
         </div>
     </div>
 
-    <!-- Recipients Modal -->
     <div id="recipients-modal-overlay" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
