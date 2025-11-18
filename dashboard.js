@@ -1,7 +1,7 @@
 // ===================================================================
 // --- 1. CONFIGURATION ---
 // ===================================================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwCzokDIfT6HBaXKMEGX5_oaZ4ozPy3QJQdNehATK-iZiWG3sLleDSdtzFbUBOZX-LqAw/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwtZuva76Wo70W17mQYR6V_NZFzSv6Tr6YUXkH7FkZvM8tcA-E4psc9WaWWKbptzj8T5w/exec'; 
 const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
 
 // --- DERIVED CONFIG ---
@@ -18,7 +18,7 @@ function callApi(action, payload, callback, errorElementId = 'campaign-status') 
     setLoading(true);
     const statusElement = document.getElementById(errorElementId);
     if (statusElement) statusElement.style.display = 'none';
-    
+
     
     const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
     window[callbackName] = function(data) {
