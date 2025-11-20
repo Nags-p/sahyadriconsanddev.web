@@ -1,0 +1,6 @@
+{
+  "deno.enable": true,
+  "deno.lint": true,
+  "deno.unstable": true,
+  "typescript.tsdk": "C:\\Users\\nagar\\.deno\\lib\\typescript.js"
+}

@@ -8,6 +8,8 @@ const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
 
 
 
+
+
 // --- SUPABASE CLIENT ---
 const { createClient } = supabase;
 const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -19,7 +21,7 @@ const MASTER_TEMPLATE_URL = 'https://raw.githubusercontent.com/Nags-p/sahyadrico
 let masterTemplateHtml = '', allCustomers = [], customerHeaders = [], availableSegments = [];
 
 // ===================================================================
-// --- 2. CORE FUNCTIONS ---
+// --- 2. CORE & HELPER FUNCTIONS ---
 // ===================================================================
 async function callEmailApi(action, payload, callback, errorElementId = 'campaign-status') {
     setLoading(true);
@@ -86,7 +88,6 @@ function showPage(pageId, dom) {
 // ===================================================================
 // --- 3. DATA HANDLING (DIRECT SUPABASE CALLS) ---
 // ===================================================================
-
 async function fetchImages(dom) {
     setLoading(true);
     dom.imageGridContainer.innerHTML = '<p>Loading images...</p>';
@@ -197,9 +198,6 @@ function renderInquiries(inquiries, dom, status) {
     inquiries.forEach(inquiry => {
         const card = document.createElement('div');
         card.className = 'inquiry-card';
-
-        // --- THIS IS THE FIX ---
-        // We only generate a public URL if inquiry.file_url exists.
         let fileLink = 'None';
         if (inquiry.file_url) {
             const { data: { publicUrl } } = _supabase.storage.from('contact_uploads').getPublicUrl(inquiry.file_url);
@@ -354,33 +352,50 @@ function renderCustomerTable(customers, dom) {
 
 async function fetchCampaignArchive(dom) {
     setLoading(true);
-    dom.archiveTableBody.innerHTML = `<tr><td colspan="4">Loading...</td></tr>`;
+    dom.archiveTableBody.innerHTML = `<tr><td colspan="6">Loading...</td></tr>`;
     try {
         const { data, error } = await _supabase.from('campaign_archive').select('*').order('created_at', { ascending: false });
         if (error) throw error;
         renderCampaignArchive(data, dom);
     } catch (error) {
-        dom.archiveTableBody.innerHTML = `<tr><td colspan="4">Error: ${error.message}</td></tr>`;
+        dom.archiveTableBody.innerHTML = `<tr><td colspan="6">Error: ${error.message}</td></tr>`;
     }
     setLoading(false);
 }
 
-function renderCampaignArchive(campaigns, dom) {
+async function renderCampaignArchive(campaigns, dom) {
     const tBody = dom.archiveTableBody;
     const tHead = dom.archiveTableHead;
     tBody.innerHTML = '';
-    tHead.innerHTML = '<tr><th>Date</th><th>Subject</th><th>Recipients Sent</th><th>Actions</th></tr>';
+    tHead.innerHTML = '<tr><th>Date</th><th>Subject</th><th>Sent</th><th>Opens</th><th>Clicks</th><th>Actions</th></tr>';
 
     if (campaigns.length === 0) {
-        tBody.innerHTML = `<tr><td colspan="4">No campaigns have been sent yet.</td></tr>`;
+        tBody.innerHTML = `<tr><td colspan="6">No campaigns have been sent yet.</td></tr>`;
         return;
     }
-
+    
+    const campaignIds = campaigns.map(c => c.id);
+    const { data: allOpens, error: opensError } = await _supabase.from('email_opens').select('campaign_id').in('campaign_id', campaignIds);
+    const { data: allClicks, error: clicksError } = await _supabase.from('email_clicks').select('campaign_id').in('campaign_id', campaignIds);
+    
+    if (opensError || clicksError) {
+        showStatusMessage(dom.customerStatus, 'Error fetching tracking data.', false);
+    }
+    
     campaigns.forEach(campaign => {
+        const opens = allOpens ? allOpens.filter(o => o.campaign_id === campaign.id).length : 0;
+        const clicks = allClicks ? allClicks.filter(c => c.campaign_id === campaign.id).length : 0;
+        
         const row = document.createElement('tr');
         const sentDate = new Date(campaign.created_at).toLocaleString();
         
-        row.innerHTML = `<td>${sentDate}</td><td>${campaign.subject}</td><td>${campaign.emails_sent}</td>`;
+        row.innerHTML = `
+            <td>${sentDate}</td>
+            <td>${campaign.subject}</td>
+            <td>${campaign.emails_sent || 0}</td>
+            <td>${opens}</td>
+            <td>${clicks}</td>
+        `;
         
         const actionsTd = document.createElement('td');
         actionsTd.className = 'action-buttons';
