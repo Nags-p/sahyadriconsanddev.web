@@ -1,192 +1,121 @@
-/* ==================================================
-   SAHYADRI CONSTRUCTIONS - MAIN JAVASCRIPT FILE
-   Handles:
-   1. Supabase Client Initialization
-   2. AJAX Supabase Contact Form Submission (Public Bucket Version)
-   3. Mobile Navigation & Header Effects
-   4. Active Link Highlighting
-   5. Dynamic Project Page Loader
-   6. Testimonial Slider
-   ================================================== */
-
 document.addEventListener('DOMContentLoaded', () => {
+    
+    // 1. ANIMATION SCROLL REVEAL (Intersection Observer)
+    const revealElements = document.querySelectorAll('.reveal');
+    
+    const revealCallback = (entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                // Optional: Stop observing once revealed
+                observer.unobserve(entry.target);
+            }
+        });
+    };
 
-    // --- 1. SUPABASE CLIENT INITIALIZATION ---
-    // ⚠️ IMPORTANT: Replace with your actual Supabase URL and Anon Key
+    const revealOptions = {
+        threshold: 0.15, // Trigger when 15% of element is visible
+        rootMargin: "0px 0px -50px 0px"
+    };
+
+    const observer = new IntersectionObserver(revealCallback, revealOptions);
+    revealElements.forEach(el => observer.observe(el));
+
+    // 2. SUPABASE CONFIG
     const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2ns-yio';
-    
     const { createClient } = supabase;
     const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // --- 2. ELEMENT SELECTIONS ---
-    const companyName = "Sahyadri Constructions and Developers";
-    const navToggle = document.querySelector('.mobile-nav-toggle');
-    const header = document.querySelector('.header');
-    const navLinksContainer = document.querySelector('#nav-links');
-    const navLinks = document.querySelectorAll('#nav-links a');
-    const sections = document.querySelectorAll('section[id]');
+    // 3. MOBILE NAV
+    const mobileToggle = document.querySelector('.mobile-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    if(mobileToggle) {
+        mobileToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            mobileToggle.innerHTML = navLinks.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+        });
+    }
+
+    // 4. SWIPER
+    if(document.querySelector('.testimonial-swiper')) {
+        new Swiper('.testimonial-swiper', {
+            loop: true,
+            spaceBetween: 30,
+            centeredSlides: true,
+            slidesPerView: 1,
+            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+            breakpoints: {
+                768: { slidesPerView: 2, spaceBetween: 30, centeredSlides: false },
+                1024: { slidesPerView: 3, spaceBetween: 40, centeredSlides: false }
+            }
+        });
+    }
+
+    // 5. SUPABASE FORM
     const contactForm = document.querySelector('#contact-form');
-    const thankYouMessage = document.querySelector('#thank-you-message');
-    const formStatus = document.querySelector('#form-status');
     const submitBtn = document.querySelector('#submit-btn');
-    const projectTitleElement = document.getElementById('project-title');
-    const backToTopBtn = document.querySelector('#back-to-top-btn');
+    const thankYou = document.querySelector('#thank-you-message');
+    const status = document.querySelector('#form-status');
 
-    // --- DYNAMIC COMPANY NAME LOADER ---
-    document.querySelectorAll('.company-name').forEach(element => {
-        element.textContent = companyName;
-    });
-
-    // --- 3. SUPABASE CONTACT FORM SUBMISSION ---
     if (contactForm) {
-        contactForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
             submitBtn.disabled = true;
             submitBtn.textContent = 'Sending...';
-            formStatus.textContent = '';
-            formStatus.style.color = 'inherit';
 
             try {
                 const formData = new FormData(contactForm);
                 const formProps = Object.fromEntries(formData);
                 const file = formProps.file_upload;
-
                 let publicFileUrl = null;
 
                 if (file && file.size > 0) {
                     const fileExt = file.name.split('.').pop();
                     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-                    
-                    const { error: uploadError } = await _supabase.storage
-                        .from('contact_uploads')
-                        .upload(fileName, file);
-
-                    if (uploadError) {
-                        throw new Error(`File Upload Failed: ${uploadError.message}`);
-                    }
-
-                    // Get the public URL now that the bucket is public.
-                    const { data } = _supabase.storage
-                        .from('contact_uploads')
-                        .getPublicUrl(fileName);
-
+                    const { error } = await _supabase.storage.from('contact_uploads').upload(fileName, file);
+                    if(error) throw error;
+                    const { data } = _supabase.storage.from('contact_uploads').getPublicUrl(fileName);
                     publicFileUrl = data.publicUrl;
                 }
 
-                const inquiryData = {
+                const { error } = await _supabase.from('contact_inquiries').insert([{
                     name: formProps.name,
                     email: formProps.email,
                     phone: formProps.phone,
                     project_type: formProps.project_type,
-                    location: formProps.location,
+                    location: formProps.location || 'Not specified',
                     budget_range: formProps.budget_range || null,
                     start_date: formProps.start_date || null,
                     message: formProps.message,
-                    // Save the public URL to the database
-                    file_url: publicFileUrl, 
+                    file_url: publicFileUrl,
                     consent_given: formProps.consent === 'on'
-                };
-                
-                const { error: insertError } = await _supabase
-                    .from('contact_inquiries')
-                    .insert([inquiryData]);
+                }]);
+                if(error) throw error;
 
-                if (insertError) {
-                    throw new Error(`Database submission failed: ${insertError.message}`);
-                }
-                
                 contactForm.style.display = 'none';
-                thankYouMessage.classList.remove('hidden');
+                thankYou.classList.remove('hidden');
+                thankYou.style.display = 'block';
 
             } catch (error) {
-                formStatus.textContent = `Error: ${error.message}. Please try again.`;
-                formStatus.style.color = 'red';
+                status.textContent = 'Error. Please try again.';
+                status.style.color = 'red';
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Send Message';
             }
         });
     }
-
-    // --- 4. MOBILE NAVIGATION LOGIC ---
-    if (navToggle && navLinksContainer) {
-        navToggle.addEventListener('click', () => {
-            const isVisible = navLinksContainer.classList.toggle('is-visible');
-            
-            // Ensure this attribute updates, as the CSS relies on it for color change
-            navToggle.setAttribute('aria-expanded', isVisible);
-            
-            navToggle.innerHTML = isVisible
-                ? '<i class="fas fa-times" aria-hidden="true"></i><span class="sr-only">Close menu</span>'
-                : '<i class="fas fa-bars" aria-hidden="true"></i><span class="sr-only">Menu</span>';
-        });
-    }
-
-    if (navLinks.length > 0) {
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                if (navLinksContainer.classList.contains('is-visible')) {
-                    navToggle.click();
-                }
-            });
-        });
-    }
-
-    // --- 5. HEADER SCROLL EFFECT ---
-    if (header) {
-        const handleScroll = () => {
-            header.classList.toggle('scrolled', window.scrollY > 100);
-        };
-        window.addEventListener('scroll', handleScroll);
-        handleScroll();
-    }
-
-    // --- 6. ACTIVE LINK ON SCROLL (SCROLLSPY) AND DYNAMIC TITLE ---
-    const onScroll = () => {
-        const scrollPosition = window.scrollY + 150;
-        let activeSectionFound = false;
-
-        const formatTitle = (id) => {
-            const text = id.replace(/-/g, ' ');
-            return text.charAt(0).toUpperCase() + text.slice(1);
-        };
-
-        sections.forEach(section => {
-            if (scrollPosition >= section.offsetTop && scrollPosition < section.offsetTop + section.offsetHeight) {
-                const currentSectionId = '#' + section.getAttribute('id');
-                const sectionId = section.getAttribute('id');
-
-                document.title = (sectionId === 'hero')
-                    ? companyName
-                    : `${formatTitle(sectionId)} - ${companyName}`;
-                
-                activeSectionFound = true;
-
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === currentSectionId) {
-                        link.classList.add('active');
-                    }
-                });
-            }
-        });
-
-        if (!activeSectionFound && window.scrollY < sections[0].offsetTop) {
-            document.title = companyName;
-        }
-    };
-    window.addEventListener('scroll', onScroll);
-    onScroll();
-
-    // --- 7. DYNAMIC PROJECT PAGE LOADER ---
+    
+    // 6. PROJECT PAGE LOADER
+    const projectTitleElement = document.getElementById('project-title');
     if (projectTitleElement) {
         const urlParams = new URLSearchParams(window.location.search);
         const projectId = parseInt(urlParams.get('id'));
         const project = projectsData.find(p => p.id === projectId);
 
         if (project) {
-            document.title = `Project: ${project.title} - ${companyName}`;
+            document.title = `${project.title} - Sahyadri`;
             projectTitleElement.textContent = project.title;
             document.getElementById('project-subtitle').textContent = project.subtitle;
             document.getElementById('project-vision').textContent = project.vision;
@@ -196,49 +125,28 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('project-year').textContent = project.year;
             document.getElementById('project-type').textContent = project.type;
             document.getElementById('project-scope').textContent = project.scope;
-
+            
             const gallery = document.getElementById('project-gallery');
-            gallery.innerHTML = '';
-            project.galleryImages.forEach(imageUrl => {
-                const img = document.createElement('img');
-                img.src = imageUrl;
-                img.alt = `Image of ${project.title}`;
-                gallery.appendChild(img);
-            });
-        } else {
-            projectTitleElement.textContent = 'Project Not Found';
-            document.querySelector('.project-detail-section').innerHTML = '<p style="text-align:center;">Sorry, we could not find the project you were looking for.</p>';
-        }
-    }
-
-    // --- 8. BACK TO TOP BUTTON LOGIC ---
-    if (backToTopBtn) {
-        const toggleVisibility = () => {
-            backToTopBtn.classList.toggle('visible', window.scrollY > 300);
-        };
-        window.addEventListener('scroll', toggleVisibility);
-    }
-
-    // --- 9. TESTIMONIAL SLIDER ---
-    const swiper = new Swiper('.testimonial-swiper', {
-        loop: true,
-        grabCursor: true,
-        centeredSlides: true,
-        slidesPerView: 'auto',
-        spaceBetween: 20,
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        breakpoints: {
-            768: {
-                slidesPerView: 2,
-                spaceBetween: 30
-            },
-            1024: {
-                slidesPerView: 3,
-                spaceBetween: 40
+            if(gallery) {
+                gallery.innerHTML = '';
+                project.galleryImages.forEach(url => {
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.classList.add('reveal'); // Animate images
+                    gallery.appendChild(img);
+                });
+                
+                // Re-observe new images
+                const newImages = gallery.querySelectorAll('.reveal');
+                const observer = new IntersectionObserver(revealCallback, revealOptions);
+                newImages.forEach(el => observer.observe(el));
             }
         }
+    }
+
+    // 7. BACK TO TOP
+    const backToTopBtn = document.querySelector('#back-to-top-btn');
+    window.addEventListener('scroll', () => {
+        if(backToTopBtn) backToTopBtn.classList.toggle('visible', window.scrollY > 300);
     });
 });
