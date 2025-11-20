@@ -43,7 +43,7 @@ async function callEmailApi(action, payload, callback, errorElementId = 'campaig
 
         if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
         const data = await response.json();
-        setLoading(false);
+        // Do not set loading false here, let the calling function handle it
         callback(data);
     } catch (error) {
         setLoading(false);
@@ -706,13 +706,54 @@ document.addEventListener('DOMContentLoaded', () => {
         callEmailApi('sendTest', { campaignData: getCampaignData() }, r => showStatusMessage(dom.campaignStatus, r.message, r.success));
     });
 
-    dom.campaignForm.addEventListener('submit', e => {
+    dom.campaignForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const segs = getSelectedSegments(dom);
         if (segs.length === 0) { alert('Please select at least one segment.'); return; }
         const segText = segs.includes('All') ? "All Customers" : `${segs.length} segment(s)`;
         if (!confirm(`Send campaign to ${segText}?`)) return;
-        callEmailApi('runCampaign', { campaignData: getCampaignData(), segments: segs }, r => showStatusMessage(dom.campaignStatus, r.message, r.success));
+
+        setLoading(true);
+        showStatusMessage(dom.campaignStatus, "Preparing campaign...", true);
+        
+        const campaignData = getCampaignData();
+
+        try {
+            const { data: campaignRecord, error: insertError } = await _supabase
+                .from('campaign_archive')
+                .insert({ subject: campaignData.subject })
+                .select()
+                .single();
+
+            if (insertError) throw insertError;
+            
+            campaignData.campaignId = campaignRecord.id;
+
+            showStatusMessage(dom.campaignStatus, "Sending emails...", true);
+
+            callEmailApi('runCampaign', { campaignData: campaignData, segments: segs }, async (r) => {
+                if (r.success) {
+                    const emailCount = (r.message.match(/\d+/) || [0])[0];
+                    const { error: updateError } = await _supabase
+                        .from('campaign_archive')
+                        .update({ emails_sent: parseInt(emailCount, 10) })
+                        .eq('id', campaignRecord.id);
+
+                    if (updateError) {
+                        showStatusMessage(dom.campaignStatus, `Emails sent, but failed to update archive: ${updateError.message}`, false);
+                    } else {
+                        showStatusMessage(dom.campaignStatus, r.message, r.success);
+                    }
+                } else {
+                    showStatusMessage(dom.campaignStatus, r.message, r.success);
+                }
+                setLoading(false);
+            });
+
+        } catch (error) {
+            showStatusMessage(dom.campaignStatus, `Error creating campaign: ${error.message}`, false);
+            setLoading(false);
+        }
     });
 
     dom.editModalClose.addEventListener('click', () => closeEditCustomerModal(dom));
