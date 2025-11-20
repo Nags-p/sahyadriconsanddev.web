@@ -19,22 +19,40 @@ let masterTemplateHtml = '', allCustomers = [], customerHeaders = [], availableS
 // ===================================================================
 // --- 2. CORE FUNCTIONS ---
 // ===================================================================
+// --- 2. CORE FUNCTIONS (NEW callApi) ---
+// ===================================================================
 async function callApi(action, payload, callback, errorElementId = 'campaign-status') {
     setLoading(true);
     const statusElement = document.getElementById(errorElementId);
     if (statusElement) statusElement.style.display = 'none';
-    
-    const { data: { session } } = await _supabase.auth.getSession();
-    if (session) {
-        payload.jwt = session.access_token;
-    } else {
-        alert("Your session has expired. Please log in again.");
-        logout();
-        return;
-    }
 
-    const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-    window[callbackName] = function(data) {
+    try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session) {
+            alert("Your session has expired. Please log in again.");
+            logout();
+            return;
+        }
+
+        // Add action and JWT to the payload for the POST request
+        payload.action = action;
+        payload.jwt = session.access_token;
+
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors', // Important for cross-origin requests
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8', // Apps Script requires this for doPost
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Network response was not ok: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
         setLoading(false);
         if (data.message && (data.message.includes("Invalid JWT") || data.message.includes("Expired JWT"))) {
             alert("Your session is invalid or has expired. Please log in again.");
@@ -42,33 +60,20 @@ async function callApi(action, payload, callback, errorElementId = 'campaign-sta
         } else {
             callback(data);
         }
-        if (document.getElementById(callbackName)) {
-            document.body.removeChild(document.getElementById(callbackName));
-        }
-        delete window[callbackName];
-    };
-    
-    const scriptTag = document.createElement('script');
-    scriptTag.id = callbackName;
-    scriptTag.src = `${SCRIPT_URL}?action=${action}&payload=${encodeURIComponent(JSON.stringify(payload))}&callback=${callbackName}`;
-    scriptTag.onerror = () => {
+    } catch (error) {
         setLoading(false);
+        const errorMsg = `Network Error: ${error.message}`;
         const errorStatusElement = document.getElementById(errorElementId);
+        
         if (errorStatusElement) {
-            showStatusMessage(errorStatusElement, "Network Error: Failed to contact the API.", false);
+            showStatusMessage(errorStatusElement, errorMsg, false);
         } else {
-            alert("Network Error: Failed to contact the API.");
+            alert(errorMsg);
         }
-        if (window[callbackName]) {
-             if (document.getElementById(callbackName)) {
-                document.body.removeChild(document.getElementById(callbackName));
-            }
-            delete window[callbackName];
-        }
-        callback({success: false, message: "Network Error"});
-    };
-    document.body.appendChild(scriptTag);
+        callback({ success: false, message: errorMsg });
+    }
 }
+
 
 function setLoading(isLoading) {
     document.querySelectorAll('button').forEach(btn => btn.disabled = isLoading);
