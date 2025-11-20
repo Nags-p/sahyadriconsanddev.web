@@ -12,7 +12,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- 1. SUPABASE CLIENT INITIALIZATION ---
-    // ⚠️ IMPORTANT: Replace with your actual Supabase URL and Anon Key
+    // ⚠️ IMPORTANT: These keys are already correct from your last file. No changes needed here.
     const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2ns-yio';
     
@@ -40,69 +40,70 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 3. SUPABASE CONTACT FORM SUBMISSION ---
     if (contactForm) {
-    contactForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
+        contactForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
 
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending...';
-        formStatus.textContent = '';
-        formStatus.style.color = 'inherit';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            formStatus.textContent = '';
+            formStatus.style.color = 'inherit';
 
-        try {
-            const formData = new FormData(contactForm);
-            const formProps = Object.fromEntries(formData);
-            const file = formProps.file_upload;
+            try {
+                const formData = new FormData(contactForm);
+                const formProps = Object.fromEntries(formData);
+                const file = formProps.file_upload;
 
-            let filePathForDb = null; // Changed variable name for clarity
+                let filePathForDb = null;
 
-            if (file && file.size > 0) {
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-                
-                // --- THIS IS THE CORRECT PATH TO SAVE ---
-                filePathForDb = `${fileName}`; 
+                if (file && file.size > 0) {
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+                    
+                    // --- THIS IS THE FINAL, CORRECTED LOGIC ---
+                    // The path saved to the database is ONLY the filename.
+                    filePathForDb = fileName; 
 
-                const { error: uploadError } = await _supabase.storage
-                    .from('contact_uploads')
-                    .upload(filePathForDb, file); // Use the clean path for upload
+                    const { error: uploadError } = await _supabase.storage
+                        .from('contact_uploads')
+                        .upload(filePathForDb, file); // Upload using only the filename as the path
 
-                if (uploadError) {
-                    throw new Error(`File Upload Failed: ${uploadError.message}`);
+                    if (uploadError) {
+                        throw new Error(`File Upload Failed: ${uploadError.message}`);
+                    }
                 }
+
+                const inquiryData = {
+                    name: formProps.name,
+                    email: formProps.email,
+                    phone: formProps.phone,
+                    project_type: formProps.project_type,
+                    location: formProps.location,
+                    budget_range: formProps.budget_range || null,
+                    start_date: formProps.start_date || null,
+                    message: formProps.message,
+                    // Save the clean filename to the 'file_url' column
+                    file_url: filePathForDb, 
+                    consent_given: formProps.consent === 'on'
+                };
+                
+                const { error: insertError } = await _supabase
+                    .from('contact_inquiries')
+                    .insert([inquiryData]);
+
+                if (insertError) {
+                    throw new Error(`Database submission failed: ${insertError.message}`);
+                }
+                
+                contactForm.style.display = 'none';
+                thankYouMessage.classList.remove('hidden');
+
+            } catch (error) {
+                formStatus.textContent = `Error: ${error.message}. Please try again.`;
+                formStatus.style.color = 'red';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Message';
             }
-
-            const inquiryData = {
-                name: formProps.name,
-                email: formProps.email,
-                phone: formProps.phone,
-                project_type: formProps.project_type,
-                location: formProps.location,
-                budget_range: formProps.budget_range || null,
-                start_date: formProps.start_date || null,
-                message: formProps.message,
-                // --- SAVE THE CLEAN FILE PATH, NOT THE URL ---
-                file_url: filePathForDb, 
-                consent_given: formProps.consent === 'on'
-            };
-            
-            const { error: insertError } = await _supabase
-                .from('contact_inquiries')
-                .insert([inquiryData]);
-
-            if (insertError) {
-                throw new Error(`Database submission failed: ${insertError.message}`);
-            }
-            
-            contactForm.style.display = 'none';
-            thankYouMessage.classList.remove('hidden');
-
-        } catch (error) {
-            formStatus.textContent = `Error: ${error.message}. Please try again.`;
-            formStatus.style.color = 'red';
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Send Message';
-        }
-    });
+        });
     }
 
     // --- 4. MOBILE NAVIGATION LOGIC ---
