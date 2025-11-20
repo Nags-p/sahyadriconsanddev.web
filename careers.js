@@ -87,7 +87,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // =======================
     const statusForm = document.getElementById('status-check-form');
     const statusResult = document.getElementById('status-result');
-    const statusText = document.getElementById('status-text');
+    const resultStatus = document.getElementById('result-status');
+    const resultPosition = document.getElementById('result-position');
 
     if (statusForm) {
         statusForm.addEventListener('submit', async (e) => {
@@ -101,30 +102,42 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!email) return;
 
             btn.disabled = true;
-            btn.textContent = 'Checking...';
+            btn.textContent = 'Searching...';
             statusResult.style.display = 'none';
 
             try {
-                // Call the Secure Database Function
+                // Call the Updated Secure Function
                 const { data, error } = await _supabase
                     .rpc('check_application_status', { applicant_email: email });
 
                 if (error) throw error;
 
-                statusResult.style.display = 'inline-block'; // Show result box
+                statusResult.style.display = 'block'; // Show result box
 
                 if (data) {
-                    // Status Color Logic
-                    let color = '#2563eb'; // Blue (Default/New)
-                    if(data === 'Shortlisted') color = '#eab308'; // Yellow
-                    if(data === 'Hired') color = '#16a34a'; // Green
-                    if(data === 'Rejected') color = '#ef4444'; // Red
+                    // data is now an object: { status: "...", position: "..." }
                     
-                    statusText.textContent = data;
-                    statusText.style.color = color;
+                    // Set Position Name
+                    resultPosition.textContent = data.position;
+
+                    // Status Color Logic
+                    let color = '#2563eb'; // Blue (New)
+                    let label = data.status;
+
+                    switch(data.status) {
+                        case 'Screening': color = '#c2410c'; break; // Orange
+                        case 'Interview': color = '#7e22ce'; break; // Purple
+                        case 'Shortlisted': color = '#eab308'; break; // Yellow
+                        case 'Hired': color = '#16a34a'; break; // Green
+                        case 'Rejected': color = '#ef4444'; break; // Red
+                    }
+                    
+                    resultStatus.textContent = label;
+                    resultStatus.style.color = color;
                 } else {
-                    statusText.textContent = "Application Not Found";
-                    statusText.style.color = '#64748b';
+                    resultPosition.textContent = "-";
+                    resultStatus.textContent = "Application Not Found";
+                    resultStatus.style.color = '#64748b';
                 }
 
             } catch (err) {

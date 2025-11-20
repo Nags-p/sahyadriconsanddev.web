@@ -131,13 +131,27 @@ function renderCareersTable(applicants, tbody) {
     applicants.forEach(app => {
         const row = document.createElement('tr');
         
-        // Status Badge Logic
-        let statusBg = '#eff6ff'; // Blue bg
-        let statusColor = '#2563eb'; // Blue text
+        // --- 1. PROFESSIONAL STATUS COLORS ---
+        let statusBg = '#eff6ff'; // Default Blue (New)
+        let statusColor = '#2563eb';
         
-        if(app.status === 'Shortlisted') { statusBg = '#fef9c3'; statusColor = '#ca8a04'; }
-        if(app.status === 'Hired') { statusBg = '#dcfce7'; statusColor = '#16a34a'; }
-        if(app.status === 'Rejected') { statusBg = '#fee2e2'; statusColor = '#dc2626'; }
+        switch(app.status) {
+            case 'Screening':
+                statusBg = '#fff7ed'; statusColor = '#c2410c'; // Orange
+                break;
+            case 'Interview':
+                statusBg = '#f3e8ff'; statusColor = '#7e22ce'; // Purple
+                break;
+            case 'Shortlisted':
+                statusBg = '#fef9c3'; statusColor = '#854d0e'; // Yellow/Gold
+                break;
+            case 'Hired':
+                statusBg = '#dcfce7'; statusColor = '#15803d'; // Green
+                break;
+            case 'Rejected':
+                statusBg = '#fee2e2'; statusColor = '#b91c1c'; // Red
+                break;
+        }
 
         const statusBadge = `<span class="status-badge" style="background:${statusBg}; color:${statusColor};">${app.status}</span>`;
 
@@ -146,15 +160,16 @@ function renderCareersTable(applicants, tbody) {
             ? `<a href="${app.resume_url}" target="_blank" class="btn-secondary" style="padding:6px 12px; font-size:0.8rem; display:inline-flex; align-items:center; gap:5px; border-radius:4px; text-decoration:none;"><i class="fas fa-download"></i> Resume</a>`
             : '<span style="color:#94a3b8; font-size:0.85rem; font-style:italic;">No File</span>';
 
+        // --- 2. UPDATED DROPDOWN OPTIONS ---
         row.innerHTML = `
             <td style="white-space: nowrap; color:#64748b; font-size:0.85rem;">
                 ${new Date(app.created_at).toLocaleDateString()}
             </td>
             <td>
                 <div class="applicant-info">
-                    <h4>${app.name}</h4>
-                    <a href="mailto:${app.email}">${app.email}</a>
-                    <span>${app.phone}</span>
+                    <h4 style="margin:0; font-size:0.95rem; color:#0f172a;">${app.name}</h4>
+                    <a href="mailto:${app.email}" style="display:block; font-size:0.85rem; color:#2563eb; text-decoration:none;">${app.email}</a>
+                    <span style="font-size:0.8rem; color:#64748b;">${app.phone}</span>
                 </div>
             </td>
             <td><strong>${app.position}</strong></td>
@@ -163,11 +178,13 @@ function renderCareersTable(applicants, tbody) {
             <td>
                 <div class="action-cell">
                     <select class="status-select" onchange="updateCareerStatus(${app.id}, this.value)">
-                        <option value="" disabled selected>Action</option>
-                        <option value="New">Mark New</option>
-                        <option value="Shortlisted">Shortlist</option>
-                        <option value="Hired">Hire</option>
-                        <option value="Rejected">Reject</option>
+                        <option value="" disabled selected>Change Status</option>
+                        <option value="New">New / Incoming</option>
+                        <option value="Screening">Screening</option>
+                        <option value="Interview">Interview</option>
+                        <option value="Shortlisted">Shortlisted</option>
+                        <option value="Hired">Hired</option>
+                        <option value="Rejected">Rejected</option>
                     </select>
                     <button onclick="deleteApplication(${app.id})" class="btn-delete-icon" title="Delete Application">
                         <i class="fas fa-trash-alt"></i>

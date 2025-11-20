@@ -59,10 +59,21 @@
                 </form>
 
                 <!-- Result Display -->
-                <div id="status-result" style="display: none; margin-top: 20px; padding: 15px; border-radius: 8px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                    <span style="font-weight: 600; color: var(--text-primary);">Current Status: </span>
-                    <span id="status-text" style="font-weight: 700; text-transform: uppercase; margin-left: 5px;">-</span>
+                    <div id="status-result" style="display: none; margin-top: 25px; padding: 20px; border-radius: 12px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
+    
+                 <!-- Position Row -->
+                    <div style="margin-bottom: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 500; color: var(--text-secondary); font-size: 0.9rem;">Position Applied:</span>
+                    <span id="result-position" style="font-weight: 700; color: var(--text-primary); font-size: 1rem;">-</span>
                 </div>
+
+                <!-- Status Row -->
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 500; color: var(--text-secondary); font-size: 0.9rem;">Current Status:</span>
+                <span id="result-status" style="font-weight: 700; text-transform: uppercase; font-size: 1rem;">-</span>
+            </div>
+
+        </div>
             </div>
         </div>
     </section>
