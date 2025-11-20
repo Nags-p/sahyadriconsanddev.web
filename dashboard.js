@@ -1,7 +1,7 @@
 // ===================================================================
 // --- 1. CONFIGURATION ---
 // ===================================================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKWm5QFrZ5LCPopIygpP_dqTut7JWytEXRvdro5tbcUGWHCiPCWA5prwfXG1EObaEq1w/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbymcR4qU7vwzM50iTW2ZvlLPKxgmrk74fVZoX40IMDgA_W5bxw1fZA3jcHTKgmrW5gelw/exec'; 
 const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
 
 // --- DERIVED CONFIG ---
