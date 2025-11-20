@@ -6,6 +6,8 @@ const SCRIPT_URL = config.SCRIPT_URL;
 const SUPABASE_URL = config.SUPABASE_URL;
 const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
 
+
+
 // --- SUPABASE CLIENT ---
 const { createClient } = supabase;
 const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -13,7 +15,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // --- DERIVED CONFIG & STATE VARIABLES ---
 const IMAGE_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/promotional_images/`;
 const WEBSITE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/';
-const MASTER_TEMPLATE_URL = 'https://raw.githubusercontent.com/Nags-p/sahyadriconsanddev.web/main/email_templates/master-promo.html'; // <-- THE FIX IS HERE
 let masterTemplateHtml = '', allCustomers = [], customerHeaders = [], availableSegments = [];
 
 // ===================================================================
@@ -84,6 +85,7 @@ function showPage(pageId, dom) {
 // ===================================================================
 // --- 3. DATA HANDLING (DIRECT SUPABASE CALLS) ---
 // ===================================================================
+
 async function fetchImages(dom) {
     setLoading(true);
     dom.imageGridContainer.innerHTML = '<p>Loading images...</p>';
@@ -181,7 +183,7 @@ async function fetchInquiries(dom, status) {
     setLoading(false);
 }
 
-function renderInquiries(inquiries, dom) {
+function renderInquiries(inquiries, dom, status) {
     const containerId = status === 'New' ? 'inquiries-container' : 'archived-inquiries-container';
     const container = document.getElementById(containerId);
     container.innerHTML = '';
@@ -196,11 +198,12 @@ function renderInquiries(inquiries, dom) {
         card.className = 'inquiry-card';
 
         // --- THIS IS THE FIX ---
-        // The inquiry.file_url from the database is already the complete, correct public URL.
-        // We just use it directly in the link.
-        const fileLink = inquiry.file_url 
-            ? `<a href="${inquiry.file_url}" target="_blank" class="btn-secondary" style="display: inline-block; text-decoration: none; padding: 5px 10px; font-size: 14px; border-radius: 5px;">View File</a>` 
-            : 'None';
+        // We only generate a public URL if inquiry.file_url exists.
+        let fileLink = 'None';
+        if (inquiry.file_url) {
+            const { data: { publicUrl } } = _supabase.storage.from('contact_uploads').getPublicUrl(inquiry.file_url);
+            fileLink = `<a href="${publicUrl}" target="_blank" class="btn-secondary" style="display: inline-block; text-decoration: none; padding: 5px 10px; font-size: 14px; border-radius: 5px;">View File</a>`;
+        }
 
         card.innerHTML = `
             <h4>${inquiry.name} <span style="font-size: 12px; color: #777; font-weight: normal;">(${new Date(inquiry.created_at).toLocaleDateString()})</span></h4>
@@ -287,7 +290,7 @@ async function fetchCustomerData(dom) {
         if (data.length > 0) {
             customerHeaders = Object.keys(data[0]).filter(h => h !== 'id' && h !== 'created_at');
         } else {
-            customerHeaders = ['name', 'email', 'phone', 'city', 'segment']; // Default headers if no customers
+            customerHeaders = ['name', 'email', 'phone', 'city', 'segment'];
         }
         renderCustomerTable(allCustomers, dom);
     } catch(error) {
