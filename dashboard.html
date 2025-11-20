@@ -27,7 +27,8 @@
             <div class="sidebar-header"><h1>Admin Panel</h1></div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li id="nav-inquiries" data-page="page-inquiries" class="active">Inquiries</li>
+                    <li id="nav-inquiries" data-page="page-inquiries" class="active">New Inquiries</li>
+                    <li id="nav-archived-inquiries" data-page="page-archived-inquiries">Archived Inquiries</li>
                     <li id="nav-promotions" data-page="page-promotions">Promotions</li>
                     <li id="nav-customers" data-page="page-customers">Customers</li>
                     <li id="nav-archive" data-page="page-archive">Campaign History</li>
@@ -37,12 +38,18 @@
         <div class="main-content">
             <div id="page-inquiries" class="page active">
                 <div class="content-box">
-                    <h2>Website Inquiries</h2>
+                    <h2>New Website Inquiries</h2>
                     <p>New leads from your website contact form appear here. Add them to your main customer list or delete them.</p>
-                    <div id="inquiries-container">
-                        <!-- Inquiries will be loaded here by JavaScript -->
-                    </div>
+                    <div id="inquiries-container"></div>
                     <div id="inquiries-status" class="status-message"></div>
+                </div>
+            </div>
+
+            <div id="page-archived-inquiries" class="page">
+                <div class="content-box">
+                    <h2>Archived Inquiries</h2>
+                    <p>These are inquiries that you have already converted to customers or manually deleted.</p>
+                    <div id="archived-inquiries-container"></div>
                 </div>
             </div>
 

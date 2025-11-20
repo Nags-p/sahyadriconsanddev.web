@@ -1,7 +1,7 @@
 // ===================================================================
 // --- 1. CONFIGURATION ---
 // ===================================================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbymcR4qU7vwzM50iTW2ZvlLPKxgmrk74fVZoX40IMDgA_W5bxw1fZA3jcHTKgmrW5gelw/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby3L2GzHyZ2qVlrmKfyrZnyDmINwmDaIAyEEUVOnMO5TDu38wSsyhve1K0fHOZIv6WKxQ/exec'; 
 const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
 
 // --- DERIVED CONFIG ---
@@ -62,30 +62,37 @@ function showPage(pageId, dom) {
     
     if (pageId === 'page-customers') fetchCustomerData(dom);
     if (pageId === 'page-archive') fetchCampaignArchive(dom);
-    if (pageId === 'page-inquiries') fetchInquiries(dom);
+    if (pageId === 'page-inquiries') fetchInquiries(dom, 'New');
+    if (pageId === 'page-archived-inquiries') fetchInquiries(dom, 'Archived');
 }
 
 // ===================================================================
 // --- 3. DATA HANDLING & RENDERING FUNCTIONS ---
 // ===================================================================
-function fetchInquiries(dom) {
-    dom.campaignLoader.textContent = 'Fetching inquiries...';
-    dom.inquiriesContainer.innerHTML = `<p>Loading...</p>`;
-    callApi('getInquiries', {}, response => {
+function fetchInquiries(dom, status) {
+    const containerId = status === 'New' ? 'inquiries-container' : 'archived-inquiries-container';
+    const statusId = 'inquiries-status';
+    const container = document.getElementById(containerId);
+    
+    dom.campaignLoader.textContent = `Fetching ${status} inquiries...`;
+    container.innerHTML = `<p>Loading...</p>`;
+    
+    callApi('getInquiries', { status: status }, response => {
         if (response.success) {
-            renderInquiries(response.inquiries, dom);
+            renderInquiries(response.inquiries, dom, status);
         } else {
-            dom.inquiriesContainer.innerHTML = `<p style="color: red;">Error: ${response.message}</p>`;
+            container.innerHTML = `<p style="color: red;">Error: ${response.message}</p>`;
         }
-    }, 'inquiries-status');
+    }, statusId);
 }
 
-function renderInquiries(inquiries, dom) {
-    const container = dom.inquiriesContainer;
+function renderInquiries(inquiries, dom, status) {
+    const containerId = status === 'New' ? 'inquiries-container' : 'archived-inquiries-container';
+    const container = document.getElementById(containerId);
     container.innerHTML = '';
 
     if (inquiries.length === 0) {
-        container.innerHTML = '<p>No new inquiries at this time.</p>';
+        container.innerHTML = `<p>No ${status.toLowerCase()} inquiries found.</p>`;
         return;
     }
 
@@ -98,7 +105,7 @@ function renderInquiries(inquiries, dom) {
             : 'None';
 
         card.innerHTML = `
-            <h4>${inquiry.name}</h4>
+            <h4>${inquiry.name} <span style="font-size: 12px; color: #777; font-weight: normal;">(${new Date(inquiry.created_at).toLocaleDateString()})</span></h4>
             <p><strong>Email:</strong> ${inquiry.email}</p>
             <p><strong>Phone:</strong> ${inquiry.phone}</p>
             <p><strong>Location:</strong> ${inquiry.location}</p>
@@ -112,31 +119,33 @@ function renderInquiries(inquiries, dom) {
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'inquiry-actions';
 
-        const addBtn = document.createElement('button');
-        addBtn.textContent = 'Add to Customers';
-        addBtn.className = 'btn-primary';
-        addBtn.addEventListener('click', () => {
-            if (confirm(`Add ${inquiry.name} to the main customer list? This will remove the inquiry from this page.`)) {
-                callApi('addCustomerFromInquiry', { inquiryData: inquiry }, response => {
-                    showStatusMessage(dom.inquiriesStatus, response.message, response.success);
-                    if (response.success) fetchInquiries(dom);
-                }, 'inquiries-status');
-            }
-        });
+        if (status === 'New') {
+            const addBtn = document.createElement('button');
+            addBtn.textContent = 'Add to Customers';
+            addBtn.className = 'btn-primary';
+            addBtn.addEventListener('click', () => {
+                if (confirm(`Add ${inquiry.name} to customers? This will move it to the archived list.`)) {
+                    callApi('addCustomerFromInquiry', { inquiryData: inquiry }, response => {
+                        showStatusMessage(dom.inquiriesStatus, response.message, response.success);
+                        if (response.success) fetchInquiries(dom, 'New');
+                    }, 'inquiries-status');
+                }
+            });
+            actionsDiv.appendChild(addBtn);
+        }
 
         const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'Delete Inquiry';
+        deleteBtn.textContent = 'Delete Forever';
         deleteBtn.className = 'btn-danger';
         deleteBtn.addEventListener('click', () => {
-            if (confirm(`Permanently delete this inquiry from ${inquiry.name}?`)) {
+            if (confirm(`PERMANENTLY DELETE this inquiry from ${inquiry.name}? This cannot be undone.`)) {
                 callApi('deleteInquiry', { inquiryId: inquiry.id }, response => {
                     showStatusMessage(dom.inquiriesStatus, response.message, response.success);
-                    if (response.success) fetchInquiries(dom);
+                    if (response.success) fetchInquiries(dom, status); 
                 }, 'inquiries-status');
             }
         });
 
-        actionsDiv.appendChild(addBtn);
         actionsDiv.appendChild(deleteBtn);
         card.appendChild(actionsDiv);
         container.appendChild(card);
