@@ -71,15 +71,11 @@ function showStatusMessage(element, message, isSuccess) {
 }
 
 function showPage(pageId, dom, params = null) {
-    // Hide all pages
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     
-    // Show target page
     const targetPage = document.getElementById(pageId);
     if (targetPage) targetPage.classList.add('active');
     
-    // Update Sidebar Active State
-    // Convert 'page-something' to 'nav-something'
     const navId = pageId.replace('page-', 'nav-');
     dom.navItems.forEach(n => n.classList.remove('active'));
     const activeNav = document.getElementById(navId);
@@ -96,14 +92,118 @@ function showPage(pageId, dom, params = null) {
     if (pageId === 'page-analytics') {
         loadAnalyticsDropdown(dom, params ? params.campaignId : null);
     }
+
+    // --- FIX: CAREERS LOGIC ADDED HERE ---
+    if (pageId === 'page-careers') {
+        fetchCareers(dom);
+    }
 }
 
 // ===================================================================
-// --- 3. ANALYTICS TAB LOGIC ---
+// --- 3. CAREERS LOGIC (NEW) ---
+// ===================================================================
+
+async function fetchCareers(dom) {
+    setLoading(true);
+    const tbody = document.querySelector('#careers-table tbody');
+    if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">Loading applicants...</td></tr>';
+
+        const { data, error } = await _supabase
+            .from('job_applications')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            tbody.innerHTML = `<tr><td colspan="6">Error: ${error.message}</td></tr>`;
+        } else if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">No job applications yet.</td></tr>';
+        } else {
+            renderCareersTable(data, tbody);
+        }
+    }
+    setLoading(false);
+}
+
+function renderCareersTable(applicants, tbody) {
+    tbody.innerHTML = '';
+
+    applicants.forEach(app => {
+        const row = document.createElement('tr');
+        
+        // Status Badge Logic
+        let statusBg = '#eff6ff'; // Blue bg
+        let statusColor = '#2563eb'; // Blue text
+        
+        if(app.status === 'Shortlisted') { statusBg = '#fef9c3'; statusColor = '#ca8a04'; }
+        if(app.status === 'Hired') { statusBg = '#dcfce7'; statusColor = '#16a34a'; }
+        if(app.status === 'Rejected') { statusBg = '#fee2e2'; statusColor = '#dc2626'; }
+
+        const statusBadge = `<span class="status-badge" style="background:${statusBg}; color:${statusColor};">${app.status}</span>`;
+
+        // Resume Button
+        const resumeBtn = app.resume_url 
+            ? `<a href="${app.resume_url}" target="_blank" class="btn-secondary" style="padding:6px 12px; font-size:0.8rem; display:inline-flex; align-items:center; gap:5px; border-radius:4px; text-decoration:none;"><i class="fas fa-download"></i> Resume</a>`
+            : '<span style="color:#94a3b8; font-size:0.85rem; font-style:italic;">No File</span>';
+
+        row.innerHTML = `
+            <td style="white-space: nowrap; color:#64748b; font-size:0.85rem;">
+                ${new Date(app.created_at).toLocaleDateString()}
+            </td>
+            <td>
+                <div class="applicant-info">
+                    <h4>${app.name}</h4>
+                    <a href="mailto:${app.email}">${app.email}</a>
+                    <span>${app.phone}</span>
+                </div>
+            </td>
+            <td><strong>${app.position}</strong></td>
+            <td>${statusBadge}</td>
+            <td>${resumeBtn}</td>
+            <td>
+                <div class="action-cell">
+                    <select class="status-select" onchange="updateCareerStatus(${app.id}, this.value)">
+                        <option value="" disabled selected>Action</option>
+                        <option value="New">Mark New</option>
+                        <option value="Shortlisted">Shortlist</option>
+                        <option value="Hired">Hire</option>
+                        <option value="Rejected">Reject</option>
+                    </select>
+                    <button onclick="deleteApplication(${app.id})" class="btn-delete-icon" title="Delete Application">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Global functions for HTML event handlers (onclick/onchange)
+window.updateCareerStatus = async (id, newStatus) => {
+    if(!confirm(`Change status to ${newStatus}?`)) return;
+    const { error } = await _supabase.from('job_applications').update({ status: newStatus }).eq('id', id);
+    if(error) alert(`Error updating status: ${error.message}`);
+    else {
+        fetchCareers({}); // Refresh table
+    }
+};
+
+window.deleteApplication = async (id) => {
+    if(!confirm("Permanently delete this application?")) return;
+    const { error } = await _supabase.from('job_applications').delete().eq('id', id);
+    if(error) alert(`Error deleting: ${error.message}`);
+    else {
+        fetchCareers({}); // Refresh table
+    }
+};
+
+
+// ===================================================================
+// --- 4. ANALYTICS TAB LOGIC ---
 // ===================================================================
 
 async function loadAnalyticsDropdown(dom, selectedId = null) {
-    // 1. Fetch list of campaigns
     const { data: campaigns, error } = await _supabase
         .from('campaign_archive')
         .select('id, subject, created_at')
@@ -115,7 +215,6 @@ async function loadAnalyticsDropdown(dom, selectedId = null) {
     }
 
     const select = dom.analyticsSelect;
-    // Reset dropdown
     select.innerHTML = '<option value="" disabled selected>Select a campaign...</option>';
 
     campaigns.forEach(c => {
@@ -126,7 +225,6 @@ async function loadAnalyticsDropdown(dom, selectedId = null) {
         select.appendChild(option);
     });
 
-    // 2. Handle Selection
     if (selectedId) {
         select.value = selectedId;
         fetchCampaignAnalytics(dom, selectedId);
@@ -134,7 +232,6 @@ async function loadAnalyticsDropdown(dom, selectedId = null) {
         dom.analyticsContent.style.display = 'none';
     }
 
-    // 3. Attach Listener
     select.onchange = (e) => {
         const newId = e.target.value;
         history.pushState(null, null, `#analytics-${newId}`);
@@ -145,7 +242,6 @@ async function loadAnalyticsDropdown(dom, selectedId = null) {
 async function fetchCampaignAnalytics(dom, campaignId) {
     setLoading(true);
     
-    // Reset stats view
     document.getElementById('stat-sent').textContent = '-';
     document.getElementById('stat-opens').textContent = '-';
     document.getElementById('stat-clicks').textContent = '-';
@@ -183,7 +279,7 @@ async function fetchCampaignAnalytics(dom, campaignId) {
 
 
 // ===================================================================
-// --- 4. DATA HANDLING (OTHER PAGES) ---
+// --- 5. DATA HANDLING (OTHER PAGES) ---
 // ===================================================================
 
 async function fetchCampaignArchive(dom) {
@@ -201,9 +297,7 @@ async function fetchCampaignArchive(dom) {
 
 async function renderCampaignArchive(campaigns, dom) {
     const tBody = dom.archiveTableBody;
-    const tHead = dom.archiveTableHead;
     tBody.innerHTML = '';
-    tHead.innerHTML = '<tr><th>Date</th><th>Subject</th><th>Sent</th><th>Opens</th><th>Clicks</th><th>Actions</th></tr>';
 
     if (campaigns.length === 0) {
         tBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No campaigns have been sent yet.</td></tr>`;
@@ -211,12 +305,8 @@ async function renderCampaignArchive(campaigns, dom) {
     }
     
     const campaignIds = campaigns.map(c => c.id);
-    const { data: allOpens, error: opensError } = await _supabase.from('email_opens').select('campaign_id, recipient_email').in('campaign_id', campaignIds);
-    const { data: allClicks, error: clicksError } = await _supabase.from('email_clicks').select('campaign_id, recipient_email').in('campaign_id', campaignIds);
-    
-    if (opensError || clicksError) {
-        showStatusMessage(dom.customerStatus, 'Error fetching tracking data.', false);
-    }
+    const { data: allOpens } = await _supabase.from('email_opens').select('campaign_id, recipient_email').in('campaign_id', campaignIds);
+    const { data: allClicks } = await _supabase.from('email_clicks').select('campaign_id, recipient_email').in('campaign_id', campaignIds);
     
     campaigns.forEach(campaign => {
         const opensCount = allOpens ? [...new Set(allOpens.filter(o => o.campaign_id === campaign.id).map(o => o.recipient_email))].length : 0;
@@ -337,15 +427,13 @@ function renderImageGrid(images, dom) {
                     if (!error) fetchImages(dom);
                     setLoading(false);
                 }
-            } else if (newName === oldName) {
-                showStatusMessage(dom.imageManagerStatus, "New name is the same as the old name. No change made.", true);
             }
         });
 
         card.querySelector('.btn-copy-url').addEventListener('click', () => {
             navigator.clipboard.writeText(publicUrl)
-                .then(() => showStatusMessage(dom.imageManagerStatus, `URL for "${image.name}" copied to clipboard!`, true))
-                .catch(err => showStatusMessage(dom.imageManagerStatus, `Failed to copy URL: ${err.message}`, false));
+                .then(() => showStatusMessage(dom.imageManagerStatus, `URL copied!`, true))
+                .catch(err => showStatusMessage(dom.imageManagerStatus, `Failed to copy URL`, false));
         });
     });
 }
@@ -397,10 +485,8 @@ function renderInquiries(inquiries, dom, status) {
             <p><strong><i class="fas fa-envelope"></i> Email:</strong> ${inquiry.email}</p>
             <p><strong><i class="fas fa-phone-alt"></i> Phone:</strong> ${inquiry.phone || 'N/A'}</p>
             <p><strong><i class="fas fa-map-marker-alt"></i> Location:</strong> ${inquiry.location || 'N/A'}</p>
-            <p><strong><i class="fas fa-building"></i> Project Type:</strong> ${inquiry.project_type || 'N/A'}</p>
-            <p><strong><i class="fas fa-money-bill-wave"></i> Budget:</strong> ${inquiry.budget_range || 'Not specified'}</p>
-            <p><strong><i class="fas fa-calendar-alt"></i> Start Date:</strong> ${inquiry.start_date || 'Not specified'}</p>
-            <p><strong><i class="fas fa-paperclip"></i> Attachment:</strong> ${fileLink}</p>
+            <p><strong><i class="fas fa-building"></i> Project:</strong> ${inquiry.project_type || 'N/A'}</p>
+            <p><strong><i class="fas fa-paperclip"></i> File:</strong> ${fileLink}</p>
             <p class="inquiry-message"><strong><i class="fas fa-comment"></i> Message:</strong><br>${inquiry.message}</p>
         `;
         
@@ -412,24 +498,15 @@ function renderInquiries(inquiries, dom, status) {
             addBtn.innerHTML = '<i class="fas fa-user-plus"></i> Add to Customers';
             addBtn.className = 'btn-primary';
             addBtn.addEventListener('click', async () => {
-                if (confirm(`Add ${inquiry.name} to customers? This will move it to the archived list.`)) {
+                if (confirm(`Add ${inquiry.name} to customers?`)) {
                     setLoading(true);
-                    const { data: existing, error: checkError } = await _supabase.from('customers').select('id').eq('email', inquiry.email).single();
-                    if (checkError && checkError.code !== 'PGRST116') {
-                         showStatusMessage(dom.inquiriesStatus, `Error checking existing customer: ${checkError.message}`, false);
-                         setLoading(false); return;
-                    }
+                    const { data: existing } = await _supabase.from('customers').select('id').eq('email', inquiry.email).single();
                     if (existing) {
-                        showStatusMessage(dom.inquiriesStatus, `Customer with email ${inquiry.email} already exists.`, false);
+                        showStatusMessage(dom.inquiriesStatus, `Customer already exists.`, false);
                         setLoading(false); return;
                     }
-                    const { error: insertError } = await _supabase.from('customers').insert([{ name: inquiry.name, email: inquiry.email, phone: inquiry.phone, city: inquiry.location, segment: 'New Lead' }]);
-                    if (insertError) {
-                         showStatusMessage(dom.inquiriesStatus, `Error adding customer: ${insertError.message}`, false);
-                         setLoading(false); return;
-                    }
-                    const { error: updateError } = await _supabase.from('contact_inquiries').update({ status: 'Archived' }).eq('id', inquiry.id);
-                    showStatusMessage(dom.inquiriesStatus, updateError ? `Customer added, but failed to archive: ${updateError.message}` : `Customer '${inquiry.name}' added and archived.`, !updateError);
+                    await _supabase.from('customers').insert([{ name: inquiry.name, email: inquiry.email, phone: inquiry.phone, city: inquiry.location, segment: 'New Lead' }]);
+                    await _supabase.from('contact_inquiries').update({ status: 'Archived' }).eq('id', inquiry.id);
                     fetchInquiries(dom, 'New');
                     setLoading(false);
                 }
@@ -441,11 +518,10 @@ function renderInquiries(inquiries, dom, status) {
         deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete Forever';
         deleteBtn.className = 'btn-danger';
         deleteBtn.addEventListener('click', async () => {
-             if (confirm(`PERMANENTLY DELETE this inquiry from ${inquiry.name}?`)) {
+             if (confirm(`PERMANENTLY DELETE this inquiry?`)) {
                 setLoading(true);
-                const { error } = await _supabase.from('contact_inquiries').delete().eq('id', inquiry.id);
-                showStatusMessage(dom.inquiriesStatus, error ? `Error: ${error.message}` : 'Inquiry deleted.', !error);
-                if (!error) fetchInquiries(dom, status);
+                await _supabase.from('contact_inquiries').delete().eq('id', inquiry.id);
+                fetchInquiries(dom, status);
                 setLoading(false);
              }
         });
@@ -524,7 +600,7 @@ function renderCustomerTable(customers, dom) {
 }
 
 // ===================================================================
-// --- 5. MODAL & FORM HANDLING ---
+// --- 6. INITIALIZATION & AUTHENTICATION ---
 // ===================================================================
 function openEditCustomerModal(customer, dom) {
     dom.editCustomerRowId.value = customer.id;
@@ -540,42 +616,29 @@ function openEditCustomerModal(customer, dom) {
             const select = document.createElement('select'); 
             select.name = header;
             const blankOpt = document.createElement('option'); 
-            blankOpt.value = ''; 
-            blankOpt.textContent = 'No Segment'; 
-            select.appendChild(blankOpt);
+            blankOpt.value = ''; blankOpt.textContent = 'No Segment'; select.appendChild(blankOpt);
             availableSegments.forEach(s => { 
-                const opt = document.createElement('option'); 
-                opt.value = s; 
-                opt.textContent = s; 
-                select.appendChild(opt); 
+                const opt = document.createElement('option'); opt.value = s; opt.textContent = s; select.appendChild(opt); 
             });
             select.value = customer[header] || '';
             dom.editCustomerFields.appendChild(select);
         } else {
             const input = document.createElement('input'); 
             input.type = (header === 'phone' || header === 'city') ? 'text' : (header === 'email' ? 'email' : 'text');
-            input.name = header; 
-            input.value = customer[header] || '';
+            input.name = header; input.value = customer[header] || '';
             dom.editCustomerFields.appendChild(input);
         }
     });
     dom.editCustomerModalOverlay.classList.add('active');
 }
 
-function closeEditCustomerModal(dom) { 
-    dom.editCustomerModalOverlay.classList.remove('active'); 
-}
+function closeEditCustomerModal(dom) { dom.editCustomerModalOverlay.classList.remove('active'); }
 
 async function deleteCustomerPrompt(id, customerIdentifier, dom) {
     if (confirm(`Are you sure you want to delete ${customerIdentifier || 'this customer'}?`)) {
         setLoading(true);
-        const { error } = await _supabase.from('customers').delete().eq('id', id);
-        if (error) {
-            showStatusMessage(dom.customerStatus, `Error: ${error.message}`, false);
-        } else {
-            showStatusMessage(dom.customerStatus, "Customer deleted.", true);
-            fetchCustomerData(dom);
-        }
+        await _supabase.from('customers').delete().eq('id', id);
+        fetchCustomerData(dom);
         setLoading(false);
     }
 }
@@ -583,23 +646,17 @@ async function deleteCustomerPrompt(id, customerIdentifier, dom) {
 function openRecipientsModal(recipients, subject, dom) {
     dom.recipientsModalTitle.textContent = `Recipients for "${subject}"`;
     dom.recipientsList.innerHTML = '';
-    
     if (recipients.length > 0) {
         recipients.forEach(email => { 
-            const li = document.createElement('li'); 
-            li.textContent = email; 
-            dom.recipientsList.appendChild(li); 
+            const li = document.createElement('li'); li.textContent = email; dom.recipientsList.appendChild(li); 
         });
     } else {
         dom.recipientsList.innerHTML = '<li>No recipients were recorded for this campaign.</li>';
     }
-    
     dom.recipientsModalOverlay.classList.add('active');
 }
 
-function closeRecipientsModal(dom) { 
-    dom.recipientsModalOverlay.classList.remove('active'); 
-}
+function closeRecipientsModal(dom) { dom.recipientsModalOverlay.classList.remove('active'); }
 
 function getSelectedSegments(dom) {
     if (dom.segmentContainer.querySelector('input[value="All"]').checked) return ['All'];
@@ -617,9 +674,6 @@ function getCampaignData() {
     };
 }
 
-// ===================================================================
-// --- 6. INITIALIZATION & AUTHENTICATION ---
-// ===================================================================
 document.addEventListener('DOMContentLoaded', () => {
     const dom = {
         loginOverlay: document.getElementById('login-overlay'),
@@ -657,7 +711,6 @@ document.addEventListener('DOMContentLoaded', () => {
         imageUploadInput: document.getElementById('image-upload-input'),
         imageUploadPreview: document.getElementById('image-upload-preview'),
         imageManagerStatus: document.getElementById('image-manager-status'),
-        // New Analytics DOM Elements
         analyticsPage: document.getElementById('page-analytics'),
         analyticsSelect: document.getElementById('analytics-campaign-select'),
         analyticsContent: document.getElementById('analytics-dashboard-content'),
@@ -673,7 +726,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const campaignId = parts.length > 1 ? parts[1] : null;
             showPage('page-analytics', dom, { campaignId });
         } else {
-            // FIXED: Do not replace hyphens with underscores
             const pageId = `page-${hash || 'inquiries'}`; 
             if (document.getElementById(pageId)) {
                 showPage(pageId, dom);
@@ -708,8 +760,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 _supabase.storage.from('promotional_images').list('', { limit: 100, offset: 0, sortBy: { column: 'created_at', order: 'desc' } }),
                 fetch(MASTER_TEMPLATE_URL).then(res => res.text())
             ]);
-            if (segmentsRes.error) throw segmentsRes.error;
-            if (imagesRes.error) throw imagesRes.error;
             availableSegments = [...new Set(segmentsRes.data.map(item => item.segment))].filter(Boolean);
             masterTemplateHtml = templateRes;
             populateCheckboxes(availableSegments);
@@ -782,8 +832,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const segs = getSelectedSegments(dom);
         if (segs.length === 0) { alert('Please select at least one segment.'); return; }
-        const segText = segs.includes('All') ? "All Customers" : `${segs.length} segment(s)`;
-        if (!confirm(`Send campaign to ${segText}?`)) return;
+        if (!confirm(`Send campaign to ${segs.includes('All') ? "All Customers" : segs.length + " segment(s)"}?`)) return;
 
         setLoading(true);
         showStatusMessage(dom.campaignStatus, "Preparing campaign...", true);
@@ -791,7 +840,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const campaignData = getCampaignData();
 
         try {
-            const { data: campaignRecord, error: insertError } = await _supabase.from('campaign_archive').insert({ subject: campaignData.subject, segments: segs.join(', ') }).select().single();
+            const { data: campaignRecord, error: insertError } = await _supabase.from('campaign_archive').insert({ subject: campaignData.subject }).select().single();
             if (insertError) throw insertError;
             
             campaignData.campaignId = campaignRecord.id;
@@ -800,12 +849,8 @@ document.addEventListener('DOMContentLoaded', () => {
             callEmailApi('runCampaign', { campaignData: campaignData, segments: segs }, async (r) => {
                 if (r.success) {
                     const emailCount = (r.message.match(/\d+/) || [0])[0];
-                    const { error: updateError } = await _supabase.from('campaign_archive').update({ emails_sent: parseInt(emailCount, 10) }).eq('id', campaignRecord.id);
-                    if (updateError) {
-                        showStatusMessage(dom.campaignStatus, `Emails sent, but failed to update archive: ${updateError.message}`, false);
-                    } else {
-                        showStatusMessage(dom.campaignStatus, r.message, r.success);
-                    }
+                    await _supabase.from('campaign_archive').update({ emails_sent: parseInt(emailCount, 10) }).eq('id', campaignRecord.id);
+                    showStatusMessage(dom.campaignStatus, r.message, r.success);
                 } else {
                     showStatusMessage(dom.campaignStatus, r.message, r.success);
                 }
@@ -822,7 +867,6 @@ document.addEventListener('DOMContentLoaded', () => {
     dom.editModalCancel.addEventListener('click', () => closeEditCustomerModal(dom));
     dom.recipientsModalClose.addEventListener('click', () => closeRecipientsModal(dom));
 
-    
     dom.editCustomerForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         setLoading(true);
@@ -840,24 +884,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoading(false);
     });
 
-    // --- Image Upload Preview & Handling ---
-    dom.imageUploadInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                dom.imageUploadPreview.style.backgroundImage = `url('${e.target.result}')`;
-                dom.imageUploadPreview.classList.add('has-image');
-                dom.imageUploadPreview.innerHTML = '';
-            };
-            reader.readAsDataURL(file);
-        } else {
-            dom.imageUploadPreview.style.backgroundImage = 'none';
-            dom.imageUploadPreview.classList.remove('has-image');
-            dom.imageUploadPreview.innerHTML = '<span>No Image Selected</span>';
-        }
-    });
-
     dom.imageUploadInput.addEventListener('change', async (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -865,30 +891,21 @@ document.addEventListener('DOMContentLoaded', () => {
         showStatusMessage(dom.imageManagerStatus, `Uploading "${file.name}"...`, true);
         
         const validExtensions = ['jpeg', 'jpg', 'png', 'gif'];
-        const fileExt = file.name.split('.').pop().toLowerCase();
-        if (!validExtensions.includes(fileExt)) {
+        if (!validExtensions.includes(file.name.split('.').pop().toLowerCase())) {
             showStatusMessage(dom.imageManagerStatus, `Invalid file type. Only JPEG, PNG, GIF are allowed.`, false);
             setLoading(false);
-            dom.imageUploadInput.value = '';
-            dom.imageUploadPreview.style.backgroundImage = 'none';
-            dom.imageUploadPreview.classList.remove('has-image');
-            dom.imageUploadPreview.innerHTML = '<span>No Image Selected</span>';
             return;
         }
 
         const fileName = `${Date.now()}_${file.name.replace(/[^a-z0-9.]/gi, '_')}`;
         try {
-            const { error } = await _supabase.storage.from('promotional_images').upload(fileName, file);
-            if (error) throw error;
+            await _supabase.storage.from('promotional_images').upload(fileName, file);
             showStatusMessage(dom.imageManagerStatus, `"${file.name}" uploaded successfully as "${fileName}".`, true);
             fetchImages(dom);
         } catch (error) {
             showStatusMessage(dom.imageManagerStatus, `Upload failed: ${error.message}`, false);
         }
         dom.imageUploadInput.value = '';
-        dom.imageUploadPreview.style.backgroundImage = 'none';
-        dom.imageUploadPreview.classList.remove('has-image');
-        dom.imageUploadPreview.innerHTML = '<span>No Image Selected</span>';
         setLoading(false);
     });
 

@@ -41,6 +41,7 @@
                     <li id="nav-promotions" data-page="page-promotions"><i class="fas fa-bullhorn"></i> Promotions</li>
                     <li id="nav-customers" data-page="page-customers"><i class="fas fa-users"></i> Customers</li>
                     <li id="nav-archive" data-page="page-archive"><i class="fas fa-history"></i> Campaign History</li>
+                    <li id="nav-careers" data-page="page-careers"><i class="fas fa-briefcase"></i> Careers <span id="career-badge" class="badge-new">New</span></li>
                     <!-- NEW TAB HERE -->
  
 
@@ -165,6 +166,32 @@
         </div>
     </div>
 </div>
+
+<!-- CAREERS PAGE -->
+            <div id="page-careers" class="page">
+                <div class="content-box">
+                    <div class="analytics-header" style="justify-content: space-between;">
+                        <h2>Job Applications</h2>
+                        <button class="btn-secondary" onclick="fetchCareers(dom)">Refresh List</button>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table id="careers-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Applicant</th>
+                                    <th>Position</th>
+                                    <th>Status</th>
+                                    <th>Resume</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div id="careers-status" class="status-message"></div>
+                </div>
+            </div>
         </div>
     </div>
 

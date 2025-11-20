@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Careers - Sahyadri Constructions</title>
+    <link href="images/logo.png" rel="icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 1. HEADER (Same as Index) -->
+    <header class="header">
+        <div class="container nav-wrapper">
+            <a href="index.html" class="logo">
+                <img src="images/header.png" alt="Logo">
+                <span>Sahyadri</span>
+            </a>
+            <nav>
+                <div class="nav-links">
+                    <a href="index.html"><i class="fas fa-arrow-left"></i> Back to Home</a>
+                    <a href="index.html#about">About</a>
+                    <a href="index.html#projects">Projects</a>
+                </div>
+            </nav>
+            <div class="header-actions">
+                <a href="index.html#contact" class="btn btn-primary">Contact Us</a>
+            </div>
+            <button class="mobile-toggle"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <!-- 2. CAREER HERO -->
+    <section id="hero" style="padding-bottom: 80px; min-height: 60vh;">
+        <div class="container hero-grid" style="text-align: center;">
+            <div class="hero-text">
+                <h1>Build Your Future with <span>Sahyadri</span></h1>
+                <p>Join a team of engineers, architects, and builders dedicated to quality and innovation. We don't just build structures; we build careers.</p>
+                <div class="hero-buttons">
+                    <a href="#openings" class="btn btn-primary">View Openings</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. CULTURE / WHY JOIN US -->
+    <section id="culture" style="background: var(--bg-page);">
+        <div class="container">
+            <div class="section-title">
+                <h2>Why Work With Us?</h2>
+                <p>We value our people as much as our projects.</p>
+            </div>
+            <div class="services-grid">
+                <!-- Reuse Service Card Style for consistency -->
+                <div class="service-card">
+                    <div class="icon"><i class="fas fa-hard-hat"></i></div>
+                    <h3>Safety First</h3>
+                    <p>We strictly adhere to safety protocols. Your well-being is our top priority on every site.</p>
+                </div>
+                <div class="service-card">
+                    <div class="icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Growth</h3>
+                    <p>Work on diverse commercial and residential projects that challenge and grow your skills.</p>
+                </div>
+                <div class="service-card">
+                    <div class="icon"><i class="fas fa-users"></i></div>
+                    <h3>Team Spirit</h3>
+                    <p>A collaborative environment where every voice is heard, from interns to project managers.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. CURRENT OPENINGS -->
+    <section id="openings" style="background-color: var(--light-gray);">
+        <div class="container">
+            <h2 class="section-title">Current Openings</h2>
+            
+            <div class="job-list">
+                
+                <!-- Job Card 1 -->
+                <div class="job-card">
+                    <div class="job-info">
+                        <h3>Site Supervisor</h3>
+                        <p class="job-meta"><i class="fas fa-map-marker-alt"></i> Mandya/Mysore &nbsp;|&nbsp; <i class="fas fa-clock"></i> Full Time</p>
+                        <p>Oversee daily site operations, manage labor, and ensure quality control standards are met.</p>
+                    </div>
+                    <a href="#apply" class="btn btn-secondary">Apply Now</a>
+                </div>
+
+                <!-- Job Card 2 -->
+                <div class="job-card">
+                    <div class="job-info">
+                        <h3>Civil Engineer</h3>
+                        <p class="job-meta"><i class="fas fa-map-marker-alt"></i> Mandya &nbsp;|&nbsp; <i class="fas fa-clock"></i> Full Time</p>
+                        <p>Plan, design, and oversee construction and maintenance of building structures and infrastructure.</p>
+                    </div>
+                    <a href="#apply" class="btn btn-secondary">Apply Now</a>
+                </div>
+
+                <!-- Job Card 3 -->
+                <div class="job-card">
+                    <div class="job-info">
+                        <h3>Architectural Intern</h3>
+                        <p class="job-meta"><i class="fas fa-map-marker-alt"></i> Remote/Hybrid &nbsp;|&nbsp; <i class="fas fa-clock"></i> Internship</p>
+                        <p>Assist in creating blueprints, 3D visualizations, and client presentations.</p>
+                    </div>
+                    <a href="#apply" class="btn btn-secondary">Apply Now</a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. APPLICATION FORM -->
+    <section id="apply">
+        <!-- Updated Form Section in careers.html -->
+<div class="contact-form contact-card" style="max-width: 700px; margin: 0 auto;">
+    <h3>Apply Now</h3>
+    <p style="margin-bottom: 20px; color: var(--text-secondary);">Don't see your role? Send us your CV.</p>
+    
+    <!-- CHANGED ID to 'career-form' -->
+    <form id="career-form">
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="email" name="email" placeholder="Email Address" required>
+        <input type="tel" name="phone" placeholder="Phone Number" required>
+        
+        <div class="form-group select-wrapper">
+            <select name="position" required style="width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 16px; font-family: var(--font-main);">
+                <option value="" disabled selected>Position Applying For</option>
+                <option value="Site Supervisor">Site Supervisor</option>
+                <option value="Civil Engineer">Civil Engineer</option>
+                <option value="Architectural Intern">Architectural Intern</option>
+                <option value="General Application">General Application</option>
+            </select>
+        </div>
+        
+        <label style="font-size:0.9rem; margin-bottom:5px; display:block; color: var(--text-secondary);">Upload Resume (PDF/Doc)</label>
+        <input type="file" name="resume_upload" id="resume_upload" accept=".pdf, .doc, .docx" required>
+
+        <textarea name="message" placeholder="Briefly tell us about your experience..." required></textarea>
+
+        <div class="consent-group" style="margin-bottom:20px; display: flex; gap: 10px; align-items: flex-start;">
+            <input type="checkbox" id="consent" name="consent" checked required style="width:auto; margin-top: 5px;">
+            <label for="consent" style="font-size:0.9rem; color: var(--text-secondary);">I certify that the information provided is accurate.</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="career-submit-btn" style="width:100%">Submit Application</button>
+        <div id="career-form-status" style="margin-top:10px;"></div>
+    </form>
+
+    <div id="career-thank-you" class="hidden" style="text-align:center; margin-top:20px; padding: 20px; background: #f0fdf4; border-radius: 8px; color: #15803d;">
+        <h3>Application Sent!</h3>
+        <p>Our HR team will review your details and contact you if shortlisted.</p>
+    </div>
+</div>
+    </section>
+
+    <!-- FOOTER (Same as Index) -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-top">
+                <a href="index.html" class="footer-logo">
+                    <img src="images/logo.png" alt="Logo">
+                    <span>Sahyadri Constructions</span>
+                </a>
+                <div class="footer-socials">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                </div>
+            </div>
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="index.html#about">About Us</a></li>
+                        <li><a href="index.html#projects">Our Portfolio</a></li>
+                        <li><a href="careers.html">Careers</a></li> <!-- Active Link -->
+                        <li><a href="index.html#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="index.html#services">Residential</a></li>
+                        <li><a href="index.html#services">Commercial</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Get in Touch</h4>
+                    <div class="footer-contact-item"><i class="fas fa-envelope"></i> sahyadriconstructions449@gmail.com</div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Reuse main.js for form logic -->
+    <script src="main.js" defer></script> 
+</body>
+</html>

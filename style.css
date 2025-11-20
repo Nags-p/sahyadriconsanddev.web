@@ -532,3 +532,70 @@ section { padding: 100px 0; scroll-margin-top: 80px; }
 .project-details-card { background: #f8fafc; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0; }
 .project-details-card li { padding: 12px 0; border-bottom: 1px solid #e2e8f0; display: flex; flex-direction: column; }
 @media (max-width: 768px) { .project-info-grid { grid-template-columns: 1fr; } .project-details-card { order: -1; } }
+
+
+/* =======================
+   CAREER PAGE STYLES
+   ======================= */
+
+.job-list {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.job-card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.job-card:hover {
+    border-color: var(--brand-blue);
+    box-shadow: var(--shadow-md);
+    transform: translateX(5px);
+}
+
+.job-info h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.3rem;
+    color: var(--brand-navy);
+}
+
+.job-meta {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.job-meta i {
+    color: var(--brand-accent);
+}
+
+.job-info p:last-child {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+}
+
+@media (max-width: 768px) {
+    .job-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+    .job-card .btn {
+        width: 100%;
+    }
+}

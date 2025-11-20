@@ -1068,3 +1068,143 @@ a.btn-info:hover {
     align-items: center;
     flex-wrap: wrap; /* Allows buttons to stack if screen is narrow */
 }
+
+
+.badge-new {
+    background-color: #ef4444;
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: auto;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+/* =======================
+   CAREERS PAGE STYLES (FIXED)
+   ======================= */
+
+/* Fix the huge Refresh Button */
+.analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.analytics-header h2 {
+    margin: 0;
+    border: none;
+    padding: 0;
+}
+
+.analytics-header button {
+    width: auto !important; /* Stop it from stretching */
+    flex-grow: 0;
+    padding: 10px 20px;
+    margin: 0;
+}
+
+/* Table Styling */
+#careers-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#careers-table th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    padding: 15px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+#careers-table td {
+    padding: 15px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+    color: #334155;
+}
+
+#careers-table tr:last-child td {
+    border-bottom: none;
+}
+
+#careers-table tr:hover {
+    background-color: #fdfdfd;
+}
+
+/* Applicant Info Styling */
+.applicant-info h4 {
+    margin: 0 0 4px 0;
+    font-size: 0.95rem;
+    color: #0f172a;
+}
+.applicant-info a {
+    display: block;
+    font-size: 0.85rem;
+    color: #2563eb;
+    text-decoration: none;
+}
+.applicant-info span {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Action Column Styling */
+.action-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-select {
+    padding: 6px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #334155;
+    background-color: white;
+    cursor: pointer;
+    outline: none;
+}
+
+.btn-delete-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fee2e2;
+    color: #ef4444;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn-delete-icon:hover {
+    background-color: #ef4444;
+    color: white;
+}

@@ -149,4 +149,75 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('scroll', () => {
         if(backToTopBtn) backToTopBtn.classList.toggle('visible', window.scrollY > 300);
     });
+
+
+
+    // ... existing Supabase config ...
+
+    // --- NEW CAREER FORM LOGIC ---
+    const careerForm = document.querySelector('#career-form');
+    const careerBtn = document.querySelector('#career-submit-btn');
+    const careerThankYou = document.querySelector('#career-thank-you');
+    const careerStatus = document.querySelector('#career-form-status');
+
+    if (careerForm) {
+        careerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            careerBtn.disabled = true;
+            careerBtn.textContent = 'Uploading...';
+            careerStatus.textContent = '';
+
+            try {
+                const formData = new FormData(careerForm);
+                const file = document.getElementById('resume_upload').files[0];
+                let resumeUrl = null;
+
+                // 1. Upload Resume
+                if (file) {
+                    const fileExt = file.name.split('.').pop();
+                    // Add 'resume_' prefix to keep bucket organized
+                    const fileName = `resume_${Date.now()}.${fileExt}`; 
+                    
+                    const { error: uploadError } = await _supabase.storage
+                        .from('contact_uploads') // Reusing existing bucket
+                        .upload(fileName, file);
+
+                    if (uploadError) throw new Error(`Resume upload failed: ${uploadError.message}`);
+                    
+                    const { data } = _supabase.storage
+                        .from('contact_uploads')
+                        .getPublicUrl(fileName);
+                        
+                    resumeUrl = data.publicUrl;
+                }
+
+                // 2. Insert into Job Applications Table
+                const { error: dbError } = await _supabase
+                    .from('job_applications')
+                    .insert([{
+                        name: formData.get('name'),
+                        email: formData.get('email'),
+                        phone: formData.get('phone'),
+                        position: formData.get('position'),
+                        message: formData.get('message'),
+                        resume_url: resumeUrl,
+                        status: 'New' // Default status
+                    }]);
+
+                if (dbError) throw new Error(dbError.message);
+
+                // 3. Success State
+                careerForm.style.display = 'none';
+                careerThankYou.classList.remove('hidden');
+                careerThankYou.style.display = 'block';
+
+            } catch (error) {
+                console.error(error);
+                careerStatus.textContent = `Error: ${error.message}`;
+                careerStatus.style.color = 'red';
+                careerBtn.disabled = false;
+                careerBtn.textContent = 'Submit Application';
+            }
+        });
+    }
 });
