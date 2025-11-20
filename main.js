@@ -113,7 +113,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (navToggle && navLinksContainer) {
         navToggle.addEventListener('click', () => {
             const isVisible = navLinksContainer.classList.toggle('is-visible');
+            
+            // Ensure this attribute updates, as the CSS relies on it for color change
             navToggle.setAttribute('aria-expanded', isVisible);
+            
             navToggle.innerHTML = isVisible
                 ? '<i class="fas fa-times" aria-hidden="true"></i><span class="sr-only">Close menu</span>'
                 : '<i class="fas fa-bars" aria-hidden="true"></i><span class="sr-only">Menu</span>';
