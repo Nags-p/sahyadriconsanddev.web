@@ -5,9 +5,11 @@ const SCRIPT_URL = config.SCRIPT_URL;
 const SUPABASE_URL = config.SUPABASE_URL;
 const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
 
+// --- SUPABASE CLIENT ---
 const { createClient } = supabase;
 const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// --- DERIVED CONFIG & STATE VARIABLES ---
 const IMAGE_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/promotional_images/`;
 const WEBSITE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/';
 const MASTER_TEMPLATE_URL = 'https://raw.githubusercontent.com/Nags-p/sahyadriconsanddev.web/main/email_templates/master-promo.html';
@@ -87,6 +89,7 @@ function showPage(pageId, dom, params = null) {
 // ===================================================================
 // --- 3. DATA HANDLING (DIRECT SUPABASE CALLS) ---
 // ===================================================================
+
 async function fetchCampaignAnalytics(dom, campaignId) {
     setLoading(true);
     dom.analyticsTitle.textContent = 'Campaign Analytics';
@@ -118,6 +121,20 @@ async function fetchCampaignAnalytics(dom, campaignId) {
         
     } catch (error) {
         alert(`Error loading analytics: ${error.message}`);
+    }
+    setLoading(false);
+}
+
+// --- THIS FUNCTION WAS MISSING. IT IS NOW RESTORED. ---
+async function fetchCampaignArchive(dom) {
+    setLoading(true);
+    dom.archiveTableBody.innerHTML = `<tr><td colspan="6">Loading...</td></tr>`;
+    try {
+        const { data, error } = await _supabase.from('campaign_archive').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        renderCampaignArchive(data, dom);
+    } catch (error) {
+        dom.archiveTableBody.innerHTML = `<tr><td colspan="6">Error: ${error.message}</td></tr>`;
     }
     setLoading(false);
 }
@@ -571,7 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (document.getElementById(pageId)) {
                 showPage(pageId, dom);
             } else {
-                showPage('page-inquiries', dom); // Fallback
+                showPage('page-inquiries', dom);
             }
         }
     }
@@ -667,7 +684,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!campaignForm.checkValidity()) { campaignForm.reportValidity(); return; }
         callEmailApi('sendTest', { campaignData: getCampaignData() }, r => {
             showStatusMessage(dom.campaignStatus, r.message, r.success);
-            setLoading(false);
+            setLoading(false); // Important: callEmailApi doesn't handle this
         });
     });
 
