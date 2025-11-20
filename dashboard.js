@@ -5,11 +5,9 @@ const SCRIPT_URL = config.SCRIPT_URL;
 const SUPABASE_URL = config.SUPABASE_URL;
 const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
 
-// --- SUPABASE CLIENT ---
 const { createClient } = supabase;
 const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// --- DERIVED CONFIG & STATE VARIABLES ---
 const IMAGE_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/promotional_images/`;
 const WEBSITE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/';
 const MASTER_TEMPLATE_URL = 'https://raw.githubusercontent.com/Nags-p/sahyadriconsanddev.web/main/email_templates/master-promo.html';
@@ -27,8 +25,7 @@ async function callEmailApi(action, payload, callback, errorElementId = 'campaig
         const { data: { session } } = await _supabase.auth.getSession();
         if (!session) {
             alert("Session expired. Please log in again.");
-            logout();
-            return;
+            await logout(); return;
         }
 
         payload.action = action;
@@ -132,7 +129,6 @@ async function renderCampaignArchive(campaigns, dom) {
     tHead.innerHTML = '<tr><th>Date</th><th>Subject</th><th>Sent</th><th>Opens</th><th>Clicks</th><th>Actions</th></tr>';
 
     if (campaigns.length === 0) {
-        // --- FIX #1: Correctly format the "no campaigns" message ---
         tBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No campaigns have been sent yet.</td></tr>`;
         return;
     }
@@ -152,26 +148,13 @@ async function renderCampaignArchive(campaigns, dom) {
         const row = document.createElement('tr');
         const sentDate = new Date(campaign.created_at).toLocaleString();
         
-        // --- FIX #2: Create each <td> individually for robustness ---
-        const dateTd = document.createElement('td');
-        dateTd.textContent = sentDate;
-        row.appendChild(dateTd);
-        
-        const subjectTd = document.createElement('td');
-        subjectTd.textContent = campaign.subject;
-        row.appendChild(subjectTd);
-        
-        const sentTd = document.createElement('td');
-        sentTd.textContent = campaign.emails_sent || 0;
-        row.appendChild(sentTd);
-        
-        const opensTd = document.createElement('td');
-        opensTd.textContent = opensCount;
-        row.appendChild(opensTd);
-        
-        const clicksTd = document.createElement('td');
-        clicksTd.textContent = clicksCount;
-        row.appendChild(clicksTd);
+        row.innerHTML = `
+            <td>${sentDate}</td>
+            <td>${campaign.subject}</td>
+            <td>${campaign.emails_sent || 0}</td>
+            <td>${opensCount}</td>
+            <td>${clicksCount}</td>
+        `;
         
         const actionsTd = document.createElement('td');
         actionsTd.className = 'action-buttons';
@@ -211,6 +194,7 @@ async function renderCampaignArchive(campaigns, dom) {
         tBody.appendChild(row);
     });
 }
+
 async function fetchImages(dom) {
     setLoading(true);
     dom.imageGridContainer.innerHTML = '<p>Loading images...</p>';
@@ -583,7 +567,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const campaignId = hash.split('/')[2];
             showPage('page-campaign-analytics', dom, { campaignId });
         } else {
-            const pageId = `page-${hash.replace('_', '-') || 'inquiries'}`;
+            const pageId = `page-${hash.replace(/_/g, '-') || 'inquiries'}`;
             if (document.getElementById(pageId)) {
                 showPage(pageId, dom);
             } else {
@@ -629,7 +613,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         setLoading(false);
     }
-
+    
     async function logout() {
         setLoading(true);
         await _supabase.auth.signOut();
