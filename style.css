@@ -599,3 +599,41 @@ section { padding: 100px 0; scroll-margin-top: 80px; }
         width: 100%;
     }
 }
+
+/* =======================
+   MOBILE CONTACT BUTTON
+   ======================= */
+
+/* 1. Hide by default (Desktop) */
+.mobile-contact-btn {
+    display: none;
+}
+
+/* 2. Show only on Mobile */
+@media (max-width: 1200px) {
+    .mobile-contact-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        
+        /* Sizing */
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        height: 34px;
+        
+        /* Push to the right side, next to the hamburger */
+        margin-left: auto; 
+        margin-right: 12px; /* Space between Button and Menu Icon */
+        
+        /* Styling */
+        background-color: var(--git-blue);
+        color: rgb(78, 78, 132);
+        border-radius: 50px; /* Rounded pill shape looks good on mobile */
+        box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2);
+    }
+    
+    /* Ensure icon size is balanced */
+    .mobile-contact-btn i {
+        font-size: 0.8rem;
+    }
+}
