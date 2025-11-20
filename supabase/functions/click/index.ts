@@ -7,10 +7,10 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(
+    // THE FIX: Create an admin client
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '' // Use the powerful service role key
     );
 
     const url = new URL(req.url);
@@ -19,21 +19,23 @@ Deno.serve(async (req) => {
     const redirect_url = url.searchParams.get('redirect');
 
     if (campaign_id && recipient_email && redirect_url) {
-        await supabase.from('email_clicks').insert({ campaign_id, recipient_email, redirect_url });
+        // Use the admin client to insert data
+        await supabaseAdmin.from('email_clicks').insert({ campaign_id, recipient_email, redirect_url });
     }
     
-    // Redirect to the final destination URL
     if (redirect_url) {
         return Response.redirect(redirect_url, 302);
     } else {
-        // Fallback if no redirect URL is provided
         return new Response('Link expired or invalid.', { headers: { ...corsHeaders } });
     }
     
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
-    })
+    // If there's an error, still try to redirect the user
+    const url = new URL(req.url);
+    const redirect_url = url.searchParams.get('redirect');
+    if (redirect_url) {
+        return Response.redirect(redirect_url, 302);
+    }
+    return new Response('An error occurred.', { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 });
   }
 })
