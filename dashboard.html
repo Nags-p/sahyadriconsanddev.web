@@ -150,10 +150,55 @@
         </div>
     </div>
 
-    <!-- Modals are unchanged -->
-    <div id="edit-customer-modal-overlay" class="modal-overlay"></div>
-    <div id="recipients-modal-overlay" class="modal-overlay"></div>
-    <div id="stats-modal-overlay" class="modal-overlay"></div>
+    <!-- Edit Customer Modal -->
+    <div id="edit-customer-modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Customer</h3>
+                <button type="button" class="modal-close" id="edit-modal-close">&times;</button>
+            </div>
+            <form id="edit-customer-form">
+                <input type="hidden" id="edit-customer-rowid">
+                <div id="edit-customer-fields"></div>
+                <div class="button-group">
+                    <button type="button" class="btn-secondary" id="edit-modal-cancel">Cancel</button>
+                    <button type="submit" class="btn-primary" id="edit-modal-save">Save Changes</button>
+                </div>
+                <div id="edit-customer-status" class="status-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Recipients Modal -->
+    <div id="recipients-modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="recipients-modal-title">Recipients</h3>
+                <button type="button" class="modal-close" id="recipients-modal-close">&times;</button>
+            </div>
+            <ul id="recipients-list"></ul>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div id="stats-modal-overlay" class="modal-overlay">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 id="stats-modal-title">Campaign Stats</h3>
+                <button type="button" class="modal-close" id="stats-modal-close">&times;</button>
+            </div>
+            <div class="stats-container">
+                <div class="stats-column">
+                    <h4>Opened By</h4>
+                    <ul id="stats-opens-list" class="stats-list"></ul>
+                </div>
+                <div class="stats-column">
+                    <h4>Clicked By</h4>
+                    <ul id="stats-clicks-list" class="stats-list"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js" defer></script>
