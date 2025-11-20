@@ -2,7 +2,7 @@
    SAHYADRI CONSTRUCTIONS - MAIN JAVASCRIPT FILE
    Handles:
    1. Supabase Client Initialization
-   2. AJAX Supabase Contact Form Submission
+   2. AJAX Supabase Contact Form Submission (Public Bucket Version)
    3. Mobile Navigation & Header Effects
    4. Active Link Highlighting
    5. Dynamic Project Page Loader
@@ -12,7 +12,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- 1. SUPABASE CLIENT INITIALIZATION ---
-    // ⚠️ IMPORTANT: These keys are already correct from your last file. No changes needed here.
+    // ⚠️ IMPORTANT: Replace with your actual Supabase URL and Anon Key
     const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2ns-yio';
     
@@ -53,23 +53,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 const formProps = Object.fromEntries(formData);
                 const file = formProps.file_upload;
 
-                let filePathForDb = null;
+                let publicFileUrl = null;
 
                 if (file && file.size > 0) {
                     const fileExt = file.name.split('.').pop();
                     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
                     
-                    // --- THIS IS THE FINAL, CORRECTED LOGIC ---
-                    // The path saved to the database is ONLY the filename.
-                    filePathForDb = fileName; 
-
                     const { error: uploadError } = await _supabase.storage
                         .from('contact_uploads')
-                        .upload(filePathForDb, file); // Upload using only the filename as the path
+                        .upload(fileName, file);
 
                     if (uploadError) {
                         throw new Error(`File Upload Failed: ${uploadError.message}`);
                     }
+
+                    // Get the public URL now that the bucket is public.
+                    const { data } = _supabase.storage
+                        .from('contact_uploads')
+                        .getPublicUrl(fileName);
+
+                    publicFileUrl = data.publicUrl;
                 }
 
                 const inquiryData = {
@@ -81,8 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     budget_range: formProps.budget_range || null,
                     start_date: formProps.start_date || null,
                     message: formProps.message,
-                    // Save the clean filename to the 'file_url' column
-                    file_url: filePathForDb, 
+                    // Save the public URL to the database
+                    file_url: publicFileUrl, 
                     consent_given: formProps.consent === 'on'
                 };
                 

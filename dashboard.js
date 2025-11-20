@@ -93,16 +93,9 @@ function renderInquiries(inquiries, dom) {
         const card = document.createElement('div');
         card.className = 'inquiry-card';
 
-        let attachmentHtml = '<p><strong>Attachment:</strong> None</p>';
-        if (inquiry.file_url) {
-            // Store the clean file path in the data attribute
-            attachmentHtml = `
-                <p><strong>Attachment:</strong> 
-                    <button class="btn-secondary" style="flex-grow: 0; padding: 5px 10px; font-size: 14px;" data-file-path="${inquiry.file_url}">
-                        View File
-                    </button>
-                </p>`;
-        }
+        const fileLink = inquiry.file_url 
+            ? `<a href="${inquiry.file_url}" target="_blank" class="btn-secondary" style="display: inline-block; text-decoration: none; padding: 5px 10px; font-size: 14px; border-radius: 5px;">View File</a>` 
+            : 'None';
 
         card.innerHTML = `
             <h4>${inquiry.name}</h4>
@@ -112,42 +105,41 @@ function renderInquiries(inquiries, dom) {
             <p><strong>Project Type:</strong> ${inquiry.project_type}</p>
             <p><strong>Budget:</strong> ${inquiry.budget_range || 'Not specified'}</p>
             <p><strong>Start Date:</strong> ${inquiry.start_date || 'Not specified'}</p>
-            ${attachmentHtml}
+            <p><strong>Attachment:</strong> ${fileLink}</p>
             <p class="inquiry-message"><strong>Message:</strong><br>${inquiry.message}</p>
         `;
         
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'inquiry-actions';
-        // (Add and Delete buttons remain unchanged)
-        // ...
 
+        const addBtn = document.createElement('button');
+        addBtn.textContent = 'Add to Customers';
+        addBtn.className = 'btn-primary';
+        addBtn.addEventListener('click', () => {
+            if (confirm(`Add ${inquiry.name} to the main customer list? This will remove the inquiry from this page.`)) {
+                callApi('addCustomerFromInquiry', { inquiryData: inquiry }, response => {
+                    showStatusMessage(dom.inquiriesStatus, response.message, response.success);
+                    if (response.success) fetchInquiries(dom);
+                }, 'inquiries-status');
+            }
+        });
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete Inquiry';
+        deleteBtn.className = 'btn-danger';
+        deleteBtn.addEventListener('click', () => {
+            if (confirm(`Permanently delete this inquiry from ${inquiry.name}?`)) {
+                callApi('deleteInquiry', { inquiryId: inquiry.id }, response => {
+                    showStatusMessage(dom.inquiriesStatus, response.message, response.success);
+                    if (response.success) fetchInquiries(dom);
+                }, 'inquiries-status');
+            }
+        });
+
+        actionsDiv.appendChild(addBtn);
+        actionsDiv.appendChild(deleteBtn);
         card.appendChild(actionsDiv);
         container.appendChild(card);
-        
-        // Find the button using the new data attribute
-        const viewFileBtn = card.querySelector('[data-file-path]');
-        if (viewFileBtn) {
-            viewFileBtn.addEventListener('click', (e) => {
-                const button = e.target;
-                const originalText = button.textContent;
-                button.textContent = 'Loading...';
-                button.disabled = true;
-
-                // --- SIMPLIFIED LOGIC ---
-                // The filePath is now clean and stored directly in the data attribute.
-                const filePath = button.dataset.filePath;
-
-                callApi('createSignedUrl', { filePath: filePath }, response => {
-                    if (response.success && response.signedUrl) {
-                        window.open(response.signedUrl, '_blank');
-                    } else {
-                        showStatusMessage(dom.inquiriesStatus, `Error: ${response.message}`, false);
-                    }
-                    button.textContent = originalText;
-                    button.disabled = false;
-                }, 'inquiries-status');
-            });
-        }
     });
 }
 
@@ -414,7 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 availableSegments = data.segments;
                 populateCheckboxes(data.segments);
                 populateImages(data.images);
-                showPage('page-inquiries', dom);
+                showPage('page-inquiries', dom); // Show inquiries by default
             } else {
                 alert('Critical Error: Could not fetch dashboard data. ' + data.message);
             }
