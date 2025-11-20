@@ -6,7 +6,7 @@
 // For best practice, add 'config.js' to your .gitignore file.
 
 const config = {
-    SCRIPT_URL: 'https://script.google.com/macros/s/AKfycby03T3U12jsryR25seNLTKDlwFlsvNi3jJ_zsCRja4LoK00AAJjtzPBTUk1f27QKgbXag/exec',
+    SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxreE_UiLSgwj6EIlHosXPxyytTPuFZ_fV54z1WLbjwxxmsFGj8pmE_1p4crM3ToRVaaA/exec',
     SUPABASE_URL: 'https://qrnmnulzajmxrsrzgmlp.supabase.co',
     SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2ns-yio'
 };
