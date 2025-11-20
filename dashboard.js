@@ -132,7 +132,8 @@ async function renderCampaignArchive(campaigns, dom) {
     tHead.innerHTML = '<tr><th>Date</th><th>Subject</th><th>Sent</th><th>Opens</th><th>Clicks</th><th>Actions</th></tr>';
 
     if (campaigns.length === 0) {
-        tBody.innerHTML = `<tr><td colspan="6">No campaigns have been sent yet.</td></tr>`;
+        // --- FIX #1: Correctly format the "no campaigns" message ---
+        tBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No campaigns have been sent yet.</td></tr>`;
         return;
     }
     
@@ -151,13 +152,26 @@ async function renderCampaignArchive(campaigns, dom) {
         const row = document.createElement('tr');
         const sentDate = new Date(campaign.created_at).toLocaleString();
         
-        row.innerHTML = `
-            <td>${sentDate}</td>
-            <td>${campaign.subject}</td>
-            <td>${campaign.emails_sent || 0}</td>
-            <td>${opensCount}</td>
-            <td>${clicksCount}</td>
-        `;
+        // --- FIX #2: Create each <td> individually for robustness ---
+        const dateTd = document.createElement('td');
+        dateTd.textContent = sentDate;
+        row.appendChild(dateTd);
+        
+        const subjectTd = document.createElement('td');
+        subjectTd.textContent = campaign.subject;
+        row.appendChild(subjectTd);
+        
+        const sentTd = document.createElement('td');
+        sentTd.textContent = campaign.emails_sent || 0;
+        row.appendChild(sentTd);
+        
+        const opensTd = document.createElement('td');
+        opensTd.textContent = opensCount;
+        row.appendChild(opensTd);
+        
+        const clicksTd = document.createElement('td');
+        clicksTd.textContent = clicksCount;
+        row.appendChild(clicksTd);
         
         const actionsTd = document.createElement('td');
         actionsTd.className = 'action-buttons';
@@ -197,7 +211,6 @@ async function renderCampaignArchive(campaigns, dom) {
         tBody.appendChild(row);
     });
 }
-
 async function fetchImages(dom) {
     setLoading(true);
     dom.imageGridContainer.innerHTML = '<p>Loading images...</p>';
