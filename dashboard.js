@@ -1,9 +1,10 @@
 // ===================================================================
 // --- 1. CONFIGURATION ---
 // ===================================================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCobLVXd_BsI8NAbYrVhBp-eEikj1SuPotqIxW7C6UbbzVqvQE26x3KyoWWhS8alWQ5Q/exec'; 
-const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2ns-yio';
+// Keys are now loaded from config.js
+const SCRIPT_URL = config.SCRIPT_URL; 
+const SUPABASE_URL = config.SUPABASE_URL;
+const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
 
 // --- SUPABASE CLIENT ---
 const { createClient } = supabase;
@@ -12,10 +13,11 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // --- DERIVED CONFIG & STATE VARIABLES ---
 const IMAGE_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/promotional_images/`;
 const WEBSITE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/';
+const MASTER_TEMPLATE_URL = 'https://raw.githubusercontent.com/Nags-p/sahyadriconsanddev.web/main/email_templates/master-promo.html'; // <-- THE FIX IS HERE
 let masterTemplateHtml = '', allCustomers = [], customerHeaders = [], availableSegments = [];
 
 // ===================================================================
-// --- 2. CORE & HELPER FUNCTIONS ---
+// --- 2. CORE FUNCTIONS ---
 // ===================================================================
 async function callEmailApi(action, payload, callback, errorElementId = 'campaign-status') {
     setLoading(true);
@@ -279,6 +281,8 @@ async function fetchCustomerData(dom) {
         allCustomers = data;
         if (data.length > 0) {
             customerHeaders = Object.keys(data[0]).filter(h => h !== 'id' && h !== 'created_at');
+        } else {
+            customerHeaders = ['name', 'email', 'phone', 'city', 'segment']; // Default headers if no customers
         }
         renderCustomerTable(allCustomers, dom);
     } catch(error) {
