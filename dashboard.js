@@ -1,7 +1,7 @@
 // ===================================================================
 // --- 1. CONFIGURATION ---
 // ===================================================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwtZuva76Wo70W17mQYR6V_NZFzSv6Tr6YUXkH7FkZvM8tcA-E4psc9WaWWKbptzj8T5w/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKWm5QFrZ5LCPopIygpP_dqTut7JWytEXRvdro5tbcUGWHCiPCWA5prwfXG1EObaEq1w/exec'; 
 const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
 
 // --- DERIVED CONFIG ---
@@ -18,7 +18,6 @@ function callApi(action, payload, callback, errorElementId = 'campaign-status') 
     setLoading(true);
     const statusElement = document.getElementById(errorElementId);
     if (statusElement) statusElement.style.display = 'none';
-
     
     const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
     window[callbackName] = function(data) {
@@ -94,7 +93,16 @@ function renderInquiries(inquiries, dom) {
         const card = document.createElement('div');
         card.className = 'inquiry-card';
 
-        const fileLink = inquiry.file_url ? `<a href="${inquiry.file_url}" target="_blank">View File</a>` : 'None';
+        // Updated logic to use a button for secure URL fetching
+        let attachmentHtml = '<p><strong>Attachment:</strong> None</p>';
+        if (inquiry.file_url) {
+            attachmentHtml = `
+                <p><strong>Attachment:</strong> 
+                    <button class="btn-secondary" style="flex-grow: 0; padding: 5px 10px; font-size: 14px;" data-file-url="${inquiry.file_url}">
+                        View File
+                    </button>
+                </p>`;
+        }
 
         card.innerHTML = `
             <h4>${inquiry.name}</h4>
@@ -104,7 +112,7 @@ function renderInquiries(inquiries, dom) {
             <p><strong>Project Type:</strong> ${inquiry.project_type}</p>
             <p><strong>Budget:</strong> ${inquiry.budget_range || 'Not specified'}</p>
             <p><strong>Start Date:</strong> ${inquiry.start_date || 'Not specified'}</p>
-            <p><strong>Attachment:</strong> ${fileLink}</p>
+            ${attachmentHtml}
             <p class="inquiry-message"><strong>Message:</strong><br>${inquiry.message}</p>
         `;
         
@@ -118,7 +126,7 @@ function renderInquiries(inquiries, dom) {
             if (confirm(`Add ${inquiry.name} to the main customer list? This will remove the inquiry from this page.`)) {
                 callApi('addCustomerFromInquiry', { inquiryData: inquiry }, response => {
                     showStatusMessage(dom.inquiriesStatus, response.message, response.success);
-                    if (response.success) fetchInquiries(dom); // Refresh the list
+                    if (response.success) fetchInquiries(dom);
                 }, 'inquiries-status');
             }
         });
@@ -130,7 +138,7 @@ function renderInquiries(inquiries, dom) {
             if (confirm(`Permanently delete this inquiry from ${inquiry.name}?`)) {
                 callApi('deleteInquiry', { inquiryId: inquiry.id }, response => {
                     showStatusMessage(dom.inquiriesStatus, response.message, response.success);
-                    if (response.success) fetchInquiries(dom); // Refresh the list
+                    if (response.success) fetchInquiries(dom);
                 }, 'inquiries-status');
             }
         });
@@ -139,6 +147,39 @@ function renderInquiries(inquiries, dom) {
         actionsDiv.appendChild(deleteBtn);
         card.appendChild(actionsDiv);
         container.appendChild(card);
+        
+        // Add event listener for the new "View File" button
+        const viewFileBtn = card.querySelector('[data-file-url]');
+        if (viewFileBtn) {
+            viewFileBtn.addEventListener('click', (e) => {
+                const button = e.target;
+                const originalText = button.textContent;
+                button.textContent = 'Loading...';
+                button.disabled = true;
+
+                // Extract just the file path from the full URL
+                const fileUrl = button.dataset.fileUrl;
+                const filePath = fileUrl.split('/contact_uploads/')[1];
+
+                if (!filePath) {
+                    showStatusMessage(dom.inquiriesStatus, 'Error: Invalid file path.', false);
+                    button.textContent = originalText;
+                    button.disabled = false;
+                    return;
+                }
+
+                // Call the new API endpoint to get a secure, temporary URL
+                callApi('createSignedUrl', { filePath: filePath }, response => {
+                    if (response.success && response.signedUrl) {
+                        window.open(response.signedUrl, '_blank');
+                    } else {
+                        showStatusMessage(dom.inquiriesStatus, `Error: ${response.message}`, false);
+                    }
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }, 'inquiries-status');
+            });
+        }
     });
 }
 
@@ -405,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 availableSegments = data.segments;
                 populateCheckboxes(data.segments);
                 populateImages(data.images);
-                showPage('page-inquiries', dom); // Show inquiries by default
+                showPage('page-inquiries', dom);
             } else {
                 alert('Critical Error: Could not fetch dashboard data. ' + data.message);
             }
