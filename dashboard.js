@@ -443,7 +443,6 @@ async function handleUserSession() {
         
         // --- THIS IS THE CORRECTED LINE ---
         dom.userEmailDisplay.textContent = session.user.user_metadata.display_name || session.user.email;
-        dom.userEmailDisplay.textContent = session.user.email;
         
         dom.userRoleDisplay.textContent = userRole;
         initializeDashboard();
