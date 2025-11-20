@@ -1,7 +1,7 @@
 // ===================================================================
 // --- 1. CONFIGURATION ---
 // ===================================================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSRIZ7aSQ2s2JTV5OTfbz0cAqViA6H6p5NkpgRz7aqQpVWbR64-w5--Jna--oqp0Hq0w/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCobLVXd_BsI8NAbYrVhBp-eEikj1SuPotqIxW7C6UbbzVqvQE26x3KyoWWhS8alWQ5Q/exec'; 
 const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2ns-yio';
 
@@ -9,19 +9,15 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const { createClient } = supabase;
 const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// --- DERIVED CONFIG ---
+// --- DERIVED CONFIG & STATE VARIABLES ---
 const IMAGE_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/promotional_images/`;
 const WEBSITE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/';
-
-// --- STATE VARIABLES ---
 let masterTemplateHtml = '', allCustomers = [], customerHeaders = [], availableSegments = [];
 
 // ===================================================================
-// --- 2. CORE FUNCTIONS ---
+// --- 2. CORE & HELPER FUNCTIONS ---
 // ===================================================================
-// --- 2. CORE FUNCTIONS (NEW callApi) ---
-// ===================================================================
-async function callApi(action, payload, callback, errorElementId = 'campaign-status') {
+async function callEmailApi(action, payload, callback, errorElementId = 'campaign-status') {
     setLoading(true);
     const statusElement = document.getElementById(errorElementId);
     if (statusElement) statusElement.style.display = 'none';
@@ -29,51 +25,32 @@ async function callApi(action, payload, callback, errorElementId = 'campaign-sta
     try {
         const { data: { session } } = await _supabase.auth.getSession();
         if (!session) {
-            alert("Your session has expired. Please log in again.");
+            alert("Session expired. Please log in again.");
             logout();
             return;
         }
 
-        // Add action and JWT to the payload for the POST request
         payload.action = action;
         payload.jwt = session.access_token;
 
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
-            mode: 'cors', // Important for cross-origin requests
-            headers: {
-                'Content-Type': 'text/plain;charset=utf-8', // Apps Script requires this for doPost
-            },
+            mode: 'cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(payload)
         });
 
-        if (!response.ok) {
-            throw new Error(`Network response was not ok: ${response.statusText}`);
-        }
-
+        if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
         const data = await response.json();
-
         setLoading(false);
-        if (data.message && (data.message.includes("Invalid JWT") || data.message.includes("Expired JWT"))) {
-            alert("Your session is invalid or has expired. Please log in again.");
-            logout();
-        } else {
-            callback(data);
-        }
+        callback(data);
     } catch (error) {
         setLoading(false);
-        const errorMsg = `Network Error: ${error.message}`;
-        const errorStatusElement = document.getElementById(errorElementId);
-        
-        if (errorStatusElement) {
-            showStatusMessage(errorStatusElement, errorMsg, false);
-        } else {
-            alert(errorMsg);
-        }
+        const errorMsg = `Email API Error: ${error.message}`;
+        showStatusMessage(document.getElementById(errorElementId), errorMsg, false);
         callback({ success: false, message: errorMsg });
     }
 }
-
 
 function setLoading(isLoading) {
     document.querySelectorAll('button').forEach(btn => btn.disabled = isLoading);
@@ -103,18 +80,23 @@ function showPage(pageId, dom) {
 }
 
 // ===================================================================
-// --- 3. DATA HANDLING & RENDERING FUNCTIONS ---
+// --- 3. DATA HANDLING (DIRECT SUPABASE CALLS) ---
 // ===================================================================
-function fetchImages(dom) {
-    dom.campaignLoader.textContent = 'Loading images...';
-    dom.imageGridContainer.innerHTML = '<p>Loading...</p>';
-    callApi('getDashboardData', {}, response => {
-        if (response.success && response.images) {
-            renderImageGrid(response.images, dom);
-        } else {
-            dom.imageGridContainer.innerHTML = `<p style="color:red;">Error: ${response.message}</p>`;
-        }
-    }, 'image-manager-status');
+async function fetchImages(dom) {
+    setLoading(true);
+    dom.imageGridContainer.innerHTML = '<p>Loading images...</p>';
+    try {
+        const { data, error } = await _supabase.storage.from('promotional_images').list('', {
+            limit: 100,
+            offset: 0,
+            sortBy: { column: 'created_at', order: 'desc' },
+        });
+        if (error) throw error;
+        renderImageGrid(data, dom);
+    } catch (error) {
+        showStatusMessage(dom.imageManagerStatus, `Error fetching images: ${error.message}`, false);
+    }
+    setLoading(false);
 }
 
 function renderImageGrid(images, dom) {
@@ -126,15 +108,14 @@ function renderImageGrid(images, dom) {
     }
 
     images.forEach(image => {
-        const imageUrl = `${IMAGE_BASE_URL}${image.name}`;
+        const { data: { publicUrl } } = _supabase.storage.from('promotional_images').getPublicUrl(image.name);
         const card = document.createElement('div');
         card.className = 'image-card';
-
         const lastModified = new Date(image.updated_at || image.created_at).toLocaleDateString();
         const fileSize = image.metadata && image.metadata.size ? (image.metadata.size / 1024).toFixed(1) + ' KB' : 'N/A';
 
         card.innerHTML = `
-            <div class="image-card-preview" style="background-image: url('${imageUrl}')"></div>
+            <div class="image-card-preview" style="background-image: url('${publicUrl}')"></div>
             <div class="image-card-details">
                 <input type="text" class="image-name-input" value="${image.name}" data-original-name="${image.name}">
                 <p>${fileSize} - ${lastModified}</p>
@@ -146,54 +127,61 @@ function renderImageGrid(images, dom) {
         `;
         container.appendChild(card);
 
-        card.querySelector('.btn-delete').addEventListener('click', () => {
+        card.querySelector('.btn-delete').addEventListener('click', async () => {
             if (confirm(`Are you sure you want to delete the image "${image.name}"? This cannot be undone.`)) {
-                callApi('deleteImage', { fileName: image.name }, response => {
-                    showStatusMessage(dom.imageManagerStatus, response.message, response.success);
-                    if (response.success) fetchImages(dom);
-                }, 'image-manager-status');
+                setLoading(true);
+                const { error } = await _supabase.storage.from('promotional_images').remove([image.name]);
+                if (error) {
+                    showStatusMessage(dom.imageManagerStatus, `Error: ${error.message}`, false);
+                } else {
+                    showStatusMessage(dom.imageManagerStatus, `"${image.name}" deleted.`, true);
+                    fetchImages(dom);
+                }
+                setLoading(false);
             }
         });
 
-        card.querySelector('.btn-rename').addEventListener('click', () => {
+        card.querySelector('.btn-rename').addEventListener('click', async () => {
             const input = card.querySelector('.image-name-input');
             const oldName = input.dataset.originalName;
             const newName = input.value.trim();
 
             if (newName && newName !== oldName) {
                 if (confirm(`Rename "${oldName}" to "${newName}"?`)) {
-                    callApi('renameImage', { oldName: oldName, newName: newName }, response => {
-                        showStatusMessage(dom.imageManagerStatus, response.message, response.success);
-                        if (response.success) fetchImages(dom);
-                    }, 'image-manager-status');
+                    setLoading(true);
+                    const { error } = await _supabase.storage.from('promotional_images').move(oldName, newName);
+                     if (error) {
+                        showStatusMessage(dom.imageManagerStatus, `Error: ${error.message}`, false);
+                    } else {
+                        showStatusMessage(dom.imageManagerStatus, `Image renamed to "${newName}".`, true);
+                        fetchImages(dom);
+                    }
+                    setLoading(false);
                 }
             }
         });
     });
 }
 
-function fetchInquiries(dom, status) {
+async function fetchInquiries(dom, status) {
+    setLoading(true);
     const containerId = status === 'New' ? 'inquiries-container' : 'archived-inquiries-container';
-    const statusId = 'inquiries-status';
     const container = document.getElementById(containerId);
-    
-    if (!container) return;
-    dom.campaignLoader.textContent = `Fetching ${status} inquiries...`;
     container.innerHTML = `<p>Loading...</p>`;
     
-    callApi('getInquiries', { status: status }, response => {
-        if (response.success) {
-            renderInquiries(response.inquiries, dom, status);
-        } else {
-            container.innerHTML = `<p style="color: red;">Error: ${response.message}</p>`;
-        }
-    }, statusId);
+    try {
+        const { data, error } = await _supabase.from('contact_inquiries').select('*').eq('status', status).order('created_at', { ascending: false });
+        if (error) throw error;
+        renderInquiries(data, dom, status);
+    } catch (error) {
+        container.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+    }
+    setLoading(false);
 }
 
 function renderInquiries(inquiries, dom, status) {
     const containerId = status === 'New' ? 'inquiries-container' : 'archived-inquiries-container';
     const container = document.getElementById(containerId);
-    if (!container) return;
     container.innerHTML = '';
 
     if (inquiries.length === 0) {
@@ -204,10 +192,8 @@ function renderInquiries(inquiries, dom, status) {
     inquiries.forEach(inquiry => {
         const card = document.createElement('div');
         card.className = 'inquiry-card';
-
-        const fileLink = inquiry.file_url 
-            ? `<a href="${inquiry.file_url}" target="_blank" class="btn-secondary" style="display: inline-block; text-decoration: none; padding: 5px 10px; font-size: 14px; border-radius: 5px;">View File</a>` 
-            : 'None';
+        const { data: { publicUrl } } = _supabase.storage.from('contact_uploads').getPublicUrl(inquiry.file_url);
+        const fileLink = inquiry.file_url ? `<a href="${publicUrl}" target="_blank" class="btn-secondary" style="display: inline-block; text-decoration: none; padding: 5px 10px; font-size: 14px; border-radius: 5px;">View File</a>` : 'None';
 
         card.innerHTML = `
             <h4>${inquiry.name} <span style="font-size: 12px; color: #777; font-weight: normal;">(${new Date(inquiry.created_at).toLocaleDateString()})</span></h4>
@@ -228,12 +214,34 @@ function renderInquiries(inquiries, dom, status) {
             const addBtn = document.createElement('button');
             addBtn.textContent = 'Add to Customers';
             addBtn.className = 'btn-primary';
-            addBtn.addEventListener('click', () => {
+            addBtn.addEventListener('click', async () => {
                 if (confirm(`Add ${inquiry.name} to customers? This will move it to the archived list.`)) {
-                    callApi('addCustomerFromInquiry', { inquiryData: inquiry }, response => {
-                        showStatusMessage(dom.inquiriesStatus, response.message, response.success);
-                        if (response.success) fetchInquiries(dom, 'New');
-                    }, 'inquiries-status');
+                    setLoading(true);
+                    const { data: existing, error: checkError } = await _supabase.from('customers').select('id').eq('email', inquiry.email).single();
+                    if (checkError && checkError.code !== 'PGRST116') {
+                         showStatusMessage(dom.inquiriesStatus, `Error checking customer: ${checkError.message}`, false);
+                         setLoading(false);
+                         return;
+                    }
+                    if (existing) {
+                        showStatusMessage(dom.inquiriesStatus, `Customer with email ${inquiry.email} already exists.`, false);
+                        setLoading(false);
+                        return;
+                    }
+                    const { error: insertError } = await _supabase.from('customers').insert([{ name: inquiry.name, email: inquiry.email, phone: inquiry.phone, city: inquiry.location, segment: 'New Lead' }]);
+                    if (insertError) {
+                         showStatusMessage(dom.inquiriesStatus, `Error adding customer: ${insertError.message}`, false);
+                         setLoading(false);
+                         return;
+                    }
+                    const { error: updateError } = await _supabase.from('contact_inquiries').update({ status: 'Archived' }).eq('id', inquiry.id);
+                    if (updateError) {
+                        showStatusMessage(dom.inquiriesStatus, `Customer added, but failed to archive inquiry: ${updateError.message}`, false);
+                    } else {
+                        showStatusMessage(dom.inquiriesStatus, `Customer '${inquiry.name}' added and inquiry archived.`, true);
+                    }
+                    fetchInquiries(dom, 'New');
+                    setLoading(false);
                 }
             });
             actionsDiv.appendChild(addBtn);
@@ -242,13 +250,18 @@ function renderInquiries(inquiries, dom, status) {
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = 'Delete Forever';
         deleteBtn.className = 'btn-danger';
-        deleteBtn.addEventListener('click', () => {
-            if (confirm(`PERMANENTLY DELETE this inquiry from ${inquiry.name}? This cannot be undone.`)) {
-                callApi('deleteInquiry', { inquiryId: inquiry.id }, response => {
-                    showStatusMessage(dom.inquiriesStatus, response.message, response.success);
-                    if (response.success) fetchInquiries(dom, status); 
-                }, 'inquiries-status');
-            }
+        deleteBtn.addEventListener('click', async () => {
+             if (confirm(`PERMANENTLY DELETE this inquiry from ${inquiry.name}? This cannot be undone.`)) {
+                setLoading(true);
+                const { error } = await _supabase.from('contact_inquiries').delete().eq('id', inquiry.id);
+                if (error) {
+                    showStatusMessage(dom.inquiriesStatus, `Error deleting inquiry: ${error.message}`, false);
+                } else {
+                    showStatusMessage(dom.inquiriesStatus, 'Inquiry deleted.', true);
+                    fetchInquiries(dom, status);
+                }
+                setLoading(false);
+             }
         });
 
         actionsDiv.appendChild(deleteBtn);
@@ -257,18 +270,21 @@ function renderInquiries(inquiries, dom, status) {
     });
 }
 
-function fetchCustomerData(dom) {
-    dom.campaignLoader.textContent = 'Fetching customer list...';
+async function fetchCustomerData(dom) {
+    setLoading(true);
     dom.customerTableBody.innerHTML = `<tr><td colspan="6">Loading...</td></tr>`;
-    callApi('getCustomers', {}, response => {
-        if (response.success) {
-            allCustomers = response.customers;
-            customerHeaders = response.headers.filter(h => h !== 'id' && h !== 'created_at');
-            renderCustomerTable(allCustomers, dom);
-        } else {
-            showStatusMessage(dom.customerStatus, `Error: ${response.message}`, false);
+    try {
+        const { data, error } = await _supabase.from('customers').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        allCustomers = data;
+        if (data.length > 0) {
+            customerHeaders = Object.keys(data[0]).filter(h => h !== 'id' && h !== 'created_at');
         }
-    }, 'customer-status');
+        renderCustomerTable(allCustomers, dom);
+    } catch(error) {
+        showStatusMessage(dom.customerStatus, `Error: ${error.message}`, false);
+    }
+    setLoading(false);
 }
 
 function renderCustomerTable(customers, dom) {
@@ -323,16 +339,17 @@ function renderCustomerTable(customers, dom) {
     });
 }
 
-function fetchCampaignArchive(dom) {
-    dom.campaignLoader.textContent = 'Fetching campaign history...';
+async function fetchCampaignArchive(dom) {
+    setLoading(true);
     dom.archiveTableBody.innerHTML = `<tr><td colspan="4">Loading...</td></tr>`;
-    callApi('getCampaignArchive', {}, response => {
-        if (response.success) {
-            renderCampaignArchive(response.campaigns, dom);
-        } else {
-            dom.archiveTableBody.innerHTML = `<tr><td colspan="4">Error: ${response.message}</td></tr>`;
-        }
-    }, 'customer-status');
+    try {
+        const { data, error } = await _supabase.from('campaign_archive').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        renderCampaignArchive(data, dom);
+    } catch (error) {
+        dom.archiveTableBody.innerHTML = `<tr><td colspan="4">Error: ${error.message}</td></tr>`;
+    }
+    setLoading(false);
 }
 
 function renderCampaignArchive(campaigns, dom) {
@@ -425,12 +442,17 @@ function closeEditCustomerModal(dom) {
     dom.editCustomerModalOverlay.classList.remove('active'); 
 }
 
-function deleteCustomerPrompt(id, customerIdentifier, dom) {
+async function deleteCustomerPrompt(id, customerIdentifier, dom) {
     if (confirm(`Are you sure you want to delete ${customerIdentifier || 'this customer'}?`)) {
-        callApi('deleteCustomer', { id: id }, response => {
-            showStatusMessage(dom.customerStatus, response.message, response.success);
-            if (response.success) fetchCustomerData(dom);
-        }, 'customer-status');
+        setLoading(true);
+        const { error } = await _supabase.from('customers').delete().eq('id', id);
+        if (error) {
+            showStatusMessage(dom.customerStatus, `Error: ${error.message}`, false);
+        } else {
+            showStatusMessage(dom.customerStatus, "Customer deleted.", true);
+            fetchCustomerData(dom);
+        }
+        setLoading(false);
     }
 }
 
@@ -527,22 +549,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function initializeDashboard() {
+    async function initializeDashboard() {
+        setLoading(true);
         dom.loginOverlay.style.display = 'none';
         dom.dashboardLayout.style.display = 'flex';
-        
-        dom.campaignLoader.textContent = 'Fetching dashboard data...';
-        callApi('getDashboardData', {}, data => {
-            if (data.success) {
-                masterTemplateHtml = data.templateHtml;
-                availableSegments = data.segments;
-                populateCheckboxes(data.segments);
-                populateImages(data.images);
-                showPage('page-inquiries', dom);
-            } else {
-                alert('Critical Error: Could not fetch dashboard data. ' + data.message);
-            }
-        });
+        try {
+            dom.campaignLoader.textContent = 'Fetching dashboard data...';
+            const [segmentsRes, imagesRes, templateRes] = await Promise.all([
+                _supabase.from('customers').select('segment'),
+                _supabase.storage.from('promotional_images').list(),
+                fetch(MASTER_TEMPLATE_URL).then(res => res.text())
+            ]);
+
+            if (segmentsRes.error) throw segmentsRes.error;
+            if (imagesRes.error) throw imagesRes.error;
+            
+            availableSegments = [...new Set(segmentsRes.data.map(item => item.segment))].filter(Boolean);
+            masterTemplateHtml = templateRes;
+            
+            populateCheckboxes(availableSegments);
+            populateImages(imagesRes.data);
+            showPage('page-inquiries', dom);
+        } catch(error) {
+            alert(`Critical Error: Could not fetch dashboard data. ${error.message}`);
+        }
+        setLoading(false);
     }
 
     async function logout() {
@@ -583,13 +614,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const campaignForm = document.getElementById('campaign-form');
         if (!campaignForm.checkValidity()) { campaignForm.reportValidity(); return; }
         const cData = getCampaignData();
-        const composedHtml = masterTemplateHtml
-            .replace(/{{headline}}/g, cData.headline)
-            .replace(/{{image_url}}/g, IMAGE_BASE_URL + cData.image_filename)
-            .replace(/{{body_text}}/g, cData.body_text.replace(/\n/g, '<br>'))
-            .replace(/{{cta_text}}/g, cData.cta_text)
-            .replace(/{{cta_link}}/g, WEBSITE_BASE_URL + cData.cta_path)
-            .replace(/{{unsubscribe_link_text}}/g, 'Preview Mode');
+        const composedHtml = masterTemplateHtml.replace(/{{headline}}/g, cData.headline).replace(/{{image_url}}/g, IMAGE_BASE_URL + cData.image_filename).replace(/{{body_text}}/g, cData.body_text.replace(/\n/g, '<br>')).replace(/{{cta_text}}/g, cData.cta_text).replace(/{{cta_link}}/g, WEBSITE_BASE_URL + cData.cta_path).replace(/{{unsubscribe_link_text}}/g, 'Preview Mode');
         const pWin = window.open('', '_blank');
         pWin.document.write(composedHtml);
         pWin.document.close();
@@ -598,7 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-send-test').addEventListener('click', () => {
         const campaignForm = document.getElementById('campaign-form');
         if (!campaignForm.checkValidity()) { campaignForm.reportValidity(); return; }
-        callApi('sendTest', { campaignData: getCampaignData() }, r => showStatusMessage(dom.campaignStatus, r.message, r.success));
+        callEmailApi('sendTest', { campaignData: getCampaignData() }, r => showStatusMessage(dom.campaignStatus, r.message, r.success));
     });
 
     dom.campaignForm.addEventListener('submit', e => {
@@ -607,43 +632,49 @@ document.addEventListener('DOMContentLoaded', () => {
         if (segs.length === 0) { alert('Please select at least one segment.'); return; }
         const segText = segs.includes('All') ? "All Customers" : `${segs.length} segment(s)`;
         if (!confirm(`Send campaign to ${segText}?`)) return;
-        callApi('runCampaign', { campaignData: getCampaignData(), segments: segs }, r => showStatusMessage(dom.campaignStatus, r.message, r.success));
+        callEmailApi('runCampaign', { campaignData: getCampaignData(), segments: segs }, r => showStatusMessage(dom.campaignStatus, r.message, r.success));
     });
 
     dom.editModalClose.addEventListener('click', () => closeEditCustomerModal(dom));
     dom.editModalCancel.addEventListener('click', () => closeEditCustomerModal(dom));
     dom.recipientsModalClose.addEventListener('click', () => closeRecipientsModal(dom));
     
-    dom.editCustomerForm.addEventListener('submit', function(e) {
+    dom.editCustomerForm.addEventListener('submit', async function(e) {
         e.preventDefault();
+        setLoading(true);
         const id = dom.editCustomerRowId.value;
         const updatedCustomerData = {};
         dom.editCustomerFields.querySelectorAll('input, select').forEach(input => {
             updatedCustomerData[input.name] = input.value;
         });
-        callApi('editCustomer', { id: id, customerData: updatedCustomerData }, response => {
-            showStatusMessage(dom.editCustomerStatus, response.message, response.success);
-            if (response.success) {
-                fetchCustomerData(dom);
-                setTimeout(() => closeEditCustomerModal(dom), 1500);
-            }
-        }, 'edit-customer-status');
+        const { error } = await _supabase.from('customers').update(updatedCustomerData).eq('id', id);
+        if (error) {
+            showStatusMessage(dom.editCustomerStatus, `Error: ${error.message}`, false);
+        } else {
+            showStatusMessage(dom.editCustomerStatus, "Customer updated successfully.", true);
+            fetchCustomerData(dom);
+            setTimeout(() => closeEditCustomerModal(dom), 1500);
+        }
+        setLoading(false);
     });
 
-    dom.imageUploadInput.addEventListener('change', (event) => {
+    dom.imageUploadInput.addEventListener('change', async (event) => {
         const file = event.target.files[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-            const base64String = reader.result.split(',')[1];
-            callApi('uploadImage', { fileName: file.name, fileContent: base64String, fileType: file.type }, response => {
-                showStatusMessage(dom.imageManagerStatus, response.message, response.success);
-                if (response.success) fetchImages(dom);
-                dom.imageUploadInput.value = '';
-            }, 'image-manager-status');
-        };
-        reader.onerror = (error) => { showStatusMessage(dom.imageManagerStatus, `Error reading file: ${error}`, false); };
+        setLoading(true);
+        showStatusMessage(dom.imageManagerStatus, `Uploading "${file.name}"...`, true);
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        try {
+            const { error } = await _supabase.storage.from('promotional_images').upload(fileName, file);
+            if (error) throw error;
+            showStatusMessage(dom.imageManagerStatus, `"${fileName}" uploaded successfully.`, true);
+            fetchImages(dom);
+        } catch (error) {
+            showStatusMessage(dom.imageManagerStatus, `Upload failed: ${error.message}`, false);
+        }
+        dom.imageUploadInput.value = '';
+        setLoading(false);
     });
 
     function populateCheckboxes(segments = []) {
@@ -666,7 +697,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!list) return;
         list.innerHTML = '';
         if (images.length === 0) {
-            list.innerHTML = '<option value="" disabled selected>No images found in Storage.</option>';
+            list.innerHTML = '<option value="" disabled selected>No images found. Upload one.</option>';
         } else {
             images.forEach(img => { const opt = document.createElement('option'); opt.value = img.name; opt.textContent = img.name; list.appendChild(opt); });
             list.selectedIndex = 0;
