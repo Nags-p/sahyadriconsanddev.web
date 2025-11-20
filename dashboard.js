@@ -1,7 +1,7 @@
 // ===================================================================
 // --- 1. CONFIGURATION ---
 // ===================================================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbypS1QKT69W0gIAheTIGNCT_L-Zq5ZqOthq74yfXzKitXlS87kn3ir9KhtRG2IIUl5nvQ/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSRIZ7aSQ2s2JTV5OTfbz0cAqViA6H6p5NkpgRz7aqQpVWbR64-w5--Jna--oqp0Hq0w/exec'; 
 const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2ns-yio';
 
