@@ -432,20 +432,25 @@ document.addEventListener('DOMContentLoaded', () => {
         inquiriesStatus: document.getElementById('inquiries-status')
     };
 
-    async function handleUserSession() {
-        const { data: { session } } = await _supabase.auth.getSession();
+    // In dashboard.js
+
+async function handleUserSession() {
+    const { data: { session } } = await _supabase.auth.getSession();
+    
+    if (session) {
+        const userRole = (session.user.app_metadata && session.user.app_metadata.role) || 'Viewer';
+        document.body.className = `is-${userRole.toLowerCase().replace(' ', '-')}`;
         
-        if (session) {
-            const userRole = (session.user.app_metadata && session.user.app_metadata.role) || 'Viewer';
-            document.body.className = `is-${userRole.toLowerCase().replace(' ', '-')}`;
-            dom.userEmailDisplay.textContent = session.user.email;
-            dom.userRoleDisplay.textContent = userRole; // Display the role
-            initializeDashboard();
-        } else {
-            dom.loginOverlay.style.display = 'flex';
-            dom.dashboardLayout.style.display = 'none';
-        }
+        // --- THIS IS THE CORRECTED LINE ---
+        dom.userEmailDisplay.textContent = session.user.user_metadata.display_name || session.user.email;
+        
+        dom.userRoleDisplay.textContent = userRole;
+        initializeDashboard();
+    } else {
+        dom.loginOverlay.style.display = 'flex';
+        dom.dashboardLayout.style.display = 'none';
     }
+}
 
     function initializeDashboard() {
         dom.loginOverlay.style.display = 'none';
