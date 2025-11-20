@@ -101,3 +101,32 @@ button:disabled { background-color: #ccc; cursor: not-allowed; }
     display: flex;
     gap: 10px;
 }
+
+
+
+/* Add to the end of dashboard.css */
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid #34495e;
+}
+.sidebar-footer button {
+    width: 100%;
+}
+
+/* --- PERMISSION-BASED UI HIDING --- */
+/* Hide delete buttons for Editors and Viewers */
+.is-editor .btn-danger,
+.is-viewer .btn-danger {
+    display: none !important;
+}
+
+/* Hide the entire campaign form and "Add to Customers" for Viewers */
+.is-viewer #campaign-form,
+.is-viewer .inquiry-actions .btn-primary {
+    display: none !important;
+}
+
+/* Hide edit buttons for Viewers */
+.is-viewer .btn-info {
+    display: none !important;
+}

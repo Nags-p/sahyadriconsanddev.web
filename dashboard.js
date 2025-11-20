@@ -1,12 +1,13 @@
 // ===================================================================
 // --- 1. CONFIGURATION ---
 // ===================================================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby3L2GzHyZ2qVlrmKfyrZnyDmINwmDaIAyEEUVOnMO5TDu38wSsyhve1K0fHOZIv6WKxQ/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxhyRr1lI3wFCiSDax3C6IIz8-XkmRxaBGVecUIIuhkmasK4hf8ra4QuJd5eyIxc54gcg/exec'; 
 const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2ns-yio';
 
-// --- DERIVED CONFIG ---
-const IMAGE_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/promotional_images/`;
-const WEBSITE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/';
+// --- SUPABASE CLIENT ---
+const { createClient } = supabase;
+const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // --- STATE VARIABLES ---
 let masterTemplateHtml = '', allCustomers = [], customerHeaders = [], availableSegments = [];
@@ -14,15 +15,30 @@ let masterTemplateHtml = '', allCustomers = [], customerHeaders = [], availableS
 // ===================================================================
 // --- 2. CORE FUNCTIONS ---
 // ===================================================================
-function callApi(action, payload, callback, errorElementId = 'campaign-status') {
+async function callApi(action, payload, callback, errorElementId = 'campaign-status') {
     setLoading(true);
     const statusElement = document.getElementById(errorElementId);
     if (statusElement) statusElement.style.display = 'none';
     
+    const { data: { session } } = await _supabase.auth.getSession();
+    if (session) {
+        payload.jwt = session.access_token;
+    } else {
+        // If no session, force logout to show the login screen
+        alert("Your session has expired. Please log in again.");
+        logout();
+        return;
+    }
+
     const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
     window[callbackName] = function(data) {
         setLoading(false);
-        callback(data);
+        if (data.message && (data.message.includes("Invalid JWT") || data.message.includes("Expired JWT"))) {
+            alert("Your session is invalid or has expired. Please log in again.");
+            logout();
+        } else {
+            callback(data);
+        }
         document.body.removeChild(document.getElementById(callbackName));
         delete window[callbackName];
     };
@@ -45,10 +61,12 @@ function callApi(action, payload, callback, errorElementId = 'campaign-status') 
 
 function setLoading(isLoading) {
     document.querySelectorAll('button').forEach(btn => btn.disabled = isLoading);
-    document.getElementById('campaign-loader').style.display = isLoading ? 'block' : 'none';
+    const loader = document.getElementById('campaign-loader');
+    if (loader) loader.style.display = isLoading ? 'block' : 'none';
 }
 
 function showStatusMessage(element, message, isSuccess) {
+    if (!element) return;
     element.textContent = message;
     element.className = isSuccess ? 'status-message success' : 'status-message error';
     element.style.display = 'block';
@@ -58,7 +76,8 @@ function showPage(pageId, dom) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
     dom.navItems.forEach(n => n.classList.remove('active'));
-    document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+    const activeNavItem = document.querySelector(`[data-page="${pageId}"]`);
+    if (activeNavItem) activeNavItem.classList.add('active');
     
     if (pageId === 'page-customers') fetchCustomerData(dom);
     if (pageId === 'page-archive') fetchCampaignArchive(dom);
@@ -74,6 +93,7 @@ function fetchInquiries(dom, status) {
     const statusId = 'inquiries-status';
     const container = document.getElementById(containerId);
     
+    if (!container) return;
     dom.campaignLoader.textContent = `Fetching ${status} inquiries...`;
     container.innerHTML = `<p>Loading...</p>`;
     
@@ -89,6 +109,7 @@ function fetchInquiries(dom, status) {
 function renderInquiries(inquiries, dom, status) {
     const containerId = status === 'New' ? 'inquiries-container' : 'archived-inquiries-container';
     const container = document.getElementById(containerId);
+    if (!container) return;
     container.innerHTML = '';
 
     if (inquiries.length === 0) {
@@ -367,7 +388,7 @@ function getCampaignData() {
 }
 
 // ===================================================================
-// --- 5. INITIALIZATION & EVENT LISTENERS ---
+// --- 5. INITIALIZATION & AUTHENTICATION ---
 // ===================================================================
 document.addEventListener('DOMContentLoaded', () => {
     const dom = {
@@ -377,6 +398,8 @@ document.addEventListener('DOMContentLoaded', () => {
         dashboardLayout: document.getElementById('dashboard-layout'),
         navItems: document.querySelectorAll('.sidebar-nav li'),
         campaignLoader: document.getElementById('campaign-loader'),
+        logoutBtn: document.getElementById('logout-btn'),
+        userEmailDisplay: document.getElementById('user-email-display'),
         campaignForm: document.getElementById('campaign-form'),
         campaignStatus: document.getElementById('campaign-status'),
         segmentContainer: document.getElementById('segment-container'),
@@ -401,8 +424,19 @@ document.addEventListener('DOMContentLoaded', () => {
         inquiriesStatus: document.getElementById('inquiries-status')
     };
 
-    dom.loginOverlay.style.display = 'flex';
-    dom.dashboardLayout.style.display = 'none';
+    async function handleUserSession() {
+        const { data: { session } } = await _supabase.auth.getSession();
+        
+        if (session) {
+            const userRole = (session.user.app_metadata && session.user.app_metadata.role) || 'Viewer';
+            document.body.className = `is-${userRole.toLowerCase().replace(' ', '-')}`;
+            dom.userEmailDisplay.textContent = session.user.email;
+            initializeDashboard();
+        } else {
+            dom.loginOverlay.style.display = 'flex';
+            dom.dashboardLayout.style.display = 'none';
+        }
+    }
 
     function initializeDashboard() {
         dom.loginOverlay.style.display = 'none';
@@ -415,29 +449,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 availableSegments = data.segments;
                 populateCheckboxes(data.segments);
                 populateImages(data.images);
-                showPage('page-inquiries', dom); // Show inquiries by default
+                showPage('page-inquiries', dom);
             } else {
                 alert('Critical Error: Could not fetch dashboard data. ' + data.message);
             }
         });
     }
-    
-    if (dom.loginForm) {
-        dom.loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const passwordInput = document.getElementById('password');
-            dom.campaignLoader.textContent = 'Logging in...';
-            
-            callApi('checkPassword', { password: passwordInput.value }, response => {
-                if (response.success) {
-                    initializeDashboard();
-                } else {
-                    showStatusMessage(dom.loginStatus, 'Incorrect password.', false);
-                    passwordInput.value = '';
-                }
-            }, 'login-status');
-        });
+
+    async function logout() {
+        setLoading(true);
+        await _supabase.auth.signOut();
+        window.location.reload();
     }
+    
+    dom.loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        setLoading(true);
+        dom.campaignLoader.textContent = 'Logging in...';
+
+        const { error } = await _supabase.auth.signInWithPassword({ email, password });
+
+        setLoading(false);
+        if (error) {
+            showStatusMessage(dom.loginStatus, error.message, false);
+        } else {
+            handleUserSession();
+        }
+    });
+
+    dom.logoutBtn.addEventListener('click', logout);
 
     dom.navItems.forEach(item => item.addEventListener('click', () => showPage(item.dataset.page, dom)));
     
@@ -534,4 +576,7 @@ document.addEventListener('DOMContentLoaded', () => {
             allCheckbox.checked = otherCheckboxes.length > 0 && otherCheckboxes.every(cb => cb.checked);
         }
     }
+    
+    // Check user session on initial page load
+    handleUserSession();
 });

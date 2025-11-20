@@ -1,2 +1,5 @@
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw5QZHHMbkKKEgH8Lx34RADYCWVxKSg_zHYhlSTLegn-FGOc11p2gBCQpcjjZnxGJim/exec'; 
     const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co'; // PASTE YOUR SUPABASE URL
+
+
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2ns-yio';
