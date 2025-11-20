@@ -1,14 +1,9 @@
 // ===================================================================
 // --- 1. CONFIGURATION ---
 // ===================================================================
-// Keys are now loaded from config.js
 const SCRIPT_URL = config.SCRIPT_URL; 
 const SUPABASE_URL = config.SUPABASE_URL;
 const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
-
-
-
-
 
 // --- SUPABASE CLIENT ---
 const { createClient } = supabase;
@@ -400,6 +395,13 @@ async function renderCampaignArchive(campaigns, dom) {
         const actionsTd = document.createElement('td');
         actionsTd.className = 'action-buttons';
 
+        const viewStatsBtn = document.createElement('button');
+        viewStatsBtn.textContent = 'View Stats';
+        viewStatsBtn.className = 'btn-primary';
+        viewStatsBtn.style.flexGrow = '0';
+        viewStatsBtn.addEventListener('click', () => openStatsModal(campaign, dom));
+        actionsTd.appendChild(viewStatsBtn);
+
         if (campaign.template_html) {
             const viewTemplateBtn = document.createElement('button');
             viewTemplateBtn.textContent = 'View Template';
@@ -430,6 +432,51 @@ async function renderCampaignArchive(campaigns, dom) {
 // ===================================================================
 // --- 4. MODAL & FORM HANDLING ---
 // ===================================================================
+async function openStatsModal(campaign, dom) {
+    dom.statsModalTitle.textContent = `Stats for "${campaign.subject}"`;
+    dom.statsOpensList.innerHTML = '<li>Loading...</li>';
+    dom.statsClicksList.innerHTML = '<li>Loading...</li>';
+    dom.statsModalOverlay.classList.add('active');
+
+    try {
+        const { data: opensData, error: opensError } = await _supabase
+            .from('email_opens')
+            .select('recipient_email')
+            .eq('campaign_id', campaign.id);
+        
+        if (opensError) throw opensError;
+
+        if (opensData.length > 0) {
+            const uniqueOpens = [...new Set(opensData.map(item => item.recipient_email))];
+            dom.statsOpensList.innerHTML = uniqueOpens.map(email => `<li>${email}</li>`).join('');
+        } else {
+            dom.statsOpensList.innerHTML = '<li>No opens recorded yet.</li>';
+        }
+
+        const { data: clicksData, error: clicksError } = await _supabase
+            .from('email_clicks')
+            .select('recipient_email')
+            .eq('campaign_id', campaign.id);
+
+        if (clicksError) throw clicksError;
+
+        if (clicksData.length > 0) {
+            const uniqueClicks = [...new Set(clicksData.map(item => item.recipient_email))];
+            dom.statsClicksList.innerHTML = uniqueClicks.map(email => `<li>${email}</li>`).join('');
+        } else {
+            dom.statsClicksList.innerHTML = '<li>No clicks recorded yet.</li>';
+        }
+
+    } catch (error) {
+        dom.statsOpensList.innerHTML = `<li>Error: ${error.message}</li>`;
+        dom.statsClicksList.innerHTML = `<li>Error: ${error.message}</li>`;
+    }
+}
+
+function closeStatsModal(dom) {
+    dom.statsModalOverlay.classList.remove('active');
+}
+
 function openEditCustomerModal(customer, dom) {
     dom.editCustomerRowId.value = customer.id;
     dom.editCustomerFields.innerHTML = '';
@@ -555,6 +602,11 @@ document.addEventListener('DOMContentLoaded', () => {
         recipientsModalTitle: document.getElementById('recipients-modal-title'),
         recipientsModalClose: document.getElementById('recipients-modal-close'),
         recipientsList: document.getElementById('recipients-list'),
+        statsModalOverlay: document.getElementById('stats-modal-overlay'),
+        statsModalTitle: document.getElementById('stats-modal-title'),
+        statsModalClose: document.getElementById('stats-modal-close'),
+        statsOpensList: document.getElementById('stats-opens-list'),
+        statsClicksList: document.getElementById('stats-clicks-list'),
         inquiriesContainer: document.getElementById('inquiries-container'),
         inquiriesStatus: document.getElementById('inquiries-status'),
         imageGridContainer: document.getElementById('image-grid-container'),
@@ -666,6 +718,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dom.editModalClose.addEventListener('click', () => closeEditCustomerModal(dom));
     dom.editModalCancel.addEventListener('click', () => closeEditCustomerModal(dom));
     dom.recipientsModalClose.addEventListener('click', () => closeRecipientsModal(dom));
+    dom.statsModalClose.addEventListener('click', () => closeStatsModal(dom));
     
     dom.editCustomerForm.addEventListener('submit', async function(e) {
         e.preventDefault();

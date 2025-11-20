@@ -90,3 +90,38 @@ button:disabled { background-color: #ccc; cursor: not-allowed; }
 .image-card-details p { font-size: 12px; color: #777; margin: 0 0 10px 0; }
 .image-card-actions { display: flex; gap: 5px; margin-top: auto; }
 .image-card-actions button { font-size: 14px; padding: 8px; }
+
+.stats-container {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+.stats-column {
+    flex: 1;
+    min-width: 0;
+}
+.stats-column h4 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+.stats-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+.stats-list li {
+    padding: 8px 12px;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    word-break: break-all;
+}
+.stats-list li:last-child {
+    border-bottom: none;
+}
