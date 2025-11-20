@@ -40,79 +40,69 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 3. SUPABASE CONTACT FORM SUBMISSION ---
     if (contactForm) {
-        contactForm.addEventListener('submit', async (event) => {
-            event.preventDefault(); // Stop the form from submitting the old way
+    contactForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-            // Show feedback to the user
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Sending...';
-            formStatus.textContent = '';
-            formStatus.style.color = 'inherit';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+        formStatus.textContent = '';
+        formStatus.style.color = 'inherit';
 
-            try {
-                const formData = new FormData(contactForm);
-                const formProps = Object.fromEntries(formData);
-                const file = formProps.file_upload;
+        try {
+            const formData = new FormData(contactForm);
+            const formProps = Object.fromEntries(formData);
+            const file = formProps.file_upload;
 
-                let fileUrl = null;
+            let filePathForDb = null; // Changed variable name for clarity
 
-                // Step 1: Handle file upload if a file is selected
-                if (file && file.size > 0) {
-                    const fileExt = file.name.split('.').pop();
-                    const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-                    const filePath = `${fileName}`;
-
-                    const { error: uploadError } = await _supabase.storage
-                        .from('contact_uploads')
-                        .upload(filePath, file);
-
-                    if (uploadError) {
-                        throw new Error(`File Upload Failed: ${uploadError.message}`);
-                    }
-                    
-                    // Get the public URL to store in the database
-                    const { data: urlData } = _supabase.storage
-                        .from('contact_uploads')
-                        .getPublicUrl(filePath);
-                    
-                    fileUrl = urlData.publicUrl;
-                }
-
-                // Step 2: Prepare data for the database table
-                const inquiryData = {
-                    name: formProps.name,
-                    email: formProps.email,
-                    phone: formProps.phone,
-                    project_type: formProps.project_type,
-                    location: formProps.location,
-                    budget_range: formProps.budget_range || null,
-                    start_date: formProps.start_date || null,
-                    message: formProps.message,
-                    file_url: fileUrl,
-                    consent_given: formProps.consent === 'on'
-                };
+            if (file && file.size > 0) {
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
                 
-                // Step 3: Insert the data into the 'contact_inquiries' table
-                const { error: insertError } = await _supabase
-                    .from('contact_inquiries')
-                    .insert([inquiryData]);
+                // --- THIS IS THE CORRECT PATH TO SAVE ---
+                filePathForDb = `${fileName}`; 
 
-                if (insertError) {
-                    throw new Error(`Database submission failed: ${insertError.message}`);
+                const { error: uploadError } = await _supabase.storage
+                    .from('contact_uploads')
+                    .upload(filePathForDb, file); // Use the clean path for upload
+
+                if (uploadError) {
+                    throw new Error(`File Upload Failed: ${uploadError.message}`);
                 }
-                
-                // Step 4: Show success message
-                contactForm.style.display = 'none';
-                thankYouMessage.classList.remove('hidden');
-
-            } catch (error) {
-                // Handle any errors that occurred during the process
-                formStatus.textContent = `Error: ${error.message}. Please try again.`;
-                formStatus.style.color = 'red';
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Send Message';
             }
-        });
+
+            const inquiryData = {
+                name: formProps.name,
+                email: formProps.email,
+                phone: formProps.phone,
+                project_type: formProps.project_type,
+                location: formProps.location,
+                budget_range: formProps.budget_range || null,
+                start_date: formProps.start_date || null,
+                message: formProps.message,
+                // --- SAVE THE CLEAN FILE PATH, NOT THE URL ---
+                file_url: filePathForDb, 
+                consent_given: formProps.consent === 'on'
+            };
+            
+            const { error: insertError } = await _supabase
+                .from('contact_inquiries')
+                .insert([inquiryData]);
+
+            if (insertError) {
+                throw new Error(`Database submission failed: ${insertError.message}`);
+            }
+            
+            contactForm.style.display = 'none';
+            thankYouMessage.classList.remove('hidden');
+
+        } catch (error) {
+            formStatus.textContent = `Error: ${error.message}. Please try again.`;
+            formStatus.style.color = 'red';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send Message';
+        }
+    });
     }
 
     // --- 4. MOBILE NAVIGATION LOGIC ---
