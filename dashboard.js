@@ -181,7 +181,7 @@ async function fetchInquiries(dom, status) {
     setLoading(false);
 }
 
-function renderInquiries(inquiries, dom, status) {
+function renderInquiries(inquiries, dom) {
     const containerId = status === 'New' ? 'inquiries-container' : 'archived-inquiries-container';
     const container = document.getElementById(containerId);
     container.innerHTML = '';
@@ -194,8 +194,13 @@ function renderInquiries(inquiries, dom, status) {
     inquiries.forEach(inquiry => {
         const card = document.createElement('div');
         card.className = 'inquiry-card';
-        const { data: { publicUrl } } = _supabase.storage.from('contact_uploads').getPublicUrl(inquiry.file_url);
-        const fileLink = inquiry.file_url ? `<a href="${publicUrl}" target="_blank" class="btn-secondary" style="display: inline-block; text-decoration: none; padding: 5px 10px; font-size: 14px; border-radius: 5px;">View File</a>` : 'None';
+
+        // --- THIS IS THE FIX ---
+        // The inquiry.file_url from the database is already the complete, correct public URL.
+        // We just use it directly in the link.
+        const fileLink = inquiry.file_url 
+            ? `<a href="${inquiry.file_url}" target="_blank" class="btn-secondary" style="display: inline-block; text-decoration: none; padding: 5px 10px; font-size: 14px; border-radius: 5px;">View File</a>` 
+            : 'None';
 
         card.innerHTML = `
             <h4>${inquiry.name} <span style="font-size: 12px; color: #777; font-weight: normal;">(${new Date(inquiry.created_at).toLocaleDateString()})</span></h4>
