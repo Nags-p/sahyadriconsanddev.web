@@ -15,6 +15,7 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // --- DERIVED CONFIG & STATE VARIABLES ---
 const IMAGE_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/promotional_images/`;
 const WEBSITE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/';
+const MASTER_TEMPLATE_URL = 'https://raw.githubusercontent.com/Nags-p/sahyadriconsanddev.web/main/email_templates/master-promo.html';
 let masterTemplateHtml = '', allCustomers = [], customerHeaders = [], availableSegments = [];
 
 // ===================================================================
