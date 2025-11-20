@@ -53,6 +53,9 @@ async function callEmailApi(action, payload, callback, errorElementId = 'campaig
 
 function setLoading(isLoading) {
     document.querySelectorAll('button').forEach(btn => btn.disabled = isLoading);
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) logoutBtn.disabled = false;
+
     const loader = document.getElementById('campaign-loader');
     if (loader) loader.style.display = isLoading ? 'block' : 'none';
 }
@@ -62,40 +65,93 @@ function showStatusMessage(element, message, isSuccess) {
     element.textContent = message;
     element.className = isSuccess ? 'status-message success' : 'status-message error';
     element.style.display = 'block';
+    setTimeout(() => {
+        element.style.display = 'none'; 
+    }, 5000);
 }
 
 function showPage(pageId, dom, params = null) {
+    // Hide all pages
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
     
-    const activeNavId = pageId === 'page-campaign-analytics' ? 'page-archive' : pageId;
-    const activeNavItem = document.querySelector(`[data-page="${activeNavId}"]`);
-    if (activeNavItem) {
-        dom.navItems.forEach(n => n.classList.remove('active'));
-        activeNavItem.classList.add('active');
-    }
+    // Show target page
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) targetPage.classList.add('active');
     
-    if (pageId === 'page-campaign-analytics' && params && params.campaignId) {
-        fetchCampaignAnalytics(dom, params.campaignId);
-    } else {
-       if (pageId === 'page-customers') fetchCustomerData(dom);
-       if (pageId === 'page-archive') fetchCampaignArchive(dom);
-       if (pageId === 'page-inquiries') fetchInquiries(dom, 'New');
-       if (pageId === 'page-archived-inquiries') fetchInquiries(dom, 'Archived');
-       if (pageId === 'page-image-manager') fetchImages(dom);
+    // Update Sidebar Active State
+    // Convert 'page-something' to 'nav-something'
+    const navId = pageId.replace('page-', 'nav-');
+    dom.navItems.forEach(n => n.classList.remove('active'));
+    const activeNav = document.getElementById(navId);
+    if (activeNav) activeNav.classList.add('active');
+    
+    // Page Specific Data Loading
+    if (pageId === 'page-customers') fetchCustomerData(dom);
+    if (pageId === 'page-archive') fetchCampaignArchive(dom);
+    if (pageId === 'page-inquiries') fetchInquiries(dom, 'New');
+    if (pageId === 'page-archived-inquiries') fetchInquiries(dom, 'Archived');
+    if (pageId === 'page-image-manager') fetchImages(dom);
+    
+    // Analytics Specific Logic
+    if (pageId === 'page-analytics') {
+        loadAnalyticsDropdown(dom, params ? params.campaignId : null);
     }
 }
 
 // ===================================================================
-// --- 3. DATA HANDLING (DIRECT SUPABASE CALLS) ---
+// --- 3. ANALYTICS TAB LOGIC ---
 // ===================================================================
+
+async function loadAnalyticsDropdown(dom, selectedId = null) {
+    // 1. Fetch list of campaigns
+    const { data: campaigns, error } = await _supabase
+        .from('campaign_archive')
+        .select('id, subject, created_at')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Error loading campaign list:", error);
+        return;
+    }
+
+    const select = dom.analyticsSelect;
+    // Reset dropdown
+    select.innerHTML = '<option value="" disabled selected>Select a campaign...</option>';
+
+    campaigns.forEach(c => {
+        const date = new Date(c.created_at).toLocaleDateString();
+        const option = document.createElement('option');
+        option.value = c.id;
+        option.textContent = `${date} - ${c.subject}`;
+        select.appendChild(option);
+    });
+
+    // 2. Handle Selection
+    if (selectedId) {
+        select.value = selectedId;
+        fetchCampaignAnalytics(dom, selectedId);
+    } else {
+        dom.analyticsContent.style.display = 'none';
+    }
+
+    // 3. Attach Listener
+    select.onchange = (e) => {
+        const newId = e.target.value;
+        history.pushState(null, null, `#analytics-${newId}`);
+        fetchCampaignAnalytics(dom, newId);
+    };
+}
 
 async function fetchCampaignAnalytics(dom, campaignId) {
     setLoading(true);
-    dom.analyticsTitle.textContent = 'Campaign Analytics';
-    ['stat-sent', 'stat-opens', 'stat-clicks'].forEach(id => document.getElementById(id).textContent = '-');
+    
+    // Reset stats view
+    document.getElementById('stat-sent').textContent = '-';
+    document.getElementById('stat-opens').textContent = '-';
+    document.getElementById('stat-clicks').textContent = '-';
     dom.analyticsOpensList.innerHTML = '<li>Loading...</li>';
     dom.analyticsClicksList.innerHTML = '<li>Loading...</li>';
+    dom.analyticsContent.style.display = 'block';
 
     try {
         const { data: campaign, error: campaignError } = await _supabase.from('campaign_archive').select('*').eq('id', campaignId).single();
@@ -107,7 +163,6 @@ async function fetchCampaignAnalytics(dom, campaignId) {
         const { data: clicks, error: clicksError } = await _supabase.from('email_clicks').select('recipient_email').eq('campaign_id', campaignId);
         if (clicksError) throw clicksError;
 
-        dom.analyticsTitle.textContent = `Analytics for "${campaign.subject}"`;
         document.getElementById('stat-sent').textContent = campaign.emails_sent || 0;
         
         const uniqueOpens = [...new Set(opens.map(o => o.recipient_email))];
@@ -120,15 +175,20 @@ async function fetchCampaignAnalytics(dom, campaignId) {
         dom.analyticsClicksList.innerHTML = uniqueClicks.length > 0 ? uniqueClicks.map(e => `<li>${e}</li>`).join('') : '<li>No clicks recorded.</li>';
         
     } catch (error) {
-        alert(`Error loading analytics: ${error.message}`);
+        console.error("Analytics Error:", error);
+        dom.analyticsOpensList.innerHTML = '<li>Error loading data.</li>';
     }
     setLoading(false);
 }
 
-// --- THIS FUNCTION WAS MISSING. IT IS NOW RESTORED. ---
+
+// ===================================================================
+// --- 4. DATA HANDLING (OTHER PAGES) ---
+// ===================================================================
+
 async function fetchCampaignArchive(dom) {
     setLoading(true);
-    dom.archiveTableBody.innerHTML = `<tr><td colspan="6">Loading...</td></tr>`;
+    dom.archiveTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Loading...</td></tr>`;
     try {
         const { data, error } = await _supabase.from('campaign_archive').select('*').order('created_at', { ascending: false });
         if (error) throw error;
@@ -177,15 +237,15 @@ async function renderCampaignArchive(campaigns, dom) {
         actionsTd.className = 'action-buttons';
 
         const viewAnalyticsBtn = document.createElement('a');
-        viewAnalyticsBtn.textContent = 'View Analytics';
+        viewAnalyticsBtn.innerHTML = '<i class="fas fa-chart-bar"></i> Analytics';
         viewAnalyticsBtn.className = 'btn-primary';
         viewAnalyticsBtn.style.flexGrow = '0';
-        viewAnalyticsBtn.href = `#archive/analytics/${campaign.id}`;
+        viewAnalyticsBtn.href = `#analytics-${campaign.id}`;
         actionsTd.appendChild(viewAnalyticsBtn);
 
         if (campaign.template_html && campaign.template_html !== 'pending') {
             const viewTemplateBtn = document.createElement('a');
-            viewTemplateBtn.textContent = 'View Template';
+            viewTemplateBtn.innerHTML = '<i class="fas fa-code"></i> Template';
             viewTemplateBtn.className = 'btn-info';
             viewTemplateBtn.style.flexGrow = '0';
             viewTemplateBtn.href = "javascript:void(0);";
@@ -199,7 +259,7 @@ async function renderCampaignArchive(campaigns, dom) {
         
         if (campaign.recipients && campaign.recipients.length > 0) {
             const viewListBtn = document.createElement('a');
-            viewListBtn.textContent = 'View List';
+            viewListBtn.innerHTML = '<i class="fas fa-list-ul"></i> Recipients';
             viewListBtn.className = 'btn-secondary';
             viewListBtn.style.flexGrow = '0';
             viewListBtn.href = "javascript:void(0);";
@@ -229,7 +289,7 @@ function renderImageGrid(images, dom) {
     const container = dom.imageGridContainer;
     container.innerHTML = '';
     if (images.length === 0) {
-        container.innerHTML = '<p>No promotional images found. Upload one to get started!</p>';
+        container.innerHTML = '<p class="text-medium" style="text-align: center;">No promotional images found. Upload one to get started!</p>';
         return;
     }
 
@@ -240,7 +300,18 @@ function renderImageGrid(images, dom) {
         const lastModified = new Date(image.updated_at || image.created_at).toLocaleDateString();
         const fileSize = image.metadata && image.metadata.size ? (image.metadata.size / 1024).toFixed(1) + ' KB' : 'N/A';
 
-        card.innerHTML = `<div class="image-card-preview" style="background-image: url('${publicUrl}')"></div> <div class="image-card-details"> <input type="text" class="image-name-input" value="${image.name}" data-original-name="${image.name}"> <p>${fileSize} - ${lastModified}</p> <div class="image-card-actions"> <button class="btn-secondary btn-rename">Rename</button> <button class="btn-danger btn-delete">Delete</button> </div> </div>`;
+        card.innerHTML = `
+            <div class="image-card-preview" style="background-image: url('${publicUrl}')"></div>
+            <div class="image-card-details">
+                <input type="text" class="image-name-input" value="${image.name}" data-original-name="${image.name}">
+                <p>${fileSize} - ${lastModified}</p>
+                <div class="image-card-actions">
+                    <button class="btn-secondary btn-rename"><i class="fas fa-edit"></i> Rename</button>
+                    <button class="btn-info btn-copy-url"><i class="fas fa-copy"></i> Copy URL</button>
+                    <button class="btn-danger btn-delete"><i class="fas fa-trash-alt"></i> Delete</button>
+                </div>
+            </div>
+        `;
         container.appendChild(card);
 
         card.querySelector('.btn-delete').addEventListener('click', async () => {
@@ -266,7 +337,15 @@ function renderImageGrid(images, dom) {
                     if (!error) fetchImages(dom);
                     setLoading(false);
                 }
+            } else if (newName === oldName) {
+                showStatusMessage(dom.imageManagerStatus, "New name is the same as the old name. No change made.", true);
             }
+        });
+
+        card.querySelector('.btn-copy-url').addEventListener('click', () => {
+            navigator.clipboard.writeText(publicUrl)
+                .then(() => showStatusMessage(dom.imageManagerStatus, `URL for "${image.name}" copied to clipboard!`, true))
+                .catch(err => showStatusMessage(dom.imageManagerStatus, `Failed to copy URL: ${err.message}`, false));
         });
     });
 }
@@ -275,13 +354,13 @@ async function fetchInquiries(dom, status) {
     setLoading(true);
     const containerId = status === 'New' ? 'inquiries-container' : 'archived-inquiries-container';
     const container = document.getElementById(containerId);
-    container.innerHTML = `<p>Loading...</p>`;
+    container.innerHTML = `<p style="text-align: center;">Loading...</p>`;
     try {
         const { data, error } = await _supabase.from('contact_inquiries').select('*').eq('status', status).order('created_at', { ascending: false });
         if (error) throw error;
         renderInquiries(data, dom, status);
     } catch (error) {
-        container.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+        container.innerHTML = `<p style="color: var(--danger-color); text-align: center;">Error: ${error.message}</p>`;
     }
     setLoading(false);
 }
@@ -292,28 +371,37 @@ function renderInquiries(inquiries, dom, status) {
     container.innerHTML = '';
 
     if (inquiries.length === 0) {
-        container.innerHTML = `<p>No ${status.toLowerCase()} inquiries found.</p>`;
+        container.innerHTML = `<p class="text-medium" style="text-align: center;">No ${status.toLowerCase()} inquiries found.</p>`;
         return;
     }
 
     inquiries.forEach(inquiry => {
         const card = document.createElement('div');
         card.className = 'inquiry-card';
+        
         let fileLink = 'None';
         if (inquiry.file_url) {
-            const { data: { publicUrl } } = _supabase.storage.from('contact_uploads').getPublicUrl(inquiry.file_url);
-            fileLink = `<a href="${publicUrl}" target="_blank" class="btn-secondary" style="display: inline-block; text-decoration: none; padding: 5px 10px; font-size: 14px; border-radius: 5px;">View File</a>`;
+            let publicUrl;
+            if (inquiry.file_url.startsWith('http')) {
+                publicUrl = inquiry.file_url;
+            } else {
+                const cleanPath = inquiry.file_url.replace(/^contact_uploads\//, '');
+                const { data } = _supabase.storage.from('contact_uploads').getPublicUrl(cleanPath);
+                publicUrl = data.publicUrl;
+            }
+            fileLink = `<a href="${publicUrl}" target="_blank" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 5px;"><i class="fas fa-file-alt"></i> View File</a>`;
         }
+
         card.innerHTML = `
-            <h4>${inquiry.name} <span style="font-size: 12px; color: #777; font-weight: normal;">(${new Date(inquiry.created_at).toLocaleDateString()})</span></h4>
-            <p><strong>Email:</strong> ${inquiry.email}</p>
-            <p><strong>Phone:</strong> ${inquiry.phone}</p>
-            <p><strong>Location:</strong> ${inquiry.location}</p>
-            <p><strong>Project Type:</strong> ${inquiry.project_type}</p>
-            <p><strong>Budget:</strong> ${inquiry.budget_range || 'Not specified'}</p>
-            <p><strong>Start Date:</strong> ${inquiry.start_date || 'Not specified'}</p>
-            <p><strong>Attachment:</strong> ${fileLink}</p>
-            <p class="inquiry-message"><strong>Message:</strong><br>${inquiry.message}</p>
+            <h4>${inquiry.name} <span style="font-size: 12px; color: var(--text-light); font-weight: normal;">(${new Date(inquiry.created_at).toLocaleDateString()})</span></h4>
+            <p><strong><i class="fas fa-envelope"></i> Email:</strong> ${inquiry.email}</p>
+            <p><strong><i class="fas fa-phone-alt"></i> Phone:</strong> ${inquiry.phone || 'N/A'}</p>
+            <p><strong><i class="fas fa-map-marker-alt"></i> Location:</strong> ${inquiry.location || 'N/A'}</p>
+            <p><strong><i class="fas fa-building"></i> Project Type:</strong> ${inquiry.project_type || 'N/A'}</p>
+            <p><strong><i class="fas fa-money-bill-wave"></i> Budget:</strong> ${inquiry.budget_range || 'Not specified'}</p>
+            <p><strong><i class="fas fa-calendar-alt"></i> Start Date:</strong> ${inquiry.start_date || 'Not specified'}</p>
+            <p><strong><i class="fas fa-paperclip"></i> Attachment:</strong> ${fileLink}</p>
+            <p class="inquiry-message"><strong><i class="fas fa-comment"></i> Message:</strong><br>${inquiry.message}</p>
         `;
         
         const actionsDiv = document.createElement('div');
@@ -321,14 +409,14 @@ function renderInquiries(inquiries, dom, status) {
 
         if (status === 'New') {
             const addBtn = document.createElement('button');
-            addBtn.textContent = 'Add to Customers';
+            addBtn.innerHTML = '<i class="fas fa-user-plus"></i> Add to Customers';
             addBtn.className = 'btn-primary';
             addBtn.addEventListener('click', async () => {
                 if (confirm(`Add ${inquiry.name} to customers? This will move it to the archived list.`)) {
                     setLoading(true);
                     const { data: existing, error: checkError } = await _supabase.from('customers').select('id').eq('email', inquiry.email).single();
                     if (checkError && checkError.code !== 'PGRST116') {
-                         showStatusMessage(dom.inquiriesStatus, `Error: ${checkError.message}`, false);
+                         showStatusMessage(dom.inquiriesStatus, `Error checking existing customer: ${checkError.message}`, false);
                          setLoading(false); return;
                     }
                     if (existing) {
@@ -337,7 +425,7 @@ function renderInquiries(inquiries, dom, status) {
                     }
                     const { error: insertError } = await _supabase.from('customers').insert([{ name: inquiry.name, email: inquiry.email, phone: inquiry.phone, city: inquiry.location, segment: 'New Lead' }]);
                     if (insertError) {
-                         showStatusMessage(dom.inquiriesStatus, `Error: ${insertError.message}`, false);
+                         showStatusMessage(dom.inquiriesStatus, `Error adding customer: ${insertError.message}`, false);
                          setLoading(false); return;
                     }
                     const { error: updateError } = await _supabase.from('contact_inquiries').update({ status: 'Archived' }).eq('id', inquiry.id);
@@ -350,7 +438,7 @@ function renderInquiries(inquiries, dom, status) {
         }
 
         const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'Delete Forever';
+        deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete Forever';
         deleteBtn.className = 'btn-danger';
         deleteBtn.addEventListener('click', async () => {
              if (confirm(`PERMANENTLY DELETE this inquiry from ${inquiry.name}?`)) {
@@ -370,7 +458,7 @@ function renderInquiries(inquiries, dom, status) {
 
 async function fetchCustomerData(dom) {
     setLoading(true);
-    dom.customerTableBody.innerHTML = `<tr><td colspan="6">Loading...</td></tr>`;
+    dom.customerTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Loading...</td></tr>`;
     try {
         const { data, error } = await _supabase.from('customers').select('*').order('created_at', { ascending: false });
         if (error) throw error;
@@ -390,7 +478,7 @@ function renderCustomerTable(customers, dom) {
     tHead.innerHTML = '';
 
     if (customers.length === 0) {
-        tBody.innerHTML = `<tr><td colspan="${(customerHeaders.length || 5) + 1}">No customers.</td></tr>`;
+        tBody.innerHTML = `<tr><td colspan="${(customerHeaders.length || 5) + 1}" style="text-align: center;">No customers found.</td></tr>`;
         return;
     }
 
@@ -417,13 +505,13 @@ function renderCustomerTable(customers, dom) {
         actionsTd.className = 'action-buttons';
         
         const editBtn = document.createElement('button');
-        editBtn.innerHTML = '&#9998;';
+        editBtn.innerHTML = '<i class="fas fa-edit"></i>';
         editBtn.className = 'btn-info btn-icon';
         editBtn.title = 'Edit Customer';
         editBtn.addEventListener('click', () => openEditCustomerModal(customer, dom));
         
         const deleteBtn = document.createElement('button');
-        deleteBtn.innerHTML = '&#128465;';
+        deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
         deleteBtn.className = 'btn-danger btn-icon';
         deleteBtn.title = 'Delete Customer';
         deleteBtn.addEventListener('click', () => deleteCustomerPrompt(customer.id, customer.name || customer.email, dom));
@@ -436,7 +524,7 @@ function renderCustomerTable(customers, dom) {
 }
 
 // ===================================================================
-// --- 4. MODAL & FORM HANDLING ---
+// --- 5. MODAL & FORM HANDLING ---
 // ===================================================================
 function openEditCustomerModal(customer, dom) {
     dom.editCustomerRowId.value = customer.id;
@@ -530,7 +618,7 @@ function getCampaignData() {
 }
 
 // ===================================================================
-// --- 5. INITIALIZATION & AUTHENTICATION ---
+// --- 6. INITIALIZATION & AUTHENTICATION ---
 // ===================================================================
 document.addEventListener('DOMContentLoaded', () => {
     const dom = {
@@ -563,28 +651,30 @@ document.addEventListener('DOMContentLoaded', () => {
         recipientsModalTitle: document.getElementById('recipients-modal-title'),
         recipientsModalClose: document.getElementById('recipients-modal-close'),
         recipientsList: document.getElementById('recipients-list'),
-        statsModalOverlay: document.getElementById('stats-modal-overlay'),
-        statsModalTitle: document.getElementById('stats-modal-title'),
-        statsModalClose: document.getElementById('stats-modal-close'),
-        statsOpensList: document.getElementById('stats-opens-list'),
-        statsClicksList: document.getElementById('stats-clicks-list'),
         inquiriesContainer: document.getElementById('inquiries-container'),
         inquiriesStatus: document.getElementById('inquiries-status'),
         imageGridContainer: document.getElementById('image-grid-container'),
         imageUploadInput: document.getElementById('image-upload-input'),
+        imageUploadPreview: document.getElementById('image-upload-preview'),
         imageManagerStatus: document.getElementById('image-manager-status'),
-        analyticsTitle: document.getElementById('analytics-title'),
+        // New Analytics DOM Elements
+        analyticsPage: document.getElementById('page-analytics'),
+        analyticsSelect: document.getElementById('analytics-campaign-select'),
+        analyticsContent: document.getElementById('analytics-dashboard-content'),
         analyticsOpensList: document.getElementById('analytics-opens-list'),
         analyticsClicksList: document.getElementById('analytics-clicks-list')
     };
 
     function handleHashChange() {
         const hash = window.location.hash.substring(1);
-        if (hash.startsWith('archive/analytics/')) {
-            const campaignId = hash.split('/')[2];
-            showPage('page-campaign-analytics', dom, { campaignId });
+        
+        if (hash.startsWith('analytics')) {
+            const parts = hash.split('-');
+            const campaignId = parts.length > 1 ? parts[1] : null;
+            showPage('page-analytics', dom, { campaignId });
         } else {
-            const pageId = `page-${hash.replace(/_/g, '-') || 'inquiries'}`;
+            // FIXED: Do not replace hyphens with underscores
+            const pageId = `page-${hash || 'inquiries'}`; 
             if (document.getElementById(pageId)) {
                 showPage(pageId, dom);
             } else {
@@ -615,7 +705,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dom.campaignLoader.textContent = 'Fetching dashboard data...';
             const [segmentsRes, imagesRes, templateRes] = await Promise.all([
                 _supabase.from('customers').select('segment'),
-                _supabase.storage.from('promotional_images').list(),
+                _supabase.storage.from('promotional_images').list('', { limit: 100, offset: 0, sortBy: { column: 'created_at', order: 'desc' } }),
                 fetch(MASTER_TEMPLATE_URL).then(res => res.text())
             ]);
             if (segmentsRes.error) throw segmentsRes.error;
@@ -684,7 +774,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!campaignForm.checkValidity()) { campaignForm.reportValidity(); return; }
         callEmailApi('sendTest', { campaignData: getCampaignData() }, r => {
             showStatusMessage(dom.campaignStatus, r.message, r.success);
-            setLoading(false); // Important: callEmailApi doesn't handle this
+            setLoading(false);
         });
     });
 
@@ -701,7 +791,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const campaignData = getCampaignData();
 
         try {
-            const { data: campaignRecord, error: insertError } = await _supabase.from('campaign_archive').insert({ subject: campaignData.subject }).select().single();
+            const { data: campaignRecord, error: insertError } = await _supabase.from('campaign_archive').insert({ subject: campaignData.subject, segments: segs.join(', ') }).select().single();
             if (insertError) throw insertError;
             
             campaignData.campaignId = campaignRecord.id;
@@ -731,7 +821,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dom.editModalClose.addEventListener('click', () => closeEditCustomerModal(dom));
     dom.editModalCancel.addEventListener('click', () => closeEditCustomerModal(dom));
     dom.recipientsModalClose.addEventListener('click', () => closeRecipientsModal(dom));
-    dom.statsModalClose.addEventListener('click', () => closeStatsModal(dom));
+
     
     dom.editCustomerForm.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -750,22 +840,55 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoading(false);
     });
 
+    // --- Image Upload Preview & Handling ---
+    dom.imageUploadInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                dom.imageUploadPreview.style.backgroundImage = `url('${e.target.result}')`;
+                dom.imageUploadPreview.classList.add('has-image');
+                dom.imageUploadPreview.innerHTML = '';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            dom.imageUploadPreview.style.backgroundImage = 'none';
+            dom.imageUploadPreview.classList.remove('has-image');
+            dom.imageUploadPreview.innerHTML = '<span>No Image Selected</span>';
+        }
+    });
+
     dom.imageUploadInput.addEventListener('change', async (event) => {
         const file = event.target.files[0];
         if (!file) return;
         setLoading(true);
         showStatusMessage(dom.imageManagerStatus, `Uploading "${file.name}"...`, true);
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`;
+        
+        const validExtensions = ['jpeg', 'jpg', 'png', 'gif'];
+        const fileExt = file.name.split('.').pop().toLowerCase();
+        if (!validExtensions.includes(fileExt)) {
+            showStatusMessage(dom.imageManagerStatus, `Invalid file type. Only JPEG, PNG, GIF are allowed.`, false);
+            setLoading(false);
+            dom.imageUploadInput.value = '';
+            dom.imageUploadPreview.style.backgroundImage = 'none';
+            dom.imageUploadPreview.classList.remove('has-image');
+            dom.imageUploadPreview.innerHTML = '<span>No Image Selected</span>';
+            return;
+        }
+
+        const fileName = `${Date.now()}_${file.name.replace(/[^a-z0-9.]/gi, '_')}`;
         try {
             const { error } = await _supabase.storage.from('promotional_images').upload(fileName, file);
             if (error) throw error;
-            showStatusMessage(dom.imageManagerStatus, `"${fileName}" uploaded successfully.`, true);
+            showStatusMessage(dom.imageManagerStatus, `"${file.name}" uploaded successfully as "${fileName}".`, true);
             fetchImages(dom);
         } catch (error) {
             showStatusMessage(dom.imageManagerStatus, `Upload failed: ${error.message}`, false);
         }
         dom.imageUploadInput.value = '';
+        dom.imageUploadPreview.style.backgroundImage = 'none';
+        dom.imageUploadPreview.classList.remove('has-image');
+        dom.imageUploadPreview.innerHTML = '<span>No Image Selected</span>';
         setLoading(false);
     });
 

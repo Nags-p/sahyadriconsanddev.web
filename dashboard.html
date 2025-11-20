@@ -4,20 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sahyadri Admin Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
     <div id="login-overlay" class="login-overlay">
-        <div class="content-box" style="max-width: 400px; width: 100%;">
+        <div class="content-box" style="max-width: 450px; width: 100%;">
             <h1>Admin Login</h1>
             <form id="login-form">
-                <label for="email">Email</label>
+                <label for="email"><i class="fas fa-envelope"></i> Email</label>
                 <input type="email" id="email" required autocomplete="email">
-                <label for="password">Password</label>
+                <label for="password"><i class="fas fa-lock"></i> Password</label>
                 <input type="password" id="password" required autocomplete="current-password">
-                <div class="button-group" style="margin-top:10px;">
-                    <button type="submit" class="btn-primary">Login</button>
+                <div class="button-group" style="margin-top:20px;">
+                    <button type="submit" class="btn-primary"><i class="fas fa-sign-in-alt"></i> Login</button>
                 </div>
                 <div id="login-status" class="status-message"></div>
             </form>
@@ -33,16 +34,20 @@
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li id="nav-inquiries" data-page="page-inquiries" class="active">New Inquiries</li>
-                    <li id="nav-archived-inquiries" data-page="page-archived-inquiries">Archived Inquiries</li>
-                    <li id="nav-image-manager" data-page="page-image-manager">Image Manager</li>
-                    <li id="nav-promotions" data-page="page-promotions">Promotions</li>
-                    <li id="nav-customers" data-page="page-customers">Customers</li>
-                    <li id="nav-archive" data-page="page-archive">Campaign History</li>
+                    <li id="nav-inquiries" data-page="page-inquiries" class="active"><i class="fas fa-comment-dots"></i> New Inquiries</li>
+                    <li id="nav-archived-inquiries" data-page="page-archived-inquiries"><i class="fas fa-archive"></i> Archived Inquiries</li>
+                    <li id="nav-analytics" data-page="page-analytics"><i class="fas fa-chart-pie"></i> Analytics</li>
+                    <li id="nav-image-manager" data-page="page-image-manager"><i class="fas fa-images"></i> Image Manager</li>
+                    <li id="nav-promotions" data-page="page-promotions"><i class="fas fa-bullhorn"></i> Promotions</li>
+                    <li id="nav-customers" data-page="page-customers"><i class="fas fa-users"></i> Customers</li>
+                    <li id="nav-archive" data-page="page-archive"><i class="fas fa-history"></i> Campaign History</li>
+                    <!-- NEW TAB HERE -->
+ 
+
                 </ul>
             </nav>
             <div class="sidebar-footer">
-                <button id="logout-btn" class="btn-danger">Logout</button>
+                <button id="logout-btn" class="btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
         </div>
         <div class="main-content">
@@ -67,10 +72,11 @@
                 <div class="content-box">
                     <h2>Image Manager</h2>
                     <div class="image-manager-actions">
-                        <label for="image-upload-input" class="btn-primary">Upload New Image</label>
+                        <label for="image-upload-input" class="btn-primary"><i class="fas fa-cloud-upload-alt"></i> Upload New Image</label>
                         <input type="file" id="image-upload-input" accept="image/jpeg, image/png, image/gif" style="display: none;">
+                        <div id="image-upload-preview" class="image-upload-preview"><span>No Image Selected</span></div>
                     </div>
-                    <div id="image-manager-status" class="status-message" style="margin-top: 20px;"></div>
+                    <div id="image-manager-status" class="status-message"></div>
                     <div id="image-grid-container" class="image-grid"></div>
                 </div>
             </div>
@@ -79,18 +85,18 @@
                  <div class="content-box">
                     <form id="campaign-form">
                         <h2>Compose Promotion</h2>
-                        <label for="c-subject">Email Subject</label><input type="text" id="c-subject" required>
-                        <label for="c-headline">Headline</label><input type="text" id="c-headline" required>
-                        <label for="c-image-list">Main Image</label><select id="c-image-list" required><option value="" disabled selected>Loading...</option></select>
-                        <label for="c-body">Body Text</label><textarea id="c-body" required></textarea>
-                        <label for="c-cta-text">Button Text</label><input type="text" id="c-cta-text" value="Learn More" required>
-                        <label for="c-cta-path">Button Link</label><div class="link-input-group"><span class="link-prefix">https://nags-p.github.io/sahyadriconsanddev.web/</span><input type="text" id="c-cta-path" required></div>
+                        <label for="c-subject"><i class="fas fa-pencil-alt"></i> Email Subject</label><input type="text" id="c-subject" required>
+                        <label for="c-headline"><i class="fas fa-heading"></i> Headline</label><input type="text" id="c-headline" required>
+                        <label for="c-image-list"><i class="fas fa-image"></i> Main Image</label><select id="c-image-list" required><option value="" disabled selected>Loading...</option></select>
+                        <label for="c-body"><i class="fas fa-align-left"></i> Body Text</label><textarea id="c-body" required></textarea>
+                        <label for="c-cta-text"><i class="fas fa-mouse-pointer"></i> Button Text</label><input type="text" id="c-cta-text" value="Learn More" required>
+                        <label for="c-cta-path"><i class="fas fa-link"></i> Button Link</label><div class="link-input-group"><span class="link-prefix">https://nags-p.github.io/sahyadriconsanddev.web/</span><input type="text" id="c-cta-path" required></div>
                         <h2>Select Segments</h2>
                         <div id="segment-container"></div>
                         <div class="button-group">
-                            <button type="button" id="btn-preview" class="btn-info">Preview</button>
-                            <button type="button" id="btn-send-test" class="btn-secondary">Send Test</button>
-                            <button type="submit" id="btn-send-campaign" class="btn-primary">Send Campaign</button>
+                            <button type="button" id="btn-preview" class="btn-info"><i class="fas fa-eye"></i> Preview</button>
+                            <button type="button" id="btn-send-test" class="btn-secondary"><i class="fas fa-paper-plane"></i> Send Test</button>
+                            <button type="submit" id="btn-send-campaign" class="btn-primary"><i class="fas fa-rocket"></i> Send Campaign</button>
                         </div>
                         <div class="loader" id="campaign-loader"></div>
                         <div id="campaign-status" class="status-message"></div>
@@ -101,7 +107,7 @@
             <div id="page-customers" class="page">
                 <div class="content-box">
                     <h2>Customer Management</h2>
-                    <input type="text" id="customer-search" placeholder="Search by any field..." style="margin-bottom: 15px;">
+                    <input type="text" id="customer-search" placeholder="Search by name, email, city or segment..." class="mb-20">
                     <div style="overflow-x: auto;">
                         <table id="customer-table">
                             <thead></thead>
@@ -124,29 +130,41 @@
                 </div>
             </div>
             
-            <div id="page-campaign-analytics" class="page">
-                <div class="content-box">
-                    <div class="analytics-header">
-                        <a href="#archive" class="back-link">&larr; Back to Campaign History</a>
-                        <h2 id="analytics-title">Campaign Analytics</h2>
-                    </div>
-                    <div class="stats-summary">
-                        <div class="stat-card"><h3>Sent</h3><p id="stat-sent">-</p></div>
-                        <div class="stat-card"><h3>Opens</h3><p id="stat-opens">-</p></div>
-                        <div class="stat-card"><h3>Clicks</h3><p id="stat-clicks">-</p></div>
-                    </div>
-                    <div class="stats-container">
-                        <div class="stats-column">
-                            <h4>Opened By</h4>
-                            <ul id="analytics-opens-list" class="stats-list"></ul>
-                        </div>
-                        <div class="stats-column">
-                            <h4>Clicked By</h4>
-                            <ul id="analytics-clicks-list" class="stats-list"></ul>
-                        </div>
-                    </div>
+            <!-- Replace the old analytics page div with this -->
+<div id="page-analytics" class="page">
+    <div class="content-box">
+        <div class="analytics-header" style="justify-content: space-between; align-items: center;">
+            <h2>Campaign Analytics</h2>
+        </div>
+        
+        <!-- Campaign Selector -->
+        <div style="margin-bottom: 30px; background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #eee;">
+            <label for="analytics-campaign-select">Select Campaign to View:</label>
+            <select id="analytics-campaign-select">
+                <option value="" selected disabled>Loading campaigns...</option>
+            </select>
+        </div>
+
+        <!-- Stats Display (Hidden until selected) -->
+        <div id="analytics-dashboard-content" style="display: none;">
+            <div class="stats-summary">
+                <div class="stat-card"><h3>Sent</h3><p id="stat-sent">-</p></div>
+                <div class="stat-card"><h3>Opens</h3><p id="stat-opens">-</p></div>
+                <div class="stat-card"><h3>Clicks</h3><p id="stat-clicks">-</p></div>
+            </div>
+            <div class="stats-container">
+                <div class="stats-column">
+                    <h4>Opened By <i class="fas fa-eye"></i></h4>
+                    <ul id="analytics-opens-list" class="stats-list"></ul>
+                </div>
+                <div class="stats-column">
+                    <h4>Clicked By <i class="fas fa-hand-pointer"></i></h4>
+                    <ul id="analytics-clicks-list" class="stats-list"></ul>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
         </div>
     </div>
 
@@ -155,14 +173,14 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Edit Customer</h3>
-                <button type="button" class="modal-close" id="edit-modal-close">&times;</button>
+                <button type="button" class="modal-close" id="edit-modal-close"><i class="fas fa-times"></i></button>
             </div>
             <form id="edit-customer-form">
                 <input type="hidden" id="edit-customer-rowid">
                 <div id="edit-customer-fields"></div>
                 <div class="button-group">
-                    <button type="button" class="btn-secondary" id="edit-modal-cancel">Cancel</button>
-                    <button type="submit" class="btn-primary" id="edit-modal-save">Save Changes</button>
+                    <button type="button" class="btn-secondary" id="edit-modal-cancel"><i class="fas fa-times-circle"></i> Cancel</button>
+                    <button type="submit" class="btn-primary" id="edit-modal-save"><i class="fas fa-save"></i> Save Changes</button>
                 </div>
                 <div id="edit-customer-status" class="status-message"></div>
             </form>
@@ -174,14 +192,14 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="recipients-modal-title">Recipients</h3>
-                <button type="button" class="modal-close" id="recipients-modal-close">&times;</button>
+                <button type="button" class="modal-close" id="recipients-modal-close"><i class="fas fa-times"></i></button>
             </div>
             <ul id="recipients-list"></ul>
         </div>
     </div>
 
-    <!-- Stats Modal -->
-    <div id="stats-modal-overlay" class="modal-overlay">
+    <!-- Stats Modal (Removed as Analytics Page handles it now) -->
+    <!-- <div id="stats-modal-overlay" class="modal-overlay">
         <div class="modal-content" style="max-width: 700px;">
             <div class="modal-header">
                 <h3 id="stats-modal-title">Campaign Stats</h3>
@@ -198,7 +216,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js" defer></script>
