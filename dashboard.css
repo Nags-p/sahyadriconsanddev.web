@@ -1,3 +1,4 @@
+/* All previous CSS from the last version remains the same */
 body { font-family: 'Montserrat', sans-serif; background-color: #f4f7f9; margin: 0; }
 .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f7f9; display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box;}
 .dashboard-layout { display: flex; min-height: 100vh; }
@@ -15,7 +16,7 @@ body { font-family: 'Montserrat', sans-serif; background-color: #f4f7f9; margin:
 .content-box { background: #fff; padding: 30px 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
 h2 { font-size: 24px; color: #333; border-bottom: 2px solid #8D6E63; padding-bottom: 8px; margin-top: 0; margin-bottom: 25px;}
 label { font-weight: 600; font-size: 14px; color: #555; display: block; margin-bottom: 8px; }
-input[type="text"], input[type="url"], input[type="tel"], textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; margin-bottom: 15px; font-family: 'Montserrat', sans-serif;}
+input[type="text"], input[type="url"], input[type="tel"], input[type="email"], input[type="password"], textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; margin-bottom: 15px; font-family: 'Montserrat', sans-serif;}
 .link-input-group { display: flex; align-items: center; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 15px; }
 .link-prefix { padding: 12px; background-color: #f7f7f7; color: #666; font-size: 14px; border-right: 1px solid #ddd; white-space: nowrap; }
 #c-cta-path { border: none; flex-grow: 1; margin-bottom: 0; }
@@ -60,51 +61,15 @@ button:disabled { background-color: #ccc; cursor: not-allowed; }
 .checkbox-item input:checked ~ .checkmark { background-color: #8D6E63; }
 .checkmark:after { content: ""; position: absolute; display: none; left: 7px; top: 3px; width: 5px; height: 10px; border: solid white; border-width: 0 3px 3px 0; transform: rotate(45deg); }
 .checkbox-item input:checked ~ .checkmark:after { display: block; }
+#inquiries-container { margin-top: 30px; display: grid; gap: 20px; }
+.inquiry-card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; background-color: #fafafa; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.inquiry-card h4 { margin: 0 0 15px 0; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+.inquiry-card p { margin: 0 0 10px 0; color: #555; font-size: 14px; word-break: break-word; }
+.inquiry-card strong { color: #333; min-width: 120px; display: inline-block; }
+.inquiry-card .inquiry-message { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc; white-space: pre-wrap; }
+.inquiry-actions { margin-top: 20px; display: flex; gap: 10px; }
 
-/* Add to the end of dashboard.css */
-#inquiries-container {
-    margin-top: 30px;
-    display: grid;
-    gap: 20px;
-}
-.inquiry-card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    background-color: #fafafa;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-.inquiry-card h4 {
-    margin: 0 0 15px 0;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-}
-.inquiry-card p {
-    margin: 0 0 10px 0;
-    color: #555;
-    font-size: 14px;
-    word-break: break-word;
-}
-.inquiry-card strong {
-    color: #333;
-    min-width: 120px;
-    display: inline-block;
-}
-.inquiry-card .inquiry-message {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px dashed #ccc;
-    white-space: pre-wrap;
-}
-.inquiry-actions {
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
-}
-
-
-
-/* Add to the end of dashboard.css */
+/* --- NEW STYLES --- */
 .sidebar-footer {
     padding: 20px;
     border-top: 1px solid #34495e;
@@ -112,21 +77,33 @@ button:disabled { background-color: #ccc; cursor: not-allowed; }
 .sidebar-footer button {
     width: 100%;
 }
+#user-email-display {
+    font-size: 12px;
+    color: #bdc3c7;
+    margin-top: 5px;
+    word-break: break-all;
+}
+#user-role-display {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 12px;
+    background-color: #34495e;
+    color: #95a5a6;
+    margin-top: 8px;
+}
 
 /* --- PERMISSION-BASED UI HIDING --- */
-/* Hide delete buttons for Editors and Viewers */
 .is-editor .btn-danger,
 .is-viewer .btn-danger {
     display: none !important;
 }
-
-/* Hide the entire campaign form and "Add to Customers" for Viewers */
 .is-viewer #campaign-form,
 .is-viewer .inquiry-actions .btn-primary {
     display: none !important;
 }
-
-/* Hide edit buttons for Viewers */
 .is-viewer .btn-info {
     display: none !important;
 }

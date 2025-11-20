@@ -24,7 +24,6 @@ async function callApi(action, payload, callback, errorElementId = 'campaign-sta
     if (session) {
         payload.jwt = session.access_token;
     } else {
-        // If no session, force logout to show the login screen
         alert("Your session has expired. Please log in again.");
         logout();
         return;
@@ -39,7 +38,9 @@ async function callApi(action, payload, callback, errorElementId = 'campaign-sta
         } else {
             callback(data);
         }
-        document.body.removeChild(document.getElementById(callbackName));
+        if (document.getElementById(callbackName)) {
+            document.body.removeChild(document.getElementById(callbackName));
+        }
         delete window[callbackName];
     };
     
@@ -53,6 +54,12 @@ async function callApi(action, payload, callback, errorElementId = 'campaign-sta
             showStatusMessage(errorStatusElement, "Network Error: Failed to contact the API.", false);
         } else {
             alert("Network Error: Failed to contact the API.");
+        }
+        if (window[callbackName]) {
+             if (document.getElementById(callbackName)) {
+                document.body.removeChild(document.getElementById(callbackName));
+            }
+            delete window[callbackName];
         }
         callback({success: false, message: "Network Error"});
     };
@@ -400,6 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
         campaignLoader: document.getElementById('campaign-loader'),
         logoutBtn: document.getElementById('logout-btn'),
         userEmailDisplay: document.getElementById('user-email-display'),
+        userRoleDisplay: document.getElementById('user-role-display'),
         campaignForm: document.getElementById('campaign-form'),
         campaignStatus: document.getElementById('campaign-status'),
         segmentContainer: document.getElementById('segment-container'),
@@ -431,6 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const userRole = (session.user.app_metadata && session.user.app_metadata.role) || 'Viewer';
             document.body.className = `is-${userRole.toLowerCase().replace(' ', '-')}`;
             dom.userEmailDisplay.textContent = session.user.email;
+            dom.userRoleDisplay.textContent = userRole; // Display the role
             initializeDashboard();
         } else {
             dom.loginOverlay.style.display = 'flex';
@@ -558,7 +567,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function populateImages(images = []) {
-        const list = document.getElementById('c-image-list'); list.innerHTML = '';
+        const list = document.getElementById('c-image-list'); 
+        if (!list) return;
+        list.innerHTML = '';
         if (images.length === 0) {
             list.innerHTML = '<option value="" disabled selected>No images found in Storage.</option>';
         } else {
