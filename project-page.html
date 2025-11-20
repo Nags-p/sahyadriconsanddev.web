@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Details - Sahyadri Constructions</title>
+    <title>Project Details</title>
     <link href="images/logo.png" rel="icon">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
@@ -20,7 +20,9 @@
             </a>
             <nav>
                 <div class="nav-links">
-                    <a href="index.html"><i class="fas fa-arrow-left"></i> Back to Home</a>
+                    <a href="index.html" style="color: var(--git-blue); font-weight: 600;">
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </a>
                 </div>
             </nav>
             <div class="header-actions">
@@ -36,24 +38,26 @@
             
             <!-- Title -->
             <div style="text-align: center; max-width: 800px; margin: 0 auto 60px;">
-                <h1 id="project-title" class="reveal" style="font-size: 3rem; font-weight: 800; color: var(--text-primary); margin-bottom: 15px;">Loading...</h1>
-                <p id="project-subtitle" class="reveal reveal-delay-100" style="font-size: 1.2rem; color: var(--text-secondary);"></p>
+                <h1 id="project-title" style="font-size: 3rem; font-weight: 800; color: var(--text-primary); margin-bottom: 15px;">Loading...</h1>
+                <p id="project-subtitle" style="font-size: 1.2rem; color: var(--text-secondary);"></p>
             </div>
 
             <!-- Gallery -->
-            <div id="project-gallery" class="project-gallery-grid"></div>
+            <div id="project-gallery" class="project-gallery-grid">
+                <!-- Images injected here -->
+            </div>
 
-            <!-- Details -->
+            <!-- Details Grid -->
             <div class="project-info-grid">
                 <div class="project-story">
-                    <h2 class="reveal">The Vision</h2>
-                    <p id="project-vision" class="reveal reveal-delay-100">Loading...</p>
+                    <h2>The Vision</h2>
+                    <p id="project-vision">Loading...</p>
                     
-                    <h2 class="reveal" style="margin-top: 40px;">Our Solution</h2>
-                    <p id="project-solution" class="reveal reveal-delay-100">Loading...</p>
+                    <h2 style="margin-top: 40px;">Our Solution</h2>
+                    <p id="project-solution">Loading...</p>
                 </div>
 
-                <div class="project-details-card reveal reveal-delay-200">
+                <div class="project-details-card">
                     <h3>Project Snapshot</h3>
                     <ul>
                         <li><strong>Client:</strong> <span id="project-client">-</span></li>
@@ -71,44 +75,13 @@
     <!-- FOOTER -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-top">
-                <a href="#" class="footer-logo">
-                    <img src="images/logo.png" alt="Logo">
-                    <span>Sahyadri</span>
-                </a>
-                <div class="footer-socials">
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-whatsapp"></i></a>
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                </div>
-            </div>
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <h4>Company</h4>
-                    <ul>
-                        <li><a href="index.html#about">About Us</a></li>
-                        <li><a href="index.html#projects">Portfolio</a></li>
-                        <li><a href="index.html#contact">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Services</h4>
-                    <ul>
-                        <li><a href="index.html#services">Residential</a></li>
-                        <li><a href="index.html#services">Commercial</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Contact</h4>
-                    <div class="footer-contact-item"><i class="fas fa-phone"></i> +91 7975676745</div>
-                </div>
-            </div>
+            <p style="text-align: center;">&copy; 2025 Sahyadri Constructions. All Rights Reserved.</p>
         </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="projects-data.js"></script>
-    <script src="main.js" defer></script>
+    <!-- SCRIPTS (Order is Important) -->
+    <script src="projects-data.js"></script> <!-- 1. Data loads first -->
+    <script src="project.js"></script>      <!-- 2. Logic loads second -->
+    <script src="main.js"></script>         <!-- 3. Shared logic (Nav) -->
 </body>
 </html>
