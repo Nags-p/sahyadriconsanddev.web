@@ -1,13 +1,17 @@
 // ===================================================================
 // --- 1. CONFIGURATION ---
 // ===================================================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxhyRr1lI3wFCiSDax3C6IIz8-XkmRxaBGVecUIIuhkmasK4hf8ra4QuJd5eyIxc54gcg/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbypS1QKT69W0gIAheTIGNCT_L-Zq5ZqOthq74yfXzKitXlS87kn3ir9KhtRG2IIUl5nvQ/exec'; 
 const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2ns-yio';
 
 // --- SUPABASE CLIENT ---
 const { createClient } = supabase;
 const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// --- DERIVED CONFIG ---
+const IMAGE_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/promotional_images/`;
+const WEBSITE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/';
 
 // --- STATE VARIABLES ---
 let masterTemplateHtml = '', allCustomers = [], customerHeaders = [], availableSegments = [];
@@ -90,11 +94,79 @@ function showPage(pageId, dom) {
     if (pageId === 'page-archive') fetchCampaignArchive(dom);
     if (pageId === 'page-inquiries') fetchInquiries(dom, 'New');
     if (pageId === 'page-archived-inquiries') fetchInquiries(dom, 'Archived');
+    if (pageId === 'page-image-manager') fetchImages(dom);
 }
 
 // ===================================================================
 // --- 3. DATA HANDLING & RENDERING FUNCTIONS ---
 // ===================================================================
+function fetchImages(dom) {
+    dom.campaignLoader.textContent = 'Loading images...';
+    dom.imageGridContainer.innerHTML = '<p>Loading...</p>';
+    callApi('getDashboardData', {}, response => {
+        if (response.success && response.images) {
+            renderImageGrid(response.images, dom);
+        } else {
+            dom.imageGridContainer.innerHTML = `<p style="color:red;">Error: ${response.message}</p>`;
+        }
+    }, 'image-manager-status');
+}
+
+function renderImageGrid(images, dom) {
+    const container = dom.imageGridContainer;
+    container.innerHTML = '';
+    if (images.length === 0) {
+        container.innerHTML = '<p>No promotional images found. Upload one to get started!</p>';
+        return;
+    }
+
+    images.forEach(image => {
+        const imageUrl = `${IMAGE_BASE_URL}${image.name}`;
+        const card = document.createElement('div');
+        card.className = 'image-card';
+
+        const lastModified = new Date(image.updated_at || image.created_at).toLocaleDateString();
+        const fileSize = image.metadata && image.metadata.size ? (image.metadata.size / 1024).toFixed(1) + ' KB' : 'N/A';
+
+        card.innerHTML = `
+            <div class="image-card-preview" style="background-image: url('${imageUrl}')"></div>
+            <div class="image-card-details">
+                <input type="text" class="image-name-input" value="${image.name}" data-original-name="${image.name}">
+                <p>${fileSize} - ${lastModified}</p>
+                <div class="image-card-actions">
+                    <button class="btn-secondary btn-rename">Rename</button>
+                    <button class="btn-danger btn-delete">Delete</button>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+
+        card.querySelector('.btn-delete').addEventListener('click', () => {
+            if (confirm(`Are you sure you want to delete the image "${image.name}"? This cannot be undone.`)) {
+                callApi('deleteImage', { fileName: image.name }, response => {
+                    showStatusMessage(dom.imageManagerStatus, response.message, response.success);
+                    if (response.success) fetchImages(dom);
+                }, 'image-manager-status');
+            }
+        });
+
+        card.querySelector('.btn-rename').addEventListener('click', () => {
+            const input = card.querySelector('.image-name-input');
+            const oldName = input.dataset.originalName;
+            const newName = input.value.trim();
+
+            if (newName && newName !== oldName) {
+                if (confirm(`Rename "${oldName}" to "${newName}"?`)) {
+                    callApi('renameImage', { oldName: oldName, newName: newName }, response => {
+                        showStatusMessage(dom.imageManagerStatus, response.message, response.success);
+                        if (response.success) fetchImages(dom);
+                    }, 'image-manager-status');
+                }
+            }
+        });
+    });
+}
+
 function fetchInquiries(dom, status) {
     const containerId = status === 'New' ? 'inquiries-container' : 'archived-inquiries-container';
     const statusId = 'inquiries-status';
@@ -429,28 +501,26 @@ document.addEventListener('DOMContentLoaded', () => {
         recipientsModalClose: document.getElementById('recipients-modal-close'),
         recipientsList: document.getElementById('recipients-list'),
         inquiriesContainer: document.getElementById('inquiries-container'),
-        inquiriesStatus: document.getElementById('inquiries-status')
+        inquiriesStatus: document.getElementById('inquiries-status'),
+        imageGridContainer: document.getElementById('image-grid-container'),
+        imageUploadInput: document.getElementById('image-upload-input'),
+        imageManagerStatus: document.getElementById('image-manager-status'),
     };
 
-    // In dashboard.js
-
-async function handleUserSession() {
-    const { data: { session } } = await _supabase.auth.getSession();
-    
-    if (session) {
-        const userRole = (session.user.app_metadata && session.user.app_metadata.role) || 'Viewer';
-        document.body.className = `is-${userRole.toLowerCase().replace(' ', '-')}`;
+    async function handleUserSession() {
+        const { data: { session } } = await _supabase.auth.getSession();
         
-        // --- THIS IS THE CORRECTED LINE ---
-        dom.userEmailDisplay.textContent = session.user.user_metadata.display_name || session.user.email;
-        
-        dom.userRoleDisplay.textContent = userRole;
-        initializeDashboard();
-    } else {
-        dom.loginOverlay.style.display = 'flex';
-        dom.dashboardLayout.style.display = 'none';
+        if (session) {
+            const userRole = (session.user.app_metadata && session.user.app_metadata.role) || 'Viewer';
+            document.body.className = `is-${userRole.toLowerCase().replace(' ', '-')}`;
+            dom.userEmailDisplay.textContent = session.user.user_metadata.display_name || session.user.email;
+            dom.userRoleDisplay.textContent = userRole;
+            initializeDashboard();
+        } else {
+            dom.loginOverlay.style.display = 'flex';
+            dom.dashboardLayout.style.display = 'none';
+        }
     }
-}
 
     function initializeDashboard() {
         dom.loginOverlay.style.display = 'none';
@@ -494,7 +564,6 @@ async function handleUserSession() {
     });
 
     dom.logoutBtn.addEventListener('click', logout);
-
     dom.navItems.forEach(item => item.addEventListener('click', () => showPage(item.dataset.page, dom)));
     
     dom.customerSearch.addEventListener('keyup', () => {
@@ -556,6 +625,22 @@ async function handleUserSession() {
         }, 'edit-customer-status');
     });
 
+    dom.imageUploadInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            const base64String = reader.result.split(',')[1];
+            callApi('uploadImage', { fileName: file.name, fileContent: base64String, fileType: file.type }, response => {
+                showStatusMessage(dom.imageManagerStatus, response.message, response.success);
+                if (response.success) fetchImages(dom);
+                dom.imageUploadInput.value = '';
+            }, 'image-manager-status');
+        };
+        reader.onerror = (error) => { showStatusMessage(dom.imageManagerStatus, `Error reading file: ${error}`, false); };
+    });
+
     function populateCheckboxes(segments = []) {
         dom.segmentContainer.innerHTML = '';
         createCheckbox('All', 'All Customers', true);
@@ -578,7 +663,7 @@ async function handleUserSession() {
         if (images.length === 0) {
             list.innerHTML = '<option value="" disabled selected>No images found in Storage.</option>';
         } else {
-            images.forEach(img => { const opt = document.createElement('option'); opt.value = img; opt.textContent = img; list.appendChild(opt); });
+            images.forEach(img => { const opt = document.createElement('option'); opt.value = img.name; opt.textContent = img.name; list.appendChild(opt); });
             list.selectedIndex = 0;
         }
     }
@@ -593,6 +678,5 @@ async function handleUserSession() {
         }
     }
     
-    // Check user session on initial page load
     handleUserSession();
 });

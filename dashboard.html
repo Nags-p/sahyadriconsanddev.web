@@ -28,7 +28,6 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <h1>Admin Panel</h1>
-                <!-- UPDATED: Placeholders for user email and role -->
                 <p id="user-email-display"></p>
                 <p id="user-role-display"></p>
             </div>
@@ -36,6 +35,7 @@
                 <ul>
                     <li id="nav-inquiries" data-page="page-inquiries" class="active">New Inquiries</li>
                     <li id="nav-archived-inquiries" data-page="page-archived-inquiries">Archived Inquiries</li>
+                    <li id="nav-image-manager" data-page="page-image-manager">Image Manager</li>
                     <li id="nav-promotions" data-page="page-promotions">Promotions</li>
                     <li id="nav-customers" data-page="page-customers">Customers</li>
                     <li id="nav-archive" data-page="page-archive">Campaign History</li>
@@ -60,6 +60,18 @@
                     <h2>Archived Inquiries</h2>
                     <p>These are inquiries that you have already converted to customers or manually deleted.</p>
                     <div id="archived-inquiries-container"></div>
+                </div>
+            </div>
+            
+            <div id="page-image-manager" class="page">
+                <div class="content-box">
+                    <h2>Image Manager</h2>
+                    <div class="image-manager-actions">
+                        <label for="image-upload-input" class="btn-primary">Upload New Image</label>
+                        <input type="file" id="image-upload-input" accept="image/jpeg, image/png, image/gif" style="display: none;">
+                    </div>
+                    <div id="image-manager-status" class="status-message" style="margin-top: 20px;"></div>
+                    <div id="image-grid-container" class="image-grid"></div>
                 </div>
             </div>
 
