@@ -11,19 +11,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     // ... Supabase Config ...
 
-    // --- TRACKING LOGIC ---
+    // --- TRACKING LOGIC (With IP) ---
     async function trackVisitor() {
-        // Check if we already counted this user this session to prevent spamming
+        // 1. Check session to prevent spamming counts on refresh
         if (sessionStorage.getItem('visit_tracked')) return; 
 
         try {
+            // 2. Get IP Address from free API
+            let userIp = 'Unknown';
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                userIp = data.ip;
+            } catch (e) {
+                console.warn('Could not fetch IP');
+            }
+
+            // 3. Send to Supabase
             await _supabase.from('site_traffic').insert([{ 
                 page: window.location.pathname,
-                referrer: document.referrer || 'Direct'
+                referrer: document.referrer || 'Direct',
+                ip_address: userIp // Saving the IP
             }]);
             
-            // Mark as tracked for this session (tab open)
+            // 4. Mark session as tracked
             sessionStorage.setItem('visit_tracked', 'true');
+            
         } catch (err) {
             console.log('Tracking skipped');
         }

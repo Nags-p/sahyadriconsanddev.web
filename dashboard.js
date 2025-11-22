@@ -967,16 +967,54 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Add this function at the bottom of dashboard.js
-async function fetchSiteTraffic(dom) {
-    // 1. Get count of all rows in 'site_traffic'
-    const { count, error } = await _supabase
+    async function fetchSiteTraffic(dom) {
+    // 1. Get Total Count
+    const { count, error: countError } = await _supabase
         .from('site_traffic')
-        .select('*', { count: 'exact', head: true }); // 'head: true' means don't download data, just count
+        .select('*', { count: 'exact', head: true });
 
-    if (!error) {
-        // Update the HTML element
-        const el = document.getElementById('stat-total-visits');
-        if(el) el.textContent = count;
+    // 2. Get Recent 50 Visitors (Detailed Data)
+    const { data: trafficLogs, error: dataError } = await _supabase
+        .from('site_traffic')
+        .select('created_at, ip_address, page, referrer')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+    // Update Count Display
+    const countEl = document.getElementById('stat-total-visits');
+    if (countEl) {
+        countEl.textContent = count || 0;
+    }
+
+    // Update Table Display
+    const tbody = document.querySelector('#traffic-table tbody');
+    if (tbody && trafficLogs) {
+        tbody.innerHTML = ''; // Clear loading state
+
+        trafficLogs.forEach(log => {
+            const row = document.createElement('tr');
+            
+            // Format Date (e.g., "Nov 20, 10:30 AM")
+            const dateStr = new Date(log.created_at).toLocaleString('en-US', {
+                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            const ip = log.ip_address || 'Unknown';
+            const page = log.page || '/';
+            // Clean up referrer (e.g., show 'Google' instead of full URL if possible, or just truncate)
+            let ref = log.referrer;
+            if(!ref || ref.includes(window.location.hostname) || ref === 'Direct') {
+                ref = '<span style="color:#999">Direct / Internal</span>';
+            }
+
+            row.innerHTML = `
+                <td style="padding: 8px 10px; border-bottom: 1px solid #eee;">${dateStr}</td>
+                <td style="padding: 8px 10px; border-bottom: 1px solid #eee; font-family: monospace;">${ip}</td>
+                <td style="padding: 8px 10px; border-bottom: 1px solid #eee; color: #2563eb;">${page}</td>
+                <td style="padding: 8px 10px; border-bottom: 1px solid #eee;">${ref}</td>
+            `;
+            tbody.appendChild(row);
+        });
     }
 }
     

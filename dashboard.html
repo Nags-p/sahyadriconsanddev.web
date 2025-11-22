@@ -137,10 +137,31 @@
         <h2>Website Traffic</h2>
         
         <!-- 1. GLOBAL STATS (Always Visible) -->
-        <div class="stats-summary" style="margin-bottom: 40px;">
+        <!-- 1. GLOBAL STATS & TRAFFIC LOG -->
+        <div class="stats-summary" style="margin-bottom: 20px;">
             <div class="stat-card" style="background: #e0f2fe; border: 1px solid #bae6fd;">
                 <h3 style="color: #0284c7;">Total Site Visits</h3>
                 <p id="stat-total-visits" style="color: #0369a1;">Loading...</p>
+            </div>
+        </div>
+
+        <!-- New Traffic Table -->
+        <div style="margin-bottom: 40px;">
+            <h3 style="font-size: 1.2rem; margin-bottom: 15px;">Recent Visitors Log</h3>
+            <div style="overflow-x: auto; max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px;">
+                <table id="traffic-table" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                    <thead style="background: #f9f9f9; position: sticky; top: 0;">
+                        <tr>
+                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Time</th>
+                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">IP Address</th>
+                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Page</th>
+                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Source (Referrer)</th>
+                        </tr>
+                    </thead>
+                    <tbody style="background: white;">
+                        <!-- Rows will be injected here via JS -->
+                    </tbody>
+                </table>
             </div>
         </div>
 
