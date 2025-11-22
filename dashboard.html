@@ -134,28 +134,34 @@
             <!-- Replace the old analytics page div with this -->
 <div id="page-analytics" class="page">
     <div class="content-box">
-        <div class="analytics-header" style="justify-content: space-between; align-items: center;">
-            <h2>Campaign Analytics</h2>
-        </div>
+        <h2>Website Traffic</h2>
         
-        <!-- Campaign Selector -->
+        <!-- 1. GLOBAL STATS (Always Visible) -->
+        <div class="stats-summary" style="margin-bottom: 40px;">
+            <div class="stat-card" style="background: #e0f2fe; border: 1px solid #bae6fd;">
+                <h3 style="color: #0284c7;">Total Site Visits</h3>
+                <p id="stat-total-visits" style="color: #0369a1;">Loading...</p>
+            </div>
+        </div>
+
+        <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+
+        <!-- 2. CAMPAIGN SECTION -->
+        <h2>Email Campaign Analytics</h2>
+        
         <div style="margin-bottom: 30px; background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #eee;">
             <label for="analytics-campaign-select">Select Campaign to View:</label>
             <select id="analytics-campaign-select">
-                <option value="" selected disabled>Loading campaigns...</option>
+                <option value="" selected disabled>Select a campaign...</option>
             </select>
         </div>
 
-        <!-- Stats Display (Hidden until selected) -->
+        <!-- Campaign Stats (Hidden until selected) -->
         <div id="analytics-dashboard-content" style="display: none;">
             <div class="stats-summary">
                 <div class="stat-card"><h3>Sent</h3><p id="stat-sent">-</p></div>
                 <div class="stat-card"><h3>Opens</h3><p id="stat-opens">-</p></div>
                 <div class="stat-card"><h3>Clicks</h3><p id="stat-clicks">-</p></div>
-                <div class="stat-card">
-    <h3>Total Site Visits</h3>
-    <p id="stat-total-visits">0</p>
-</div>
             </div>
             <div class="stats-container">
                 <div class="stats-column">

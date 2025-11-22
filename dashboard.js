@@ -769,7 +769,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function initializeDashboard() {
         setLoading(true);
         // Inside initializeDashboard()
-        fetchSiteTraffic(dom);
+        
         dom.loginOverlay.style.display = 'none';
         dom.dashboardLayout.style.display = 'flex';
         try {
@@ -783,6 +783,7 @@ document.addEventListener('DOMContentLoaded', () => {
             masterTemplateHtml = templateRes;
             populateCheckboxes(availableSegments);
             populateImages(imagesRes.data);
+            fetchSiteTraffic(dom);
             handleHashChange();
         } catch(error) {
             alert(`Critical Error: Could not fetch dashboard data. ${error.message}`);
