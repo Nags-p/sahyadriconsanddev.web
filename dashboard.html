@@ -145,9 +145,17 @@
             </div>
         </div>
 
-        <!-- New Traffic Table -->
-        <div style="margin-bottom: 40px;">
-            <h3 style="font-size: 1.2rem; margin-bottom: 15px;">Recent Visitors Log</h3>
+        <!-- TOGGLE BUTTON -->
+        <div style="margin-bottom: 20px;">
+            <button type="button" onclick="toggleTrafficLog()" class="btn-secondary" style="width: auto; display: inline-flex; align-items: center; gap: 8px;">
+                <span id="traffic-btn-icon">&#9656;</span> <!-- Right arrow icon -->
+                View Recent Visitor Log
+            </button>
+        </div>
+
+        <!-- HIDDEN TABLE CONTAINER -->
+        <div id="traffic-log-container" style="display: none; margin-bottom: 40px; animation: fadeIn 0.3s ease;">
+            <h3 style="font-size: 1.2rem; margin-bottom: 15px;">Recent Visitors (Last 50)</h3>
             <div style="overflow-x: auto; max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px;">
                 <table id="traffic-table" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
                     <thead style="background: #f9f9f9; position: sticky; top: 0;">
@@ -155,11 +163,11 @@
                             <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Time</th>
                             <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">IP Address</th>
                             <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Page</th>
-                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Source (Referrer)</th>
+                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Source</th>
                         </tr>
                     </thead>
                     <tbody style="background: white;">
-                        <!-- Rows will be injected here via JS -->
+                        <tr><td colspan="4" style="padding:20px; text-align:center;">Loading data...</td></tr>
                     </tbody>
                 </table>
             </div>
