@@ -9,6 +9,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2ns-yio';
     const { createClient } = supabase;
     const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ... Supabase Config ...
+
+    // --- TRACKING LOGIC ---
+    async function trackVisitor() {
+        // Check if we already counted this user this session to prevent spamming
+        if (sessionStorage.getItem('visit_tracked')) return; 
+
+        try {
+            await _supabase.from('site_traffic').insert([{ 
+                page: window.location.pathname,
+                referrer: document.referrer || 'Direct'
+            }]);
+            
+            // Mark as tracked for this session (tab open)
+            sessionStorage.setItem('visit_tracked', 'true');
+        } catch (err) {
+            console.log('Tracking skipped');
+        }
+    }
+    
+    // Run tracking
+    trackVisitor();
 
     // 2. ANIMATION SCROLL REVEAL
     const revealElements = document.querySelectorAll('.reveal');

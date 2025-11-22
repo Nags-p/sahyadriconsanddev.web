@@ -768,6 +768,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function initializeDashboard() {
         setLoading(true);
+        // Inside initializeDashboard()
+        fetchSiteTraffic(dom);
         dom.loginOverlay.style.display = 'none';
         dom.dashboardLayout.style.display = 'flex';
         try {
@@ -962,6 +964,20 @@ document.addEventListener('DOMContentLoaded', () => {
             allCheckbox.checked = otherCheckboxes.length > 0 && otherCheckboxes.every(cb => cb.checked);
         }
     }
+
+    // Add this function at the bottom of dashboard.js
+async function fetchSiteTraffic(dom) {
+    // 1. Get count of all rows in 'site_traffic'
+    const { count, error } = await _supabase
+        .from('site_traffic')
+        .select('*', { count: 'exact', head: true }); // 'head: true' means don't download data, just count
+
+    if (!error) {
+        // Update the HTML element
+        const el = document.getElementById('stat-total-visits');
+        if(el) el.textContent = count;
+    }
+}
     
     handleUserSession();
 });
