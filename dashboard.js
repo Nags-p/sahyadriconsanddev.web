@@ -225,29 +225,36 @@ window.deleteApplication = async (id) => {
 // --- 4. BLOG / INSIGHTS MANAGEMENT ---
 // ===================================================================
 
+// --- REPLACE THE fetchBlogPosts AND renderBlogTable FUNCTIONS IN dashboard.js ---
+
 async function fetchBlogPosts(dom) {
     setLoading(true);
+    
     const tbody = document.getElementById('blog-table-body');
     const statusEl = document.getElementById('blog-status');
+
     if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Loading articles...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center"><i class="fas fa-spinner fa-spin"></i> Loading articles...</td></tr>';
     }
 
     try {
+        // CHANGED: 'updated_at' -> 'created_at'
         const { data, error } = await _supabase
             .from('blog_posts')
-            .select('title, slug, tag, updated_at')
-            .order('updated_at', { ascending: false });
+            .select('title, slug, tag, created_at') 
+            .order('created_at', { ascending: false });
 
         if (error) throw error;
 
-        renderBlogTable(data || []);
+        renderBlogTable(data || [], tbody);
+        
         if (statusEl) {
             statusEl.style.display = 'none';
         }
     } catch (err) {
+        console.error("Blog Fetch Error:", err);
         if (tbody) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center">Error: ${err.message}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--danger-color);">Error loading data: ${err.message}</td></tr>`;
         }
         if (statusEl) {
             showStatusMessage(statusEl, `Error loading blog posts: ${err.message}`, false);
@@ -256,43 +263,74 @@ async function fetchBlogPosts(dom) {
     setLoading(false);
 }
 
-function renderBlogTable(posts) {
-    const tbody = document.getElementById('blog-table-body');
+function renderBlogTable(posts, tbody) {
     if (!tbody) return;
 
     tbody.innerHTML = '';
+    
     if (!posts.length) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">No articles yet. Click "New Article" to create one.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">No articles found. Click "New Article" to create one.</td></tr>';
         return;
     }
 
     posts.forEach(post => {
         const tr = document.createElement('tr');
-        const updatedStr = post.updated_at
-            ? new Date(post.updated_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
-            : '-';
+        
+        // CHANGED: Use created_at for date display
+        const dateObj = new Date(post.created_at);
+        const dateStr = !isNaN(dateObj) ? dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
 
         tr.innerHTML = `
-            <td>${post.title || '-'}</td>
-            <td><code>${post.slug}</code></td>
-            <td>${post.tag || '-'}</td>
-            <td>${updatedStr}</td>
+            <td style="font-weight: 500;">${post.title || '(No Title)'}</td>
+            <td><code style="background: #f1f5f9; padding: 2px 5px; border-radius: 4px; color: #64748b;">${post.slug}</code></td>
+            <td><span style="background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;">${post.tag || 'General'}</span></td>
+            <td style="color: #64748b; font-size: 0.9rem;">${dateStr}</td>
             <td style="text-align:right;">
-                <button class="btn-secondary btn-xs" data-blog-edit="${post.slug}"><i class="fas fa-edit"></i> Edit</button>
+                <button class="btn-secondary btn-icon" style="padding: 6px 12px; width: auto;" onclick="loadBlogIntoForm('${post.slug}')">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
             </td>
         `;
 
         tbody.appendChild(tr);
     });
-
-    // Hook edit buttons
-    tbody.querySelectorAll('button[data-blog-edit]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const slug = btn.getAttribute('data-blog-edit');
-            loadBlogIntoForm(slug);
-        });
-    });
 }
+
+// Ensure this is accessible globally
+window.loadBlogIntoForm = async (slug) => {
+    if (!slug) return;
+    setLoading(true);
+    const statusEl = document.getElementById('blog-status');
+    
+    // UI Visual Cue
+    document.getElementById('blog-title-input').focus();
+
+    try {
+        const { data: post, error } = await _supabase
+            .from('blog_posts')
+            .select('*')
+            .eq('slug', slug)
+            .maybeSingle();
+
+        if (error) throw error;
+        if (!post) throw new Error('Article not found');
+
+        // Populate Form
+        document.getElementById('blog-id').value = post.slug; 
+        document.getElementById('blog-title-input').value = post.title || '';
+        document.getElementById('blog-slug-input').value = post.slug || '';
+        document.getElementById('blog-tag-input').value = post.tag || '';
+        document.getElementById('blog-author-input').value = post.author || '';
+        document.getElementById('blog-region-input').value = post.region || '';
+        document.getElementById('blog-body-input').value = post.body_html || '';
+
+        showStatusMessage(statusEl, `Loaded "${post.title}" for editing.`, true);
+        
+    } catch (err) {
+        showStatusMessage(statusEl, `Error loading article: ${err.message}`, false);
+    }
+    setLoading(false);
+};
 
 async function loadBlogIntoForm(slug) {
     if (!slug) return;

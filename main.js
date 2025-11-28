@@ -199,4 +199,78 @@ document.addEventListener('DOMContentLoaded', () => {
             item.classList.toggle('active');
         });
     });
+
+
+    // ... existing code ...
+
+    // ==================================================
+    // 8. DYNAMIC BLOG LOADER (HOME PAGE)
+    // ==================================================
+    // ... inside document.addEventListener('DOMContentLoaded', () => { ...
+
+    // ==================================================
+    // DYNAMIC BLOG LOADER
+    // ==================================================
+    const insightsContainer = document.getElementById('home-insights-container');
+
+    if (insightsContainer) {
+        loadRecentInsights();
+    }
+
+    async function loadRecentInsights() {
+        try {
+            // Fetch latest 3 posts ordered by created_at
+            const { data: posts, error } = await _supabase
+                .from('blog_posts')
+                .select('title, slug, tag, body_html, created_at')
+                .order('created_at', { ascending: false })
+                .limit(3);
+
+            if (error) throw error;
+
+            insightsContainer.innerHTML = '';
+
+            if (!posts || posts.length === 0) {
+                insightsContainer.innerHTML = '<p class="reveal" style="grid-column: 1/-1; text-align: center;">No insights published yet.</p>';
+                return;
+            }
+
+            posts.forEach((post, index) => {
+                // Strip HTML to create a short excerpt
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = post.body_html;
+                let plainText = tempDiv.textContent || tempDiv.innerText || "";
+                let excerpt = plainText.substring(0, 100) + "...";
+
+                // Add staggered animation delay
+                const delayClass = index === 1 ? 'reveal-delay-100' : (index === 2 ? 'reveal-delay-200' : '');
+
+                const articleHTML = `
+                    <article class="insight-card reveal ${delayClass}">
+                        <span class="insight-tag">${post.tag || 'Update'}</span>
+                        <h3>${post.title}</h3>
+                        <p class="insight-excerpt">${excerpt}</p>
+                        <a href="blog.html?slug=${post.slug}">Read insight <i class="fas fa-arrow-right" style="font-size:0.8em;"></i></a>
+                    </article>
+                `;
+
+                // Convert HTML string to DOM element to animate it
+                const template = document.createElement('div');
+                template.innerHTML = articleHTML.trim();
+                const element = template.firstChild;
+
+                insightsContainer.appendChild(element);
+
+                // Trigger animation (Fallback if global observer isn't accessible)
+                setTimeout(() => element.classList.add('active'), 100);
+            });
+
+        } catch (err) {
+            console.error('Error fetching blogs:', err);
+            if (insightsContainer) {
+                insightsContainer.innerHTML = '<p style="text-align:center; color: #ef4444;">Unable to load insights.</p>';
+            }
+        }
+    }
+    // ... end of document.addEventListener ...
 });

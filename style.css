@@ -2145,4 +2145,35 @@ section {
     }
 }
 
-```
+/* Add to your style.css */
+
+.loading-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    background: white;
+    border-radius: 12px;
+    border: 1px dashed #e2e8f0;
+}
+
+.insight-excerpt {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    
+    /* Clamp text to 3 lines */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Ensure dynamic insights grid aligns correctly */
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    width: 100%;
+}
