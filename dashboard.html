@@ -41,10 +41,8 @@
                     <li id="nav-promotions" data-page="page-promotions"><i class="fas fa-bullhorn"></i> Promotions</li>
                     <li id="nav-customers" data-page="page-customers"><i class="fas fa-users"></i> Customers</li>
                     <li id="nav-archive" data-page="page-archive"><i class="fas fa-history"></i> Campaign History</li>
+                    <li id="nav-blog" data-page="page-blog"><i class="fas fa-newspaper"></i> Blog / Insights</li>
                     <li id="nav-careers" data-page="page-careers"><i class="fas fa-briefcase"></i> Careers <span id="career-badge" class="badge-new">New</span></li>
-                    <!-- NEW TAB HERE -->
- 
-
                 </ul>
             </nav>
             <div class="sidebar-footer">
@@ -130,7 +128,72 @@
                     </div>
                 </div>
             </div>
-            
+
+            <!-- BLOG / INSIGHTS PAGE -->
+            <div id="page-blog" class="page">
+                <div class="content-box">
+                    <div class="analytics-header" style="justify-content: space-between;">
+                        <div>
+                            <h2>Blog / Insights</h2>
+                            <p>Manage articles that appear in the Insights section on your website.</p>
+                        </div>
+                        <button id="blog-new-btn" class="btn-primary"><i class="fas fa-plus"></i> New Article</button>
+                    </div>
+
+                    <div class="blog-layout">
+                        <!-- LEFT: LIST -->
+                        <div class="blog-list-panel">
+                            <table id="blog-table">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Slug</th>
+                                        <th>Tag</th>
+                                        <th>Updated</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="blog-table-body">
+                                    <tr><td colspan="5" style="text-align:center;">Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- RIGHT: EDITOR -->
+                        <div class="blog-editor-panel">
+                            <form id="blog-form">
+                                <input type="hidden" id="blog-id">
+
+                                <label for="blog-title-input">Title</label>
+                                <input type="text" id="blog-title-input" required placeholder="Article title">
+
+                                <label for="blog-slug-input">Slug (URL key)</label>
+                                <input type="text" id="blog-slug-input" required placeholder="e.g. soil-testing">
+                                <small>Final URL will look like: <code>blog.html?slug=your-slug</code></small>
+
+                                <label for="blog-tag-input">Tag / Category</label>
+                                <input type="text" id="blog-tag-input" placeholder="e.g. Structural Design">
+
+                                <label for="blog-author-input">Author</label>
+                                <input type="text" id="blog-author-input" placeholder="e.g. Sahyadri Engineering Team">
+
+                                <label for="blog-region-input">Region / Context</label>
+                                <input type="text" id="blog-region-input" placeholder="e.g. Mandya & Mysuru">
+
+                                <label for="blog-body-input">Body (HTML allowed)</label>
+                                <textarea id="blog-body-input" rows="12" placeholder="Paste or write your article content in HTML"></textarea>
+
+                                <div class="button-group" style="margin-top:15px;">
+                                    <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Article</button>
+                                    <button type="button" id="blog-delete-btn" class="btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
+                                </div>
+                                <div id="blog-status" class="status-message"></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Replace the old analytics page div with this -->
 <div id="page-analytics" class="page">
     <div class="content-box">
@@ -206,7 +269,7 @@
     </div>
 </div>
 
-<!-- CAREERS PAGE -->
+            <!-- CAREERS PAGE -->
             <div id="page-careers" class="page">
                 <div class="content-box">
                     <div class="analytics-header" style="justify-content: space-between;">

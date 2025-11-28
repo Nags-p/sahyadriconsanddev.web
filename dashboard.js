@@ -93,9 +93,14 @@ function showPage(pageId, dom, params = null) {
         loadAnalyticsDropdown(dom, params ? params.campaignId : null);
     }
 
-    // --- FIX: CAREERS LOGIC ADDED HERE ---
+    // Careers Logic
     if (pageId === 'page-careers') {
         fetchCareers(dom);
+    }
+
+    // Blog Logic
+    if (pageId === 'page-blog') {
+        fetchBlogPosts(dom);
     }
 }
 
@@ -217,7 +222,188 @@ window.deleteApplication = async (id) => {
 
 
 // ===================================================================
-// --- 4. ANALYTICS TAB LOGIC ---
+// --- 4. BLOG / INSIGHTS MANAGEMENT ---
+// ===================================================================
+
+async function fetchBlogPosts(dom) {
+    setLoading(true);
+    const tbody = document.getElementById('blog-table-body');
+    const statusEl = document.getElementById('blog-status');
+    if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Loading articles...</td></tr>';
+    }
+
+    try {
+        const { data, error } = await _supabase
+            .from('blog_posts')
+            .select('title, slug, tag, updated_at')
+            .order('updated_at', { ascending: false });
+
+        if (error) throw error;
+
+        renderBlogTable(data || []);
+        if (statusEl) {
+            statusEl.style.display = 'none';
+        }
+    } catch (err) {
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center">Error: ${err.message}</td></tr>`;
+        }
+        if (statusEl) {
+            showStatusMessage(statusEl, `Error loading blog posts: ${err.message}`, false);
+        }
+    }
+    setLoading(false);
+}
+
+function renderBlogTable(posts) {
+    const tbody = document.getElementById('blog-table-body');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+    if (!posts.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">No articles yet. Click "New Article" to create one.</td></tr>';
+        return;
+    }
+
+    posts.forEach(post => {
+        const tr = document.createElement('tr');
+        const updatedStr = post.updated_at
+            ? new Date(post.updated_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+            : '-';
+
+        tr.innerHTML = `
+            <td>${post.title || '-'}</td>
+            <td><code>${post.slug}</code></td>
+            <td>${post.tag || '-'}</td>
+            <td>${updatedStr}</td>
+            <td style="text-align:right;">
+                <button class="btn-secondary btn-xs" data-blog-edit="${post.slug}"><i class="fas fa-edit"></i> Edit</button>
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+
+    // Hook edit buttons
+    tbody.querySelectorAll('button[data-blog-edit]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const slug = btn.getAttribute('data-blog-edit');
+            loadBlogIntoForm(slug);
+        });
+    });
+}
+
+async function loadBlogIntoForm(slug) {
+    if (!slug) return;
+    setLoading(true);
+    const statusEl = document.getElementById('blog-status');
+    try {
+        const { data: post, error } = await _supabase
+            .from('blog_posts')
+            .select('title, slug, tag, author, region, body_html')
+            .eq('slug', slug)
+            .maybeSingle();
+
+        if (error) throw error;
+        if (!post) throw new Error('Article not found');
+
+        // store original slug in hidden field so we can update/delete by slug
+        document.getElementById('blog-id').value = post.slug || '';
+        document.getElementById('blog-title-input').value = post.title || '';
+        document.getElementById('blog-slug-input').value = post.slug || '';
+        document.getElementById('blog-tag-input').value = post.tag || '';
+        document.getElementById('blog-author-input').value = post.author || '';
+        document.getElementById('blog-region-input').value = post.region || '';
+        document.getElementById('blog-body-input').value = post.body_html || '';
+
+        if (statusEl) {
+            statusEl.style.display = 'none';
+        }
+    } catch (err) {
+        if (statusEl) {
+            showStatusMessage(statusEl, `Error loading article: ${err.message}`, false);
+        }
+    }
+    setLoading(false);
+}
+
+function resetBlogForm() {
+    document.getElementById('blog-id').value = '';
+    document.getElementById('blog-title-input').value = '';
+    document.getElementById('blog-slug-input').value = '';
+    document.getElementById('blog-tag-input').value = '';
+    document.getElementById('blog-author-input').value = '';
+    document.getElementById('blog-region-input').value = '';
+    document.getElementById('blog-body-input').value = '';
+    const statusEl = document.getElementById('blog-status');
+    if (statusEl) statusEl.style.display = 'none';
+}
+
+async function saveBlogFromForm(e) {
+    e.preventDefault();
+    const originalSlug = document.getElementById('blog-id').value; // may be empty for new post
+    const title = document.getElementById('blog-title-input').value.trim();
+    const slug = document.getElementById('blog-slug-input').value.trim();
+    const tag = document.getElementById('blog-tag-input').value.trim();
+    const author = document.getElementById('blog-author-input').value.trim();
+    const region = document.getElementById('blog-region-input').value.trim();
+    const body_html = document.getElementById('blog-body-input').value;
+    const statusEl = document.getElementById('blog-status');
+
+    if (!title || !slug) {
+        showStatusMessage(statusEl, 'Title and slug are required.', false);
+        return;
+    }
+
+    const payload = { title, slug, tag, author, region, body_html };
+
+    try {
+        setLoading(true);
+        let result;
+        if (originalSlug) {
+            result = await _supabase.from('blog_posts').update(payload).eq('slug', originalSlug);
+        } else {
+            result = await _supabase.from('blog_posts').insert([payload]);
+        }
+
+        if (result.error) throw result.error;
+
+        showStatusMessage(statusEl, 'Article saved successfully.', true);
+        fetchBlogPosts({}); // refresh list
+    } catch (err) {
+        showStatusMessage(statusEl, `Error saving article: ${err.message}`, false);
+    }
+    setLoading(false);
+}
+
+async function deleteCurrentBlog() {
+    const originalSlug = document.getElementById('blog-id').value;
+    const statusEl = document.getElementById('blog-status');
+    if (!originalSlug) {
+        showStatusMessage(statusEl, 'No article selected to delete.', false);
+        return;
+    }
+
+    if (!confirm('Permanently delete this article?')) return;
+
+    try {
+        setLoading(true);
+        const { error } = await _supabase.from('blog_posts').delete().eq('slug', originalSlug);
+        if (error) throw error;
+
+        resetBlogForm();
+        fetchBlogPosts({}); // refresh list
+        showStatusMessage(statusEl, 'Article deleted.', true);
+    } catch (err) {
+        showStatusMessage(statusEl, `Error deleting article: ${err.message}`, false);
+    }
+    setLoading(false);
+}
+
+
+// ===================================================================
+// --- 5. ANALYTICS TAB LOGIC ---
 // ===================================================================
 
 async function loadAnalyticsDropdown(dom, selectedId = null) {
@@ -732,7 +918,10 @@ document.addEventListener('DOMContentLoaded', () => {
         analyticsSelect: document.getElementById('analytics-campaign-select'),
         analyticsContent: document.getElementById('analytics-dashboard-content'),
         analyticsOpensList: document.getElementById('analytics-opens-list'),
-        analyticsClicksList: document.getElementById('analytics-clicks-list')
+        analyticsClicksList: document.getElementById('analytics-clicks-list'),
+        blogForm: document.getElementById('blog-form'),
+        blogNewBtn: document.getElementById('blog-new-btn'),
+        blogDeleteBtn: document.getElementById('blog-delete-btn')
     };
 
     function handleHashChange() {
@@ -814,6 +1003,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     dom.logoutBtn.addEventListener('click', logout);
     
+    // Blog events
+    if (dom.blogForm) {
+        dom.blogForm.addEventListener('submit', saveBlogFromForm);
+    }
+    if (dom.blogNewBtn) {
+        dom.blogNewBtn.addEventListener('click', resetBlogForm);
+    }
+    if (dom.blogDeleteBtn) {
+        dom.blogDeleteBtn.addEventListener('click', deleteCurrentBlog);
+    }
+
     dom.navItems.forEach(item => item.addEventListener('click', (e) => {
         const page = e.currentTarget.dataset.page.replace('page-','');
         window.location.hash = page.replace(/_/g, '-');

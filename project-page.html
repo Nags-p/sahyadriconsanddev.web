@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Details</title>
+    <title>Project Details - Sahyadri Constructions</title>
     <link href="images/logo.png" rel="icon">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <!-- HEADER -->
@@ -20,13 +23,14 @@
             </a>
             <nav>
                 <div class="nav-links">
-                    <a href="index.html" style="color: var(--git-blue); font-weight: 600;">
+                    <a href="index.html" style="color: var(--brand-blue); font-weight: 600;">
                         <i class="fas fa-arrow-left"></i> Back to Home
                     </a>
                 </div>
             </nav>
             <div class="header-actions">
-                <a href="index.html#contact" class="btn btn-primary">Start Your Project -></a>
+                <a href="index.html#contact" class="btn btn-primary">Start Your Project <i
+                        class="fas fa-arrow-right"></i></a>
             </div>
             <button class="mobile-toggle"><i class="fas fa-bars"></i></button>
         </div>
@@ -35,37 +39,68 @@
     <!-- MAIN CONTENT -->
     <main style="padding-top: 140px; padding-bottom: 100px;">
         <div class="container">
-            
+
             <!-- Title -->
-            <div style="text-align: center; max-width: 800px; margin: 0 auto 60px;">
-                <h1 id="project-title" style="font-size: 3rem; font-weight: 800; color: var(--text-primary); margin-bottom: 15px;">Loading...</h1>
-                <p id="project-subtitle" style="font-size: 1.2rem; color: var(--text-secondary);"></p>
+            <div class="project-hero">
+                <div class="project-hero-text">
+                    <h1 id="project-title">Loading...</h1>
+                    <p id="project-subtitle"></p>
+                    <div class="project-meta-pills">
+                        <span class="meta-pill"><strong>Type:</strong> <span id="project-type-pill">-</span></span>
+                        <span class="meta-pill"><strong>Year:</strong> <span id="project-year-pill">-</span></span>
+                        <span class="meta-pill"><strong>Scope:</strong> <span id="project-scope-pill">-</span></span>
+                        <span class="meta-pill"><strong>Location:</strong> <span id="project-location-pill">-</span></span>
+                    </div>
+                    <div class="project-cta-buttons">
+                        <a href="index.html#contact" class="btn btn-primary">Get Free Quote</a>
+                        <a href="tel:+917975676745" class="btn btn-secondary"><i class="fas fa-phone"></i> Call Now</a>
+                    </div>
+                </div>
             </div>
 
             <!-- Gallery -->
             <div id="project-gallery" class="project-gallery-grid">
-                <!-- Images injected here -->
+                <!-- Images injected by JS -->
             </div>
 
-            <!-- Details Grid -->
-            <div class="project-info-grid">
-                <div class="project-story">
-                    <h2>The Vision</h2>
-                    <p id="project-vision">Loading...</p>
-                    
-                    <h2 style="margin-top: 40px;">Our Solution</h2>
-                    <p id="project-solution">Loading...</p>
+            <!-- Project Info Grid -->
+            <div class="project-info-grid" style="margin-top: 60px;">
+                <!-- Main Content -->
+                <div>
+                    <h2>Project Vision</h2>
+                    <p id="project-vision" style="margin-bottom: 40px;">-</p>
+
+                    <h2>The Challenge</h2>
+                    <p id="project-challenge" style="margin-bottom: 40px;">-</p>
+
+                    <h2>Our Solution</h2>
+                    <p id="project-solution" style="margin-bottom: 40px;">-</p>
+
+                    <h2>The Results</h2>
+                    <p id="project-results" style="margin-bottom: 30px;">-</p>
+
+                    <h2>Services Provided</h2>
+                    <ul id="project-services-list" class="project-services-list">
+                        <li>Loading...</li>
+                    </ul>
                 </div>
 
+                <!-- Sidebar Details Card -->
                 <div class="project-details-card">
-                    <h3>Project Snapshot</h3>
-                    <ul>
+                    <h3 style="margin-bottom: 20px; color: var(--brand-navy);">Project Details</h3>
+                    <ul style="list-style: none; padding: 0;">
                         <li><strong>Client:</strong> <span id="project-client">-</span></li>
                         <li><strong>Location:</strong> <span id="project-location">-</span></li>
                         <li><strong>Year:</strong> <span id="project-year">-</span></li>
                         <li><strong>Type:</strong> <span id="project-type">-</span></li>
                         <li><strong>Scope:</strong> <span id="project-scope">-</span></li>
                     </ul>
+
+                    <div class="project-detail-cta">
+                        <p>Need a similar outcome?</p>
+                        <a href="index.html#contact" class="btn btn-primary btn-sm" style="width:100%;">Request a Quote</a>
+                        <a href="tel:+917975676745" class="btn btn-secondary btn-sm" style="width:100%; margin-top:10px;"><i class="fas fa-phone"></i> Call Sahyadri</a>
+                    </div>
                 </div>
             </div>
 
@@ -81,7 +116,8 @@
 
     <!-- SCRIPTS (Order is Important) -->
     <script src="projects-data.js"></script> <!-- 1. Data loads first -->
-    <script src="project.js"></script>      <!-- 2. Logic loads second -->
-    <script src="main.js"></script>         <!-- 3. Shared logic (Nav) -->
+    <script src="project.js"></script> <!-- 2. Logic loads second -->
+    <script src="main.js"></script> <!-- 3. Shared logic (Nav) -->
 </body>
+
 </html>
