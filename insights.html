@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Insights - Sahyadri Constructions</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="images/logo.png" rel="icon">
+</head>
+
+<body>
+    <!-- HEADER (Same as other pages) -->
+    <header class="header">
+        <div class="container nav-wrapper">
+            <a href="index.html" class="logo">
+                <img src="images/header.png" alt="Logo">
+                <span>Sahyadri</span>
+            </a>
+            <nav>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="index.html#projects">Projects</a>
+                    <a href="insights.html" class="active" style="color: var(--brand-blue);">Insights</a> <!-- Active Link -->
+                    <a href="index.html#contact">Contact</a>
+                </div>
+            </nav>
+            <div class="header-actions">
+                <a href="tel:+917975676745" class="btn btn-primary"><i class="fas fa-phone"></i> Call Now</a>
+            </div>
+            <button class="mobile-toggle"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="services-hero" style="padding-top: 140px; background: #f8fafc; color: #1e293b;">
+        <div class="container" style="text-align: center;">
+            <h1 class="reveal" style="color: #1e293b;">All Insights & Updates</h1>
+            <p class="reveal reveal-delay-100" style="color: #64748b;">Expert advice, construction tips, and company news.</p>
+        </div>
+    </section>
+
+    <!-- MAIN GRID SECTION -->
+    <section style="padding: 60px 0; min-height: 60vh;">
+        <div class="container">
+            <!-- This container will be filled by JavaScript -->
+            <div class="insights-grid" id="all-insights-container">
+                <div class="loading-state">
+                    <i class="fas fa-circle-notch fa-spin"></i> Loading all articles...
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <p style="text-align:center;">&copy; 2025 Sahyadri Constructions. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="main.js" defer></script>
+</body>
+</html>
