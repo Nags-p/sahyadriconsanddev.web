@@ -226,6 +226,7 @@ window.deleteApplication = async (id) => {
 // ===================================================================
 
 // --- REPLACE THE fetchBlogPosts AND renderBlogTable FUNCTIONS IN dashboard.js ---
+// --- REPLACE THESE FUNCTIONS IN dashboard.js ---
 
 async function fetchBlogPosts(dom) {
     setLoading(true);
@@ -238,7 +239,7 @@ async function fetchBlogPosts(dom) {
     }
 
     try {
-        // CHANGED: 'updated_at' -> 'created_at'
+        // ERROR FIX: Changed 'updated_at' to 'created_at'
         const { data, error } = await _supabase
             .from('blog_posts')
             .select('title, slug, tag, created_at') 
@@ -276,25 +277,32 @@ function renderBlogTable(posts, tbody) {
     posts.forEach(post => {
         const tr = document.createElement('tr');
         
-        // CHANGED: Use created_at for date display
+        // Use created_at for date
         const dateObj = new Date(post.created_at);
         const dateStr = !isNaN(dateObj) ? dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
 
+        // NEW: Added the "View" button next to "Edit"
         tr.innerHTML = `
             <td style="font-weight: 500;">${post.title || '(No Title)'}</td>
             <td><code style="background: #f1f5f9; padding: 2px 5px; border-radius: 4px; color: #64748b;">${post.slug}</code></td>
             <td><span style="background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;">${post.tag || 'General'}</span></td>
             <td style="color: #64748b; font-size: 0.9rem;">${dateStr}</td>
             <td style="text-align:right;">
-                <button class="btn-secondary btn-icon" style="padding: 6px 12px; width: auto;" onclick="loadBlogIntoForm('${post.slug}')">
-                    <i class="fas fa-edit"></i> Edit
-                </button>
+                <div style="display:flex; gap:5px; justify-content:flex-end;">
+                    <a href="blog.html?slug=${post.slug}" target="_blank" class="btn-info btn-icon" style="padding: 6px 12px; width: auto; text-decoration:none;" title="View Live Post">
+                        <i class="fas fa-external-link-alt"></i> View
+                    </a>
+                    <button class="btn-secondary btn-icon" style="padding: 6px 12px; width: auto;" onclick="loadBlogIntoForm('${post.slug}')" title="Edit Post">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                </div>
             </td>
         `;
 
         tbody.appendChild(tr);
     });
 }
+
 
 // Ensure this is accessible globally
 window.loadBlogIntoForm = async (slug) => {
