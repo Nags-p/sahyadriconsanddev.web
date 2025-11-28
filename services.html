@@ -10,12 +10,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Favicon -->
     <link href="images/logo.png" rel="icon">
 </head>
 
 <body>
-    <!-- HEADER (Fixed Structure) -->
+    <!-- HEADER (Hardcoded back in for direct file access) -->
     <header class="header">
         <div class="container nav-wrapper">
             <a href="index.html" class="logo">
@@ -26,9 +25,9 @@
                 <div class="nav-links">
                     <a href="index.html">Home</a>
                     <a href="index.html#about">About</a>
-                    <!-- Active class added for styling -->
                     <a href="services.html" class="active" style="color: var(--brand-blue);">Services</a>
                     <a href="index.html#projects">Projects</a>
+                    <a href="insights.html">Insights</a>
                     <a href="index.html#contact">Contact</a>
                 </div>
             </nav>
@@ -36,15 +35,11 @@
                 <a href="index.html#contact" class="btn btn-secondary">Get Quote</a>
                 <a href="tel:+917975676745" class="btn btn-primary"><i class="fas fa-phone"></i> Call Now</a>
             </div>
-            
-            <!-- Mobile Elements -->
-            <a href="tel:+917975676745" class="btn btn-primary mobile-contact-btn"><i class="fas fa-phone"></i> Call</a>
             <button class="mobile-toggle"><i class="fas fa-bars"></i></button>
         </div>
     </header>
 
     <!-- SERVICES HERO -->
-    <!-- Added padding-top to ensure it sits below the fixed header -->
     <section class="services-hero" style="padding-top: 140px;">
         <div class="container">
             <h1 class="reveal">Our Services</h1>
@@ -55,168 +50,46 @@
     <!-- SERVICES DETAIL -->
     <section class="services-detail">
         <div class="container">
-            <!-- Residential Construction -->
+            <!-- Residential -->
             <div class="service-detail-card reveal">
-                <div class="service-detail-icon">
-                    <i class="fas fa-home"></i>
-                </div>
+                <div class="service-detail-icon"><i class="fas fa-home"></i></div>
                 <div class="service-detail-content">
                     <h2>Residential Construction</h2>
                     <p class="service-intro">Building dream homes with precision, quality, and care.</p>
-
                     <h3>What We Offer</h3>
                     <ul class="service-features">
                         <li><i class="fas fa-check-circle"></i> Custom villa construction</li>
                         <li><i class="fas fa-check-circle"></i> Apartment complexes</li>
-                        <li><i class="fas fa-check-circle"></i> Independent houses (G+1, G+2, G+3)</li>
-                        <li><i class="fas fa-check-circle"></i> Farmhouse construction</li>
-                        <li><i class="fas fa-check-circle"></i> Duplex and row houses</li>
+                        <li><i class="fas fa-check-circle"></i> Independent houses (G+1, G+2)</li>
                     </ul>
-
-                    <h3>Our Process</h3>
-                    <div class="process-steps">
-                        <div class="process-step-inline">
-                            <span class="step-number">1</span>
-                            <div>
-                                <h4>Site Analysis</h4>
-                                <p>Comprehensive evaluation of your plot</p>
-                            </div>
-                        </div>
-                        <div class="process-step-inline">
-                            <span class="step-number">2</span>
-                            <div>
-                                <h4>Design & Planning</h4>
-                                <p>Custom architectural designs</p>
-                            </div>
-                        </div>
-                        <div class="process-step-inline">
-                            <span class="step-number">3</span>
-                            <div>
-                                <h4>Approvals</h4>
-                                <p>Government sanctions & permits</p>
-                            </div>
-                        </div>
-                        <div class="process-step-inline">
-                            <span class="step-number">4</span>
-                            <div>
-                                <h4>Construction</h4>
-                                <p>Quality execution with timely delivery</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <!-- Commercial Construction -->
+            <!-- Commercial -->
             <div class="service-detail-card reveal">
-                <div class="service-detail-icon">
-                    <i class="fas fa-building"></i>
-                </div>
+                <div class="service-detail-icon"><i class="fas fa-building"></i></div>
                 <div class="service-detail-content">
                     <h2>Commercial Construction</h2>
                     <p class="service-intro">Creating functional and impressive commercial spaces.</p>
-
                     <h3>What We Offer</h3>
                     <ul class="service-features">
                         <li><i class="fas fa-check-circle"></i> Office buildings</li>
-                        <li><i class="fas fa-check-circle"></i> Retail spaces and showrooms</li>
-                        <li><i class="fas fa-check-circle"></i> Warehouses and industrial units</li>
-                        <li><i class="fas fa-check-circle"></i> Commercial complexes</li>
-                        <li><i class="fas fa-check-circle"></i> Hospitals and educational institutions</li>
-                    </ul>
-
-                    <h3>Key Features</h3>
-                    <ul class="service-features">
-                        <li><i class="fas fa-star"></i> Compliance with commercial building codes</li>
-                        <li><i class="fas fa-star"></i> Energy-efficient designs</li>
-                        <li><i class="fas fa-star"></i> Modern infrastructure integration</li>
-                        <li><i class="fas fa-star"></i> Accessibility standards</li>
+                        <li><i class="fas fa-check-circle"></i> Retail spaces</li>
+                        <li><i class="fas fa-check-circle"></i> Warehouses</li>
                     </ul>
                 </div>
             </div>
 
-            <!-- Renovation & Remodeling -->
+            <!-- Renovation -->
             <div class="service-detail-card reveal">
-                <div class="service-detail-icon">
-                    <i class="fas fa-paint-roller"></i>
-                </div>
+                <div class="service-detail-icon"><i class="fas fa-paint-roller"></i></div>
                 <div class="service-detail-content">
-                    <h2>Renovation & Remodeling</h2>
+                    <h2>Renovation</h2>
                     <p class="service-intro">Transform your existing space into something extraordinary.</p>
-
                     <h3>What We Offer</h3>
                     <ul class="service-features">
                         <li><i class="fas fa-check-circle"></i> Complete home renovations</li>
-                        <li><i class="fas fa-check-circle"></i> Kitchen and bathroom remodeling</li>
-                        <li><i class="fas fa-check-circle"></i> Office space upgrades</li>
                         <li><i class="fas fa-check-circle"></i> Structural modifications</li>
-                        <li><i class="fas fa-check-circle"></i> Facade improvements</li>
-                    </ul>
-
-                    <h3>Why Choose Our Renovation Services</h3>
-                    <ul class="service-features">
-                        <li><i class="fas fa-star"></i> Minimal disruption to daily life</li>
-                        <li><i class="fas fa-star"></i> Cost-effective solutions</li>
-                        <li><i class="fas fa-star"></i> Modern design integration</li>
-                        <li><i class="fas fa-star"></i> Quality material upgrades</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Interior Design -->
-            <div class="service-detail-card reveal">
-                <div class="service-detail-icon">
-                    <i class="fas fa-pencil-ruler"></i>
-                </div>
-                <div class="service-detail-content">
-                    <h2>Interior Design</h2>
-                    <p class="service-intro">Crafting beautiful and functional interior spaces.</p>
-
-                    <h3>What We Offer</h3>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check-circle"></i> Complete interior design</li>
-                        <li><i class="fas fa-check-circle"></i> Space planning and optimization</li>
-                        <li><i class="fas fa-check-circle"></i> Custom furniture design</li>
-                        <li><i class="fas fa-check-circle"></i> Lighting design</li>
-                        <li><i class="fas fa-check-circle"></i> Material selection and procurement</li>
-                        <li><i class="fas fa-check-circle"></i> 3D visualization</li>
-                    </ul>
-
-                    <h3>Our Specialties</h3>
-                    <ul class="service-features">
-                        <li><i class="fas fa-star"></i> Modern and contemporary styles</li>
-                        <li><i class="fas fa-star"></i> Traditional and ethnic designs</li>
-                        <li><i class="fas fa-star"></i> Minimalist interiors</li>
-                        <li><i class="fas fa-star"></i> Luxury finishes</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Planning & Approvals -->
-            <div class="service-detail-card reveal">
-                <div class="service-detail-icon">
-                    <i class="fas fa-drafting-compass"></i>
-                </div>
-                <div class="service-detail-content">
-                    <h2>Planning & Approvals</h2>
-                    <p class="service-intro">Hassle-free government approvals and comprehensive planning.</p>
-
-                    <h3>What We Offer</h3>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check-circle"></i> Architectural planning</li>
-                        <li><i class="fas fa-check-circle"></i> Structural design</li>
-                        <li><i class="fas fa-check-circle"></i> Building plan sanctions</li>
-                        <li><i class="fas fa-check-circle"></i> Municipal approvals</li>
-                        <li><i class="fas fa-check-circle"></i> RERA compliance</li>
-                        <li><i class="fas fa-check-circle"></i> Utility connections (water, electricity)</li>
-                    </ul>
-
-                    <h3>Documentation Support</h3>
-                    <ul class="service-features">
-                        <li><i class="fas fa-star"></i> Complete paperwork handling</li>
-                        <li><i class="fas fa-star"></i> Liaison with authorities</li>
-                        <li><i class="fas fa-star"></i> Fast-track approvals</li>
-                        <li><i class="fas fa-star"></i> Legal compliance</li>
                     </ul>
                 </div>
             </div>
@@ -237,7 +110,7 @@
         </div>
     </section>
 
-    <!-- FOOTER -->
+    <!-- FOOTER (Hardcoded back in) -->
     <footer class="footer">
         <div class="container">
             <div class="footer-top">
@@ -257,8 +130,7 @@
                     <ul>
                         <li><a href="index.html#about">About Us</a></li>
                         <li><a href="index.html#projects">Our Portfolio</a></li>
-                        <li><a href="index.html#testimonials">Testimonials</a></li>
-                        <li><a href="careers.html">Careers</a></li>
+                        <li><a href="insights.html">Insights</a></li>
                         <li><a href="index.html#contact">Contact</a></li>
                     </ul>
                 </div>
@@ -268,36 +140,26 @@
                         <li><a href="services.html">Residential</a></li>
                         <li><a href="services.html">Commercial</a></li>
                         <li><a href="services.html">Renovation</a></li>
-                        <li><a href="services.html">Architecture</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h4>Get in Touch</h4>
                     <div class="footer-contact-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>2nd Main Road, Ashok Nagar, Mandya</span>
+                        <i class="fas fa-map-marker-alt"></i> 2nd Main Road, Ashok Nagar, Mandya
                     </div>
                     <div class="footer-contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <a href="mailto:sahyadriconstructions449@gmail.com">sahyadriconstructions449@gmail.com</a>
-                    </div>
-                    <div class="footer-contact-item">
-                        <i class="fas fa-phone"></i>
-                        <a href="tel:+917975676745">+91 7975676745</a>
+                        <i class="fas fa-phone"></i> +91 7975676745
                     </div>
                 </div>
+            </div>
+            <div class="footer-bottom" style="text-align: center; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <p>&copy; 2025 Sahyadri Constructions. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-    <!-- FLOATING BUTTONS -->
-    <a href="https://wa.me/+917975676745" class="whatsapp-float-btn float-btn" target="_blank"><img src="images/whatsapp-icon.png"></a>
-    <a href="tel:+917975676745" class="call-float-btn float-btn" target="_blank"><img src="images/call-icon.png"></a>
-    <a href="#" id="back-to-top-btn" class="back-to-top-btn"><i class="fas fa-chevron-up"></i></a>
-
-    <!-- Supabase Client for Consistency -->
+    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="main.js" defer></script>
 </body>
-
 </html>
