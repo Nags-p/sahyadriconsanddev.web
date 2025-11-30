@@ -12,25 +12,7 @@
 <body>
 
     <!-- 1. HEADER (Same as Index) -->
-    <header class="header">
-        <div class="container nav-wrapper">
-            <a href="index.html" class="logo">
-                <img src="images/header.png" alt="Logo">
-                <span>Sahyadri</span>
-            </a>
-            <nav>
-                <div class="nav-links">
-                    <a href="index.html"><i class="fas fa-arrow-left"></i> Back to Home</a>
-                    <a href="index.html#about">About</a>
-                    <a href="index.html#projects">Projects</a>
-                </div>
-            </nav>
-            <div class="header-actions">
-                <a href="index.html#contact" class="btn btn-primary">Contact Us</a>
-            </div>
-            <button class="mobile-toggle"><i class="fas fa-bars"></i></button>
-        </div>
-    </header>
+    <header class="header" id="main-header"></header>
 
     <!-- 2. CAREER HERO -->
     <section id="hero" style="padding-bottom: 80px; min-height: 60vh;">
@@ -194,43 +176,7 @@
     </section>
 
     <!-- FOOTER (Same as Index) -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-top">
-                <a href="index.html" class="footer-logo">
-                    <img src="images/logo.png" alt="Logo">
-                    <span>Sahyadri Constructions</span>
-                </a>
-                <div class="footer-socials">
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-whatsapp"></i></a>
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                </div>
-            </div>
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <h4>Company</h4>
-                    <ul>
-                        <li><a href="index.html#about">About Us</a></li>
-                        <li><a href="index.html#projects">Our Portfolio</a></li>
-                        <li><a href="careers.html">Careers</a></li> <!-- Active Link -->
-                        <li><a href="index.html#contact">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Services</h4>
-                    <ul>
-                        <li><a href="index.html#services">Residential</a></li>
-                        <li><a href="index.html#services">Commercial</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Get in Touch</h4>
-                    <div class="footer-contact-item"><i class="fas fa-envelope"></i> sahyadriconstructions449@gmail.com</div>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <footer class="footer" id="main-footer"></footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Reuse main.js for form logic -->

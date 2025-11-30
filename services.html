@@ -15,29 +15,7 @@
 
 <body>
     <!-- HEADER (Hardcoded back in for direct file access) -->
-    <header class="header">
-        <div class="container nav-wrapper">
-            <a href="index.html" class="logo">
-                <img src="images/header.png" alt="Logo">
-                <span>Sahyadri</span>
-            </a>
-            <nav>
-                <div class="nav-links">
-                    <a href="index.html">Home</a>
-                    <a href="index.html#about">About</a>
-                    <a href="services.html" class="active" style="color: var(--brand-blue);">Services</a>
-                    <a href="index.html#projects">Projects</a>
-                    <a href="insights.html">Insights</a>
-                    <a href="index.html#contact">Contact</a>
-                </div>
-            </nav>
-            <div class="header-actions">
-                <a href="index.html#contact" class="btn btn-secondary">Get Quote</a>
-                <a href="tel:+917975676745" class="btn btn-primary"><i class="fas fa-phone"></i> Call Now</a>
-            </div>
-            <button class="mobile-toggle"><i class="fas fa-bars"></i></button>
-        </div>
-    </header>
+    <header class="header" id="main-header"></header>
 
     <!-- SERVICES HERO -->
     <section class="services-hero" style="padding-top: 140px;">
@@ -111,52 +89,7 @@
     </section>
 
     <!-- FOOTER (Hardcoded back in) -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-top">
-                <a href="index.html" class="footer-logo">
-                    <img src="images/logo.png" alt="Logo">
-                    <span>Sahyadri Constructions</span>
-                </a>
-                <div class="footer-socials">
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-whatsapp"></i></a>
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                </div>
-            </div>
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <h4>Company</h4>
-                    <ul>
-                        <li><a href="index.html#about">About Us</a></li>
-                        <li><a href="index.html#projects">Our Portfolio</a></li>
-                        <li><a href="insights.html">Insights</a></li>
-                        <li><a href="index.html#contact">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Services</h4>
-                    <ul>
-                        <li><a href="services.html">Residential</a></li>
-                        <li><a href="services.html">Commercial</a></li>
-                        <li><a href="services.html">Renovation</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Get in Touch</h4>
-                    <div class="footer-contact-item">
-                        <i class="fas fa-map-marker-alt"></i> 2nd Main Road, Ashok Nagar, Mandya
-                    </div>
-                    <div class="footer-contact-item">
-                        <i class="fas fa-phone"></i> +91 7975676745
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom" style="text-align: center; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                <p>&copy; 2025 Sahyadri Constructions. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    <footer class="footer" id="main-footer"></footer>
 
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

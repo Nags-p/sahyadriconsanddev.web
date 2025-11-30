@@ -277,31 +277,78 @@ function renderBlogTable(posts, tbody) {
     posts.forEach(post => {
         const tr = document.createElement('tr');
         
-        // Use created_at for date
+        // Format Date
         const dateObj = new Date(post.created_at);
         const dateStr = !isNaN(dateObj) ? dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
 
-        // NEW: Added the "View" button next to "Edit"
         tr.innerHTML = `
             <td style="font-weight: 500;">${post.title || '(No Title)'}</td>
             <td><code style="background: #f1f5f9; padding: 2px 5px; border-radius: 4px; color: #64748b;">${post.slug}</code></td>
             <td><span style="background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;">${post.tag || 'General'}</span></td>
             <td style="color: #64748b; font-size: 0.9rem;">${dateStr}</td>
-            <td style="text-align:right;">
-                <div style="display:flex; gap:5px; justify-content:flex-end;">
-                    <a href="blog.html?slug=${post.slug}" target="_blank" class="btn-info btn-icon" style="padding: 6px 12px; width: auto; text-decoration:none;" title="View Live Post">
-                        <i class="fas fa-external-link-alt"></i> View
-                    </a>
-                    <button class="btn-secondary btn-icon" style="padding: 6px 12px; width: auto;" onclick="loadBlogIntoForm('${post.slug}')" title="Edit Post">
-                        <i class="fas fa-edit"></i> Edit
-                    </button>
-                </div>
+            <td style="text-align:right; white-space: nowrap;">
+                
+                <!-- View Button -->
+                <a href="blog.html?slug=${post.slug}" target="_blank" class="btn-info" style="padding: 6px 10px; margin-right: 4px; text-decoration: none; font-size: 13px; border-radius: 4px; display: inline-flex; align-items: center;" title="View Article">
+                    <i class="fas fa-external-link-alt"></i>
+                </a>
+
+                <!-- Edit Button -->
+                <button class="btn-secondary" style="padding: 6px 10px; margin-right: 4px; font-size: 13px; width: auto;" onclick="loadBlogIntoForm('${post.slug}')" title="Edit">
+                    <i class="fas fa-edit"></i>
+                </button>
+
+                <!-- NEW: Delete Button -->
+                <button class="btn-danger" style="padding: 6px 10px; font-size: 13px; width: auto;" onclick="deleteBlogPost('${post.slug}')" title="Delete">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
             </td>
         `;
 
         tbody.appendChild(tr);
     });
 }
+
+// --- Function to Delete a Post from the List ---
+window.deleteBlogPost = async (slug) => {
+    if (!confirm('Are you sure you want to delete this article? This action cannot be undone.')) {
+        return;
+    }
+
+    setLoading(true);
+    const statusEl = document.getElementById('blog-status');
+
+    try {
+        const { error } = await _supabase
+            .from('blog_posts')
+            .delete()
+            .eq('slug', slug);
+
+        if (error) throw error;
+
+        // 1. Refresh the table
+        fetchBlogPosts({});
+
+        // 2. If the deleted post was currently open in the editor, reset the form
+        const currentEditorSlug = document.getElementById('blog-id').value;
+        if (currentEditorSlug === slug) {
+            resetBlogForm();
+        }
+
+        if (statusEl) {
+            showStatusMessage(statusEl, 'Article deleted successfully.', true);
+        }
+
+    } catch (err) {
+        console.error(err);
+        if (statusEl) {
+            showStatusMessage(statusEl, `Error deleting article: ${err.message}`, false);
+        } else {
+            alert(`Error deleting: ${err.message}`);
+        }
+    }
+    setLoading(false);
+};
 
 
 // Ensure this is accessible globally

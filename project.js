@@ -49,15 +49,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Images
+        // Images Logic
         const gallery = document.getElementById('project-gallery');
         if (gallery) {
             gallery.innerHTML = ''; // Clear loading text
-            project.galleryImages.forEach(imgSrc => {
+            project.galleryImages.forEach((imgSrc, index) => {
                 const img = document.createElement('img');
                 img.src = imgSrc;
                 img.alt = project.title;
-                img.classList.add('reveal'); // Add animation class
+                
+                // Add 'reveal' class for animation styling
+                img.classList.add('reveal');
+                
+                // FORCE VISIBILITY: Add 'active' class after a tiny delay
+                // This fixes the invisible image bug
+                setTimeout(() => {
+                    img.classList.add('active');
+                }, index * 200); // Staggered animation (200ms delay per image)
+
                 gallery.appendChild(img);
             });
         }
