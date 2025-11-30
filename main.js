@@ -1,6 +1,6 @@
 /* ==================================================
    MAIN SITE LOGIC
-   Handles: Shared Components, Nav, Animations, Forms, Blogs
+   Handles: Shared Components, Nav, Animations, Forms, Blogs, ScrollSpy
    ================================================== */
 
 // 1. SUPABASE CONFIGURATION
@@ -15,14 +15,13 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 document.addEventListener('DOMContentLoaded', async () => {
 
     // --- STEP 1: LOAD SHARED HEADER & FOOTER ---
-    // We await this so the header exists before we try to attach event listeners to the menu.
     await loadSharedComponents();
 
     // --- STEP 2: CORE FUNCTIONALITY ---
     initScrollAnimations();
     initBackToTop();
     initFAQ();
-    initSwiper(); // Only runs if swiper element exists
+    initSwiper(); 
     trackVisitor();
 
     // --- STEP 3: FORMS ---
@@ -30,7 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     initCalculator();
 
     // --- STEP 4: DYNAMIC BLOG CONTENT ---
-    // Check which page we are on and load appropriate content
     const homeInsightsContainer = document.getElementById('home-insights-container');
     const allInsightsContainer = document.getElementById('all-insights-container');
 
@@ -58,7 +56,12 @@ async function loadSharedComponents() {
             if (response.ok) {
                 const html = await response.text();
                 headerPlaceholder.innerHTML = html;
-                initHeaderLogic(); // Initialize Mobile Menu & Active Links
+                
+                // Initialize Header Logic (Mobile Menu & Initial Active State)
+                initHeaderLogic(); 
+                
+                // Initialize ScrollSpy (Live Active State on Scroll)
+                initScrollSpy();
             }
         }
 
@@ -76,7 +79,7 @@ async function loadSharedComponents() {
     }
 }
 
-// --- 2. HEADER LOGIC (Mobile Menu & Active State) ---
+// --- 2. HEADER LOGIC (Mobile Menu & Static Active State) ---
 function initHeaderLogic() {
     // Mobile Toggle
     const mobileToggle = document.querySelector('.mobile-toggle');
@@ -90,7 +93,7 @@ function initHeaderLogic() {
         });
     }
 
-    // Active Link Highlighting
+    // Initial Active Link Highlighting (based on URL)
     const currentPath = window.location.pathname.split("/").pop() || 'index.html';
     const links = document.querySelectorAll('.nav-links a');
 
@@ -99,12 +102,56 @@ function initHeaderLogic() {
         // Simple check: matches path, or is index.html on root
         if (href === currentPath || (currentPath === '' && href === 'index.html')) {
             link.classList.add('active');
-            link.style.color = 'var(--brand-blue)';
         }
     });
 }
 
-// --- 3. SCROLL ANIMATIONS ---
+// --- 3. SCROLL SPY (Updates Blue Line on Scroll) ---
+function initScrollSpy() {
+    // Only run on Homepage
+    const path = window.location.pathname;
+    const isHome = path.endsWith('index.html') || path === '/' || path.endsWith('/');
+    
+    if (!isHome) return;
+
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+
+        // Determine which section is currently in view
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            // 150px offset for the fixed header
+            if (pageYOffset >= (sectionTop - 150)) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        // Special check for top of page (Home)
+        if (window.scrollY < 100) {
+            current = 'home'; 
+        }
+
+        // Remove active class from all and add to current
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            const href = link.getAttribute('href');
+
+            // If we are at top, highlight Home
+            if (current === 'home' && (!href.includes('#') || href.includes('#hero'))) {
+                link.classList.add('active');
+            }
+            // Otherwise match the section ID
+            else if (current && href.includes('#' + current)) {
+                link.classList.add('active');
+            }
+        });
+    });
+}
+
+// --- 4. SCROLL ANIMATIONS ---
 function initScrollAnimations() {
     const revealElements = document.querySelectorAll('.reveal');
     const revealCallback = (entries, observer) => {
@@ -119,7 +166,7 @@ function initScrollAnimations() {
     revealElements.forEach(el => observer.observe(el));
 }
 
-// --- 4. BACK TO TOP BUTTON ---
+// --- 5. BACK TO TOP BUTTON ---
 function initBackToTop() {
     const backToTopBtn = document.querySelector('#back-to-top-btn');
     if (backToTopBtn) {
@@ -129,7 +176,7 @@ function initBackToTop() {
     }
 }
 
-// --- 5. FAQ ACCORDION ---
+// --- 6. FAQ ACCORDION ---
 function initFAQ() {
     const faqQuestions = document.querySelectorAll('.faq-question');
     faqQuestions.forEach(question => {
@@ -140,7 +187,7 @@ function initFAQ() {
     });
 }
 
-// --- 6. SWIPER SLIDER ---
+// --- 7. SWIPER SLIDER ---
 function initSwiper() {
     if (document.querySelector('.testimonial-swiper') && typeof Swiper !== 'undefined') {
         new Swiper('.testimonial-swiper', {
@@ -157,7 +204,7 @@ function initSwiper() {
     }
 }
 
-// --- 7. VISITOR TRACKING ---
+// --- 8. VISITOR TRACKING ---
 async function trackVisitor() {
     if (sessionStorage.getItem('visit_tracked')) return;
 
@@ -183,10 +230,9 @@ async function trackVisitor() {
     }
 }
 
-// --- 8. CONTACT FORM LOGIC ---
+// --- 9. CONTACT FORM LOGIC ---
 function initContactForm() {
     const contactForm = document.querySelector('#contact-form');
-    // Ensure we aren't on the careers page (which has a different form)
     if (contactForm && !document.querySelector('#career-form')) {
         const submitBtn = document.querySelector('#submit-btn');
         const thankYou = document.querySelector('#thank-you-message');
@@ -203,7 +249,6 @@ function initContactForm() {
                 const file = formProps.file_upload;
                 let publicFileUrl = null;
 
-                // File Upload
                 if (file && file.size > 0) {
                     const fileExt = file.name.split('.').pop();
                     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
@@ -213,7 +258,6 @@ function initContactForm() {
                     publicFileUrl = data.publicUrl;
                 }
 
-                // Database Insert
                 const { error } = await _supabase.from('contact_inquiries').insert([{
                     name: formProps.name,
                     email: formProps.email,
@@ -228,7 +272,6 @@ function initContactForm() {
                 }]);
                 if (error) throw error;
 
-                // Success UI
                 contactForm.style.display = 'none';
                 if(thankYou) thankYou.style.display = 'block';
 
@@ -245,7 +288,7 @@ function initContactForm() {
     }
 }
 
-// --- 9. CALCULATOR LOGIC ---
+// --- 10. CALCULATOR LOGIC ---
 function initCalculator() {
     const calcForm = document.querySelector('#calc-form');
     if (calcForm) {
@@ -285,7 +328,7 @@ function initCalculator() {
     }
 }
 
-// --- 10. BLOG LOADER (HOME PAGE - Limit 3) ---
+// --- 11. BLOG LOADER (HOME PAGE) ---
 async function loadRecentInsights(container) {
     try {
         const { data: posts, error } = await _supabase
@@ -309,7 +352,6 @@ async function loadRecentInsights(container) {
             let plainText = tempDiv.textContent || tempDiv.innerText || "";
             let excerpt = plainText.substring(0, 100) + "...";
 
-            // Animation delay based on index
             const delayClass = index === 1 ? 'reveal-delay-100' : (index === 2 ? 'reveal-delay-200' : '');
 
             const articleHTML = `
@@ -326,8 +368,6 @@ async function loadRecentInsights(container) {
             const element = template.firstChild;
 
             container.appendChild(element);
-
-            // Trigger animation
             setTimeout(() => element.classList.add('active'), 100);
         });
 
@@ -337,7 +377,7 @@ async function loadRecentInsights(container) {
     }
 }
 
-// --- 11. BLOG LOADER (ALL INSIGHTS PAGE - No Limit) ---
+// --- 12. BLOG LOADER (ALL INSIGHTS PAGE) ---
 async function loadAllInsights(container) {
     try {
         const { data: posts, error } = await _supabase
@@ -381,8 +421,6 @@ async function loadAllInsights(container) {
             const element = template.firstChild;
 
             container.appendChild(element);
-            
-            // Staggered fade in
             setTimeout(() => element.classList.add('active'), index * 100); 
         });
 
