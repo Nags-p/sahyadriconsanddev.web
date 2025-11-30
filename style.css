@@ -1429,3 +1429,91 @@ section {
         border-radius: 50px;
     }
 }
+
+/* =======================
+   BROCHURE MODAL STYLES
+   ======================= */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000; /* Higher than header */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+/* =======================
+   BROCHURE MODAL INPUT STYLES
+   ======================= */
+
+/* Style the inputs inside the brochure modal */
+#brochure-form input {
+    width: 100%;
+    padding: 14px 16px; /* Comfortable padding */
+    margin-bottom: 16px; /* Space between fields */
+    border: 1px solid #cbd5e1; /* Subtle border */
+    border-radius: 8px; /* Rounded corners */
+    font-family: var(--font-main);
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    background-color: #f8fafc; /* Slight grey background */
+    transition: all 0.2s ease;
+}
+
+/* Style when the user clicks/types */
+#brochure-form input:focus {
+    outline: none;
+    background-color: #ffffff;
+    border-color: var(--brand-blue);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); /* Blue glow */
+}
+
+/* Add spacing to the close button */
+#brochure-close {
+    top: 15px;
+    right: 20px;
+    font-size: 32px;
+    color: #94a3b8;
+    z-index: 10;
+}
+
+#brochure-close:hover {
+    color: #ef4444; /* Red on hover */
+}

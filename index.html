@@ -305,6 +305,7 @@
             </div>
             <div class="logos-row reveal reveal-delay-100">
                 <img src="images/clients/NHAI.png" alt="NHAI" class="client-logo">
+                <img src="images/clients/DBL.png" alt="Dilip Buildcon Limited" class="client-logo">
             </div>
         </div>
     </section>
@@ -384,7 +385,10 @@
                     <p>Explore our services, process, quality benchmarks, and recent projects in one concise PDF.</p>
                 </div>
                 <div class="brochure-actions">
-                    <a href="brochure.pdf" class="btn btn-primary" download>Download Brochure</a>
+                    <!-- REPLACE THE LINK WITH THIS BUTTON -->
+<button id="brochure-btn" class="btn btn-primary">
+    <i class="fas fa-file-download"></i> Download Brochure
+</button>
                     <a href="#contact" class="btn btn-secondary">Request Printed Copy</a>
                 </div>
             </div>
@@ -604,6 +608,31 @@
     <a href="tel:+917975676745" class="call-float-btn float-btn" target="_blank"><img src="images/call-icon.png"></a>
     <a href="#" id="back-to-top-btn" class="back-to-top-btn"><i class="fas fa-chevron-up"></i></a>
 
+    <!-- BROCHURE LEAD MODAL -->
+<div id="brochure-modal" class="modal-overlay">
+    <div class="modal-content contact-card" style="max-width: 500px; padding: 40px; margin: 0 20px;">
+        <span class="modal-close" id="brochure-close">&times;</span>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h3 style="color: var(--brand-navy);">Get the Portfolio</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                Please enter your details to unlock the full project brochure.
+            </p>
+        </div>
+
+        <form id="brochure-form">
+            <input type="text" name="name" placeholder="Full Name" required style="width: 100%; margin-bottom: 15px;">
+            <input type="email" name="email" placeholder="Email Address" required style="width: 100%; margin-bottom: 15px;">
+            <input type="tel" name="phone" placeholder="Phone Number" required style="width: 100%; margin-bottom: 20px;">
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                Unlock & Download
+            </button>
+            <div id="brochure-status" style="margin-top: 10px; font-size: 0.9rem; text-align: center;"></div>
+        </form>
+    </div>
+</div>
+
     <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="projects-data.js"></script>
@@ -641,4 +670,5 @@
 </body>
 
 </html>
+
 

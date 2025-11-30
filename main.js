@@ -429,3 +429,92 @@ async function loadAllInsights(container) {
         container.innerHTML = '<p style="text-align:center; color: red;">Error loading articles.</p>';
     }
 }
+
+// ==================================================
+    // 12. GATED BROCHURE LOGIC
+    // ==================================================
+    const brochureBtn = document.getElementById('brochure-btn');
+    const brochureModal = document.getElementById('brochure-modal');
+    const brochureClose = document.getElementById('brochure-close');
+    const brochureForm = document.getElementById('brochure-form');
+    const brochureStatus = document.getElementById('brochure-status');
+
+    // Open Modal
+    if (brochureBtn) {
+        brochureBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            brochureModal.classList.add('active');
+        });
+    }
+
+    // Close Modal
+    if (brochureClose) {
+        brochureClose.addEventListener('click', () => {
+            brochureModal.classList.remove('active');
+        });
+    }
+
+    // Close on Outside Click
+    window.addEventListener('click', (e) => {
+        if (e.target === brochureModal) {
+            brochureModal.classList.remove('active');
+        }
+    });
+
+    // Handle Form Submit
+    if (brochureForm) {
+        brochureForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = brochureForm.querySelector('button');
+            const originalText = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = 'Unlocking...';
+            brochureStatus.textContent = '';
+
+            try {
+                const formData = new FormData(brochureForm);
+                
+                // 1. Save Lead to Supabase (Reusing contact_inquiries table)
+                const { error } = await _supabase.from('contact_inquiries').insert([{
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    project_type: 'Brochure Request', // Special Tag to identify them
+                    message: 'User downloaded the company brochure.',
+                    location: 'Website Download',
+                    status: 'New'
+                }]);
+
+                if (error) throw error;
+
+                // 2. Success & Download
+                brochureStatus.style.color = 'green';
+                brochureStatus.textContent = 'Success! Downloading now...';
+                
+                // Trigger the PDF download programmatically
+                const link = document.createElement('a');
+                link.href = 'brochure.pdf'; // Ensure this file exists in your folder!
+                link.download = 'Sahyadri_Constructions_Brochure.pdf';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // Close modal after 2 seconds
+                setTimeout(() => {
+                    brochureModal.classList.remove('active');
+                    brochureForm.reset();
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    brochureStatus.textContent = '';
+                }, 2000);
+
+            } catch (err) {
+                console.error(err);
+                brochureStatus.style.color = 'red';
+                brochureStatus.textContent = 'Error. Please try again.';
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
+    }
