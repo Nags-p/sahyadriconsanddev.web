@@ -5,7 +5,7 @@
     <div class="footer-top">
         <a href="index.html" class="footer-logo">
             <img src="images/logo.png" alt="Logo">
-            <span><span id="company-name"></span></span>
+            <span>{{ site.company_name }}</span>
         </a>
         <div class="footer-socials">
             <a href="#"><i class="fab fa-instagram"></i></a>
@@ -42,27 +42,15 @@
             </div>
             <div class="footer-contact-item">
                 <i class="fas fa-envelope"></i>
-                <a href="mailto:sahyadriconstructions449@gmail.com">sahyadriconstructions449@gmail.com</a>
+                <a href="mailto:sahyadriconstructions449@gmail.com">{{ site.email }}</a>
             </div>
             <div class="footer-contact-item">
                 <i class="fas fa-phone"></i>
-                <a href="tel:<span id="company-phone"></span>"><span id="company-phone"></span></a>
+                <a href="tel:<span id="company-phone"></span>">{{ site.phone }}</a>
             </div>
         </div>
     </div>
     <div class="footer-bottom" style="text-align: center; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-        <p>&copy; 2025 Sahyadri Constructions. All rights reserved.</p>
+        <p>&copy; 2025 {{ site.company_name }}. All rights reserved.</p>
     </div>
-
-<p>{{ site.company_name }}</p>
-<p>{{ site.phone }}</p>
-<p>{{ site.email }}</p>
 </div>
-
-
-<script src="config.js"></script>
-<script>
-document.getElementById("company-name").innerText = COMPANY_INFO.name;
-document.getElementById("company-phone").innerText = COMPANY_INFO.phone;
-document.getElementById("company-email").innerText = COMPANY_INFO.email;
-</script>
