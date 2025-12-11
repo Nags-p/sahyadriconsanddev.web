@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sahyadri Constructions</title>
+    <title>{{ site.company_name }}</title>
     <link href="images/logo.png" rel="icon">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -42,7 +42,7 @@
         <div class="container">
             <div class="section-title reveal">
                 <h2>About Us</h2>
-                <p>Named after the steadfast Sahyadri mountains, we embody strength, reliability, and endurance.</p>
+                <p>Named after the steadfast {{ site.company_surname }} mountains, we embody strength, reliability, and endurance.</p>
             </div>
 
             <div class="about-content-split">
@@ -143,7 +143,7 @@
     <!-- WHY CHOOSE US -->
     <section id="why-choose-us">
         <div class="container">
-            <h2 class="section-title reveal">Why Build With Sahyadri</h2>
+            <h2 class="section-title reveal">Why Build With {{ site.company_surname }}</h2>
             <div class="why-grid">
                 <div class="why-card reveal">
                     <div class="why-icon">
@@ -412,7 +412,7 @@
                         <div class="testimonial-card">
                             <blockquote>
                                 "Our 4 BHK villa was completed exactly on the promised date. The structural quality,
-                                finishing, and responsiveness from the Sahyadri team were outstanding."
+                                finishing, and responsiveness from the {{ site.company_surname }} team were outstanding."
                             </blockquote>
                             <p class="testimonial-author">
                                 Rohan Sharma
@@ -519,10 +519,10 @@
                     <h3>Contact Information</h3>
                     <p>Ready to start your next project? Contact us today for a free site visit and detailed quote.</p>
                     <ul>
-                        <li><i class="fas fa-map-marker-alt"></i> 2nd Main Road, Ashok Nagar, Mandya</li>
-                        <li><i class="fas fa-phone"></i> +91 7975676745</li>
+                        <li><i class="fas fa-map-marker-alt"></i>{{ site.address }}</li>
+                        <li><i class="fas fa-phone"></i>{{ site.phone }}</li>
                         <li><i class="fab fa-whatsapp"></i> WhatsApp Us</li>
-                        <li><i class="fas fa-envelope"></i> sahyadriconstructions449@gmail.com</li>
+                        <li><i class="fas fa-envelope"></i>{{ site.email }}</li>
                     </ul>
                 </div>
 
@@ -577,7 +577,7 @@
                             <input type="checkbox" id="consent" name="consent" checked required
                                 style="width:auto; margin-top: 5px;">
                             <label for="consent" style="font-size:0.9rem; color: var(--text-secondary);">I agree to be
-                                contacted by Sahyadri Constructions.</label>
+                                contacted by {{ site.company_name }}.</label>
                         </div>
 
                         <button type="submit" class="btn btn-primary" id="submit-btn" style="width:100%">Request a Free Quote</button>
@@ -605,9 +605,9 @@
     <footer class="footer" id="main-footer"></footer>
 
     <!-- FLOATING -->
-    <a href="https://wa.me/+917975676745" class="whatsapp-float-btn float-btn" target="_blank"><img
+    <a href="https://wa.me/{{ site.phone }}" class="whatsapp-float-btn float-btn" target="_blank"><img
             src="images/whatsapp-icon.png"></a>
-    <a href="tel:+917975676745" class="call-float-btn float-btn" target="_blank"><img src="images/call-icon.png"></a>
+    <a href="tel:{{ site.phone }}" class="call-float-btn float-btn" target="_blank"><img src="images/call-icon.png"></a>
     <a href="#" id="back-to-top-btn" class="back-to-top-btn"><i class="fas fa-chevron-up"></i></a>
 
     <!-- BROCHURE LEAD MODAL -->
