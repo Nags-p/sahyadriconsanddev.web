@@ -1318,4 +1318,50 @@ a.btn-info:hover {
         width: 100%;
     }
 }
+/* --- FIX: Mobile Menu Visibility --- */
+
+/* 1. Force Sidebar Text Color to White */
+.sidebar-nav li {
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* 2. Force Icon Color to White-ish */
+.sidebar-nav li i {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* 3. Highlight Active Item (Bright Blue) */
+.sidebar-nav li.active {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-left-color: var(--accent-color) !important;
+}
+.sidebar-nav li.active i {
+    color: var(--accent-color) !important;
+}
+
+/* 4. Ensure the Sidebar Scrolls on Small Screens */
+.sidebar {
+    overflow-y: auto; /* Allows scrolling if menu is tall */
+    display: flex;
+    flex-direction: column;
+}
+
+/* 5. Mobile Specific Fixes */
+@media screen and (max-width: 768px) {
+    .sidebar-nav {
+        display: block !important; /* Ensure nav container is visible */
+        height: auto;
+        flex-grow: 1;
+    }
+    
+    .sidebar-nav ul {
+        display: block !important;
+        padding-bottom: 50px; /* Space at bottom for scrolling */
+    }
+}
 
