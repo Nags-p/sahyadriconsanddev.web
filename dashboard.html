@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
+    <!-- 1. ADDED: Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
     <div id="login-overlay" class="login-overlay">
         <div class="content-box" style="max-width: 450px; width: 100%;">
             <h1>Admin Login</h1>
@@ -49,7 +52,13 @@
                 <button id="logout-btn" class="btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
         </div>
+        
         <div class="main-content">
+            <!-- 2. ADDED: Mobile Toggle Button -->
+            <button class="mobile-nav-toggle" id="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
             <div id="page-inquiries" class="page active">
                 <div class="content-box">
                     <h2>New Website Inquiries</h2>
@@ -66,7 +75,7 @@
                     <div id="archived-inquiries-container"></div>
                 </div>
             </div>
-            
+
             <div id="page-image-manager" class="page">
                 <div class="content-box">
                     <h2>Image Manager</h2>
@@ -194,80 +203,79 @@
                 </div>
             </div>
 
-            <!-- Replace the old analytics page div with this -->
-<div id="page-analytics" class="page">
-    <div class="content-box">
-        <h2>Website Traffic</h2>
-        
-        <!-- 1. GLOBAL STATS (Always Visible) -->
-        <!-- 1. GLOBAL STATS & TRAFFIC LOG -->
-        <div class="stats-summary" style="margin-bottom: 20px;">
-            <div class="stat-card" style="background: #e0f2fe; border: 1px solid #bae6fd;">
-                <h3 style="color: #0284c7;">Total Site Visits</h3>
-                <p id="stat-total-visits" style="color: #0369a1;">Loading...</p>
-            </div>
-        </div>
+            <!-- ANALYTICS PAGE -->
+            <div id="page-analytics" class="page">
+                <div class="content-box">
+                    <h2>Website Traffic</h2>
 
-        <!-- TOGGLE BUTTON -->
-        <div style="margin-bottom: 20px;">
-            <button type="button" onclick="toggleTrafficLog()" class="btn-secondary" style="width: auto; display: inline-flex; align-items: center; gap: 8px;">
-                <span id="traffic-btn-icon">&#9656;</span> <!-- Right arrow icon -->
-                View Recent Visitor Log
-            </button>
-        </div>
+                    <!-- 1. GLOBAL STATS & TRAFFIC LOG -->
+                    <div class="stats-summary" style="margin-bottom: 20px;">
+                        <div class="stat-card" style="background: #e0f2fe; border: 1px solid #bae6fd;">
+                            <h3 style="color: #0284c7;">Total Site Visits</h3>
+                            <p id="stat-total-visits" style="color: #0369a1;">Loading...</p>
+                        </div>
+                    </div>
 
-        <!-- HIDDEN TABLE CONTAINER -->
-        <div id="traffic-log-container" style="display: none; margin-bottom: 40px; animation: fadeIn 0.3s ease;">
-            <h3 style="font-size: 1.2rem; margin-bottom: 15px;">Recent Visitors (Last 50)</h3>
-            <div style="overflow-x: auto; max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px;">
-                <table id="traffic-table" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
-                    <thead style="background: #f9f9f9; position: sticky; top: 0;">
-                        <tr>
-                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Time</th>
-                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">IP Address</th>
-                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Page</th>
-                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Source</th>
-                        </tr>
-                    </thead>
-                    <tbody style="background: white;">
-                        <tr><td colspan="4" style="padding:20px; text-align:center;">Loading data...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                    <!-- TOGGLE BUTTON -->
+                    <div style="margin-bottom: 20px;">
+                        <button type="button" onclick="toggleTrafficLog()" class="btn-secondary" style="width: auto; display: inline-flex; align-items: center; gap: 8px;">
+                            <span id="traffic-btn-icon">&#9656;</span> <!-- Right arrow icon -->
+                            View Recent Visitor Log
+                        </button>
+                    </div>
 
-        <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+                    <!-- HIDDEN TABLE CONTAINER -->
+                    <div id="traffic-log-container" style="display: none; margin-bottom: 40px; animation: fadeIn 0.3s ease;">
+                        <h3 style="font-size: 1.2rem; margin-bottom: 15px;">Recent Visitors (Last 50)</h3>
+                        <div style="overflow-x: auto; max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px;">
+                            <table id="traffic-table" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                                <thead style="background: #f9f9f9; position: sticky; top: 0;">
+                                    <tr>
+                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Time</th>
+                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">IP Address</th>
+                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Page</th>
+                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Source</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="background: white;">
+                                    <tr><td colspan="4" style="padding:20px; text-align:center;">Loading data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
-        <!-- 2. CAMPAIGN SECTION -->
-        <h2>Email Campaign Analytics</h2>
-        
-        <div style="margin-bottom: 30px; background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #eee;">
-            <label for="analytics-campaign-select">Select Campaign to View:</label>
-            <select id="analytics-campaign-select">
-                <option value="" selected disabled>Select a campaign...</option>
-            </select>
-        </div>
+                    <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
 
-        <!-- Campaign Stats (Hidden until selected) -->
-        <div id="analytics-dashboard-content" style="display: none;">
-            <div class="stats-summary">
-                <div class="stat-card"><h3>Sent</h3><p id="stat-sent">-</p></div>
-                <div class="stat-card"><h3>Opens</h3><p id="stat-opens">-</p></div>
-                <div class="stat-card"><h3>Clicks</h3><p id="stat-clicks">-</p></div>
-            </div>
-            <div class="stats-container">
-                <div class="stats-column">
-                    <h4>Opened By <i class="fas fa-eye"></i></h4>
-                    <ul id="analytics-opens-list" class="stats-list"></ul>
+                    <!-- 2. CAMPAIGN SECTION -->
+                    <h2>Email Campaign Analytics</h2>
+
+                    <div style="margin-bottom: 30px; background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #eee;">
+                        <label for="analytics-campaign-select">Select Campaign to View:</label>
+                        <select id="analytics-campaign-select">
+                            <option value="" selected disabled>Select a campaign...</option>
+                        </select>
+                    </div>
+
+                    <!-- Campaign Stats (Hidden until selected) -->
+                    <div id="analytics-dashboard-content" style="display: none;">
+                        <div class="stats-summary">
+                            <div class="stat-card"><h3>Sent</h3><p id="stat-sent">-</p></div>
+                            <div class="stat-card"><h3>Opens</h3><p id="stat-opens">-</p></div>
+                            <div class="stat-card"><h3>Clicks</h3><p id="stat-clicks">-</p></div>
+                        </div>
+                        <div class="stats-container">
+                            <div class="stats-column">
+                                <h4>Opened By <i class="fas fa-eye"></i></h4>
+                                <ul id="analytics-opens-list" class="stats-list"></ul>
+                            </div>
+                            <div class="stats-column">
+                                <h4>Clicked By <i class="fas fa-hand-pointer"></i></h4>
+                                <ul id="analytics-clicks-list" class="stats-list"></ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="stats-column">
-                    <h4>Clicked By <i class="fas fa-hand-pointer"></i></h4>
-                    <ul id="analytics-clicks-list" class="stats-list"></ul>
-                </div>
             </div>
-        </div>
-    </div>
-</div>
 
             <!-- CAREERS PAGE -->
             <div id="page-careers" class="page">
@@ -327,28 +335,46 @@
         </div>
     </div>
 
-    <!-- Stats Modal (Removed as Analytics Page handles it now) -->
-    <!-- <div id="stats-modal-overlay" class="modal-overlay">
-        <div class="modal-content" style="max-width: 700px;">
-            <div class="modal-header">
-                <h3 id="stats-modal-title">Campaign Stats</h3>
-                <button type="button" class="modal-close" id="stats-modal-close">&times;</button>
-            </div>
-            <div class="stats-container">
-                <div class="stats-column">
-                    <h4>Opened By</h4>
-                    <ul id="stats-opens-list" class="stats-list"></ul>
-                </div>
-                <div class="stats-column">
-                    <h4>Clicked By</h4>
-                    <ul id="stats-clicks-list" class="stats-list"></ul>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js" defer></script>
     <script src="dashboard.js" defer></script>
+
+    <!-- 3. ADDED: Mobile Sidebar Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('sidebar-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            function toggleSidebar() {
+                sidebar.classList.toggle('mobile-open');
+                overlay.classList.toggle('active');
+                
+                // Toggle icon
+                const icon = toggleBtn.querySelector('i');
+                if (sidebar.classList.contains('mobile-open')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            }
+
+            // Event Listeners
+            toggleBtn.addEventListener('click', toggleSidebar);
+            overlay.addEventListener('click', toggleSidebar);
+
+            // Close sidebar when a menu item is clicked on mobile
+            const navItems = document.querySelectorAll('.sidebar-nav li');
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        toggleSidebar();
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
