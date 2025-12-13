@@ -1209,3 +1209,113 @@ a.btn-info:hover {
     color: white;
 }
 
+
+
+/* --- Mobile Responsive & Sidebar Toggle --- */
+
+/* 1. Hamburger Menu Button (Hidden on Desktop) */
+.mobile-nav-toggle {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 999; /* Above content, below sidebar */
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    cursor: pointer;
+    font-size: 20px;
+    justify-content: center;
+    align-items: center;
+    transition: background-color var(--transition-speed);
+}
+
+.mobile-nav-toggle:hover {
+    background-color: var(--primary-dark-color);
+}
+
+/* 2. Sidebar Overlay (Background Dimmer) */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(2px); /* Modern blur effect */
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 3. Mobile Media Query */
+@media screen and (max-width: 768px) {
+    
+    /* Show the toggle button */
+    .mobile-nav-toggle {
+        display: flex;
+    }
+
+    /* Transform Sidebar into Off-Canvas Drawer */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 260px;
+        z-index: 1001; /* Highest priority */
+        transform: translateX(-100%); /* Hide off-screen left */
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Active state to slide sidebar in */
+    .sidebar.mobile-open {
+        transform: translateX(0);
+        box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+    }
+
+    /* Adjust Main Content */
+    .main-content {
+        padding: 20px;
+        padding-top: 70px; /* Space for the floating toggle button */
+        width: 100%;
+    }
+
+    /* Adjust Tables for Mobile (Horizontal Scroll) */
+    .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Stack form inputs on very small screens */
+    .link-input-group {
+        flex-direction: column;
+    }
+    .link-prefix {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        box-sizing: border-box;
+    }
+    
+    /* Stack buttons */
+    .button-group, .image-manager-actions {
+        flex-direction: column;
+    }
+    .button-group button, .image-manager-actions button, .image-manager-actions label {
+        width: 100%;
+    }
+}
+
