@@ -1,9 +1,11 @@
+---
+---
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy | Sahyadri Construction & Developers</title>
+    <title>Privacy Policy | {{ site.company_name }}</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -64,7 +66,7 @@
 <body>
 
     <div class="container">
-        <a href="https://nags-p.github.io/sahyadriconsanddev.web" class="back-link">&larr; Back to Home</a>
+        <a href="{{ site.domain }}" class="back-link">&larr; Back to Home</a>
         
         <h1>Privacy Policy</h1>
         
@@ -134,9 +136,9 @@
             <h2>Contact Us</h2>
             <p>If you have questions about this policy, please contact us:</p>
             <p>
-                📧 <strong>Email:</strong> info@sahyadriconstruction.in<br>
-                📞 <strong>Phone:</strong> +91 79756 76745<br>
-                📍 <strong>Address:</strong> 2nd Main Road, Ashok Nagar, Mandya – 571401
+                📧 <strong>Email:</strong> {{ site.email }}<br>
+                📞 <strong>Phone:</strong> {{ site.phone }}<br>
+                📍 <strong>Address:</strong> {{ site.address }}
             </p>
         </div>
     </div>
