@@ -713,24 +713,19 @@ section {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 30px;
+    align-items: center;
+    gap: 40px;
     font-weight: 600;
     letter-spacing: 0.05em;
 }
-
-.logos-row span {
-    padding: 12px 20px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-/* Add this to style.css under CLIENT LOGOS section */
 
 .client-logo {
     height: 50px; /* Adjust height as needed */
     width: auto;
     opacity: 0.7; /* Make them slightly faded */
     transition: all 0.3s ease;
-    filter: brightness(1)  /* Makes logos WHITE (good for dark background) */
+    /* FIX: Correct filter to make any logo white */
+    filter: brightness(0) invert(1);
 }
 
 .client-logo:hover {
@@ -914,43 +909,8 @@ section {
 }
 
 /* =======================
-   SAFETY
+   REMOVED UNUSED SAFETY STYLES
    ======================= */
-#safety {
-    background: white;
-}
-
-.safety-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.safety-card {
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 24px;
-    background: #f8fafc;
-    box-shadow: var(--shadow-sm);
-}
-
-.safety-card h3 {
-    margin-bottom: 12px;
-    color: var(--brand-navy);
-}
-
-.safety-card ul {
-    padding-left: 18px;
-    color: var(--text-secondary);
-}
-
-.safety-cta {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
 
 /* =======================
    TESTIMONIALS
@@ -1399,6 +1359,15 @@ section {
 .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
 .faq-item.active .faq-answer { max-height: 300px; }
 .faq-answer p { padding: 0 20px 20px; color: var(--text-secondary); margin: 0; }
+
+/* FIX: Add animation for the FAQ icon */
+.faq-question .fa-plus {
+    transition: transform 0.3s ease;
+}
+.faq-item.active .faq-question .fa-plus {
+    transform: rotate(45deg);
+}
+
 
 /* =======================
    MOBILE BUTTON FIX
