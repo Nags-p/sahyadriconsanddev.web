@@ -79,22 +79,23 @@
                         <div class="team-img-wrapper">
                             <img src="images/md-photo.jpg" alt="Founder">
                         </div>
-                        <h3>Name1</h3>
+                        <!-- FIX: Use variable for consistency and better placeholders -->
+                        <h3>{{ site.founder }}</h3>
                         <span>Founder & Managing Director</span>
                     </div>
                     <div class="team-card">
                         <div class="team-img-wrapper">
                             <img src="images/md-photo.jpg" alt="Engineer">
                         </div>
-                        <h3>Name2</h3>
+                        <h3>Arjun Singh</h3>
                         <span>Senior Civil Engineer</span>
                     </div>
                     <div class="team-card">
                         <div class="team-img-wrapper">
                             <img src="images/md-photo.jpg" alt="Supervisor">
                         </div>
-                        <h3>Name3</h3>
-                        <span>Site Supervisor</span>
+                        <h3>Priya Desai</h3>
+                        <span>Project Manager</span>
                     </div>
                 </div>
             </div>
@@ -104,7 +105,9 @@
     <!-- PROCESS -->
     <section id="process">
         <div class="container">
-            <h2 class="section-title reveal">Our Transparent Process</h2>
+            <div class="section-title reveal">
+                <h2>Our Transparent Process</h2>
+            </div>
             <div class="process-grid">
                 <div class="process-step reveal">
                     <div class="process-icon-wrapper"><i class="fas fa-comments"></i></div>
@@ -143,7 +146,9 @@
     <!-- WHY CHOOSE US -->
     <section id="why-choose-us">
         <div class="container">
-            <h2 class="section-title reveal">Why Build With {{ site.company_surname }}</h2>
+            <div class="section-title reveal">
+                <h2>Why Build With {{ site.company_surname }}</h2>
+            </div>
             <div class="why-grid">
                 <div class="why-card reveal">
                     <div class="why-icon">
@@ -194,7 +199,9 @@
     <!-- SERVICES -->
     <section id="services">
         <div class="container">
-            <h2 class="section-title reveal">Our Services</h2>
+            <div class="section-title reveal">
+                <h2>Our Services</h2>
+            </div>
             <div class="services-grid">
                 <div class="service-card reveal">
                     <div class="icon"><i class="fas fa-home"></i></div>
@@ -231,9 +238,10 @@
     <!-- PROJECTS -->
     <section id="projects">
         <div class="container">
-            <h2 class="section-title reveal">Our Portfolio</h2>
-            <p style="text-align: center; margin-bottom: 30px;">A glimpse of our finest residential, commercial, interior, and renovation work.</p>
-
+            <div class="section-title reveal">
+                <h2>Our Portfolio</h2>
+                <p>A glimpse of our finest residential, commercial, interior, and renovation work.</p>
+            </div>
             <!-- Filter Buttons -->
             <div class="project-filters reveal">
                 <button class="filter-btn active" data-filter="all">All</button>
@@ -244,48 +252,41 @@
             </div>
 
             <div class="projects-grid">
+                <!-- FIX: Simplified project item structure by removing redundant wrapper div -->
                 <!-- Project 1 -->
                 <div class="project-item reveal" data-category="residential">
-                    <div class="project-image-wrapper">
-                        <img src="images/project1.jpg" alt="Luxury Villa">
-                        <div class="project-overlay">
-                            <h3>Luxury Villa, Pune</h3>
-                            <p>Residential • 4,200 sq. ft. Luxury Villa</p>
-                            <a href="project-page.html?id=1" class="btn btn-primary btn-sm">View Details</a>
-                        </div>
+                    <img src="images/project1.jpg" alt="Luxury Villa">
+                    <div class="project-overlay">
+                        <h3>Luxury Villa, Pune</h3>
+                        <p>Residential • 4,200 sq. ft. Luxury Villa</p>
+                        <a href="project-page.html?id=1" class="btn btn-primary btn-sm">View Details</a>
                     </div>
                 </div>
                 <!-- Project 2 -->
                 <div class="project-item reveal reveal-delay-100" data-category="commercial">
-                    <div class="project-image-wrapper">
-                        <img src="images/project2.jpg" alt="Commercial Hub">
-                        <div class="project-overlay">
-                            <h3>Orion Commercial Hub</h3>
-                            <p>Commercial • 80,000 sq. ft. Office Hub</p>
-                            <a href="project-page.html?id=2" class="btn btn-primary btn-sm">View Details</a>
-                        </div>
+                    <img src="images/project2.jpg" alt="Commercial Hub">
+                    <div class="project-overlay">
+                        <h3>Orion Commercial Hub</h3>
+                        <p>Commercial • 80,000 sq. ft. Office Hub</p>
+                        <a href="project-page.html?id=2" class="btn btn-primary btn-sm">View Details</a>
                     </div>
                 </div>
                 <!-- Project 3 -->
                 <div class="project-item reveal reveal-delay-200" data-category="renovation">
-                    <div class="project-image-wrapper">
-                        <img src="images/project3.jpg" alt="Galaxy Heights Revamp">
-                        <div class="project-overlay">
-                            <h3>Galaxy Heights Revamp</h3>
-                            <p>Renovation • 30 occupied apartments</p>
-                            <a href="project-page.html?id=3" class="btn btn-primary btn-sm">View Details</a>
-                        </div>
+                    <img src="images/project3.jpg" alt="Galaxy Heights Revamp">
+                    <div class="project-overlay">
+                        <h3>Galaxy Heights Revamp</h3>
+                        <p>Renovation • 30 occupied apartments</p>
+                        <a href="project-page.html?id=3" class="btn btn-primary btn-sm">View Details</a>
                     </div>
                 </div>
                 <!-- Project 4 -->
                 <div class="project-item reveal" data-category="interiors">
-                    <div class="project-image-wrapper">
-                        <img src="images/project2.jpg" alt="Zenith Interiors Lab">
-                        <div class="project-overlay">
-                            <h3>Zenith Interiors Lab</h3>
-                            <p>Interiors • 8,500 sq. ft. experience center</p>
-                            <a href="project-page.html?id=4" class="btn btn-primary btn-sm">View Details</a>
-                        </div>
+                    <img src="images/project2.jpg" alt="Zenith Interiors Lab">
+                    <div class="project-overlay">
+                        <h3>Zenith Interiors Lab</h3>
+                        <p>Interiors • 8,500 sq. ft. experience center</p>
+                        <a href="project-page.html?id=4" class="btn btn-primary btn-sm">View Details</a>
                     </div>
                 </div>
             </div>
@@ -336,44 +337,48 @@
 
     <!-- CONSTRUCTION CALCULATOR -->
     <section id="calculator">
-        <div class="container calculator-grid">
-            <div class="calculator-form reveal">
+        <div class="container">
+            <div class="section-title reveal">
                 <h2>Construction Budget Calculator</h2>
                 <p>Enter your built-up area and desired finish to estimate project cost instantly.</p>
-                <form id="calc-form">
-                    <label>Built-up Area (sq. ft.)</label>
-                    <input type="number" id="calc-area" min="200" step="50" placeholder="e.g., 2500" required>
-
-                    <label>Project Type</label>
-                    <select id="calc-type" required>
-                        <option value="residential">Residential</option>
-                        <option value="commercial">Commercial</option>
-                        <option value="interiors">Interiors</option>
-                    </select>
-
-                    <label>Finish Level</label>
-                    <div class="calculator-finish-options">
-                        <label><input type="radio" name="finish" value="standard" checked> Standard (₹1,650/sq.ft)</label>
-                        <label><input type="radio" name="finish" value="premium"> Premium (₹2,150/sq.ft)</label>
-                        <label><input type="radio" name="finish" value="luxury"> Luxury (₹2,550/sq.ft)</label>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary" style="width:100%;">Calculate Budget</button>
-                </form>
-                <div id="calc-result" class="calc-result-card">
-                    <h4>Estimated Budget</h4>
-                    <p>Enter values to see estimate</p>
-                </div>
             </div>
+            <div class="calculator-grid">
+                <div class="calculator-form reveal">
+                    <form id="calc-form">
+                        <label>Built-up Area (sq. ft.)</label>
+                        <input type="number" id="calc-area" min="200" step="50" placeholder="e.g., 2500" required>
 
-            <div class="calculator-info reveal reveal-delay-100">
-                <h3>How we estimate</h3>
-                <ul>
-                    <li>Includes structure, finishes, and basic MEP works</li>
-                    <li>Excludes land cost, government fees & interiors (unless selected)</li>
-                    <li>Based on current Mandya/Bengaluru material indices</li>
-                </ul>
-                <p class="note">Final quote shared after soil test + design brief discussion.</p>
+                        <label>Project Type</label>
+                        <select id="calc-type" required>
+                            <option value="residential">Residential</option>
+                            <option value="commercial">Commercial</option>
+                            <option value="interiors">Interiors</option>
+                        </select>
+
+                        <label>Finish Level</label>
+                        <div class="calculator-finish-options">
+                            <label><input type="radio" name="finish" value="standard" checked> Standard (₹1,650/sq.ft)</label>
+                            <label><input type="radio" name="finish" value="premium"> Premium (₹2,150/sq.ft)</label>
+                            <label><input type="radio" name="finish" value="luxury"> Luxury (₹2,550/sq.ft)</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width:100%;">Calculate Budget</button>
+                    </form>
+                    <div id="calc-result" class="calc-result-card">
+                        <h4>Estimated Budget</h4>
+                        <p>Enter values to see estimate</p>
+                    </div>
+                </div>
+
+                <div class="calculator-info reveal reveal-delay-100">
+                    <h3>How we estimate</h3>
+                    <ul>
+                        <li>Includes structure, finishes, and basic MEP works</li>
+                        <li>Excludes land cost, government fees & interiors (unless selected)</li>
+                        <li>Based on current Mandya/Bengaluru material indices</li>
+                    </ul>
+                    <p class="note">Final quote shared after soil test + design brief discussion.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -387,17 +392,13 @@
                     <p>Explore our services, process, quality benchmarks, and recent projects in one concise PDF.</p>
                 </div>
                 <div class="brochure-actions">
-                    <!-- REPLACE THE LINK WITH THIS BUTTON -->
-<button id="brochure-btn" class="btn btn-primary">
-    <i class="fas fa-file-download"></i> Download Brochure
-</button>
-
+                    <button id="brochure-btn" class="btn btn-primary">
+                        <i class="fas fa-file-download"></i> Download Brochure
+                    </button>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- SAFETY SECTION REMOVED -->
 
     <!-- TESTIMONIALS -->
     <section id="testimonials">
@@ -445,13 +446,18 @@
                         </div>
                     </div>
                 </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
             </div>
+        </div>
     </section>
 
     <!-- FAQ -->
     <section id="faq">
         <div class="container">
-            <h2 class="section-title reveal">Frequently Asked Questions</h2>
+            <div class="section-title reveal">
+                <h2>Frequently Asked Questions</h2>
+            </div>
             <div class="faq-container reveal">
                 <div class="faq-item">
                     <button class="faq-question">
@@ -512,7 +518,9 @@
     <!-- CONTACT -->
     <section id="contact">
         <div class="container">
-            <h2 class="section-title reveal">Get In Touch</h2>
+            <div class="section-title reveal">
+                <h2>Get In Touch</h2>
+            </div>
             <div class="contact-content">
                 <!-- Info -->
                 <div class="contact-info contact-card reveal">
@@ -520,9 +528,10 @@
                     <p>Ready to start your next project? Contact us today for a free site visit and detailed quote.</p>
                     <ul>
                         <li><i class="fas fa-map-marker-alt"></i>{{ site.address }}</li>
-                        <li><i class="fas fa-phone"></i>{{ site.phone }}</li>
-                        <li><i class="fab fa-whatsapp"></i> WhatsApp Us</li>
-                        <li><i class="fas fa-envelope"></i>{{ site.email }}</li>
+                        <li><i class="fas fa-phone"></i><a href="tel:{{ site.phone }}">{{ site.phone }}</a></li>
+                        <!-- FIX: Made WhatsApp Us a clickable link -->
+                        <li><a href="https://wa.me/{{ site.phone }}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Us</a></li>
+                        <li><i class="fas fa-envelope"></i><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
                     </ul>
                 </div>
 
@@ -532,8 +541,9 @@
                     <p style="margin-bottom: 20px; color: var(--text-secondary);">
                         Share your project details and our engineering team will get back with cost, timeline, and next steps.
                     </p>
-
-                    <form id="contact-form">
+                    
+                    <!-- FIX: Added enctype for file uploads to work -->
+                    <form id="contact-form" enctype="multipart/form-data">
                         <input type="text" name="name" placeholder="Your Name" required>
                         <input type="email" name="email" placeholder="Your Email" required>
                         <input type="tel" name="phone" placeholder="Your Contact Number" required>
@@ -570,15 +580,13 @@
                             Plans/Images (Optional)</label>
                         <input type="file" name="file_upload" id="file_upload" accept="image/*, .pdf, .doc, .docx">
 
-                        <textarea name="message" placeholder="Your Message" required></textarea>
+                        <textarea name="message" rows="4" placeholder="Your Message" required></textarea>
 
                         <div class="consent-group"
                             style="margin-bottom:20px; display: flex; gap: 10px; align-items: flex-start;">
                             <input type="checkbox" id="consent" name="consent" checked required
                                 style="width:auto; margin-top: 5px;">
-                            <label for="consent" style="font-size:0.9rem; color: var(--text-secondary);">I agree to the Privacy Policy and consent to the processing of my information
-
-for construction-related enquiries.</label>
+                            <label for="consent" style="font-size:0.9rem; color: var(--text-secondary);">I agree to the Privacy Policy and consent to the processing of my information for construction-related enquiries.</label>
                         </div>
 
                         <button type="submit" class="btn btn-primary" id="submit-btn" style="width:100%">Request a Free Quote</button>
@@ -612,29 +620,29 @@ for construction-related enquiries.</label>
     <a href="#" id="back-to-top-btn" class="back-to-top-btn"><i class="fas fa-chevron-up"></i></a>
 
     <!-- BROCHURE LEAD MODAL -->
-<div id="brochure-modal" class="modal-overlay">
-    <div class="modal-content contact-card" style="max-width: 500px; padding: 40px; margin: 0 20px;">
-        <span class="modal-close" id="brochure-close">&times;</span>
-        
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h3 style="color: var(--brand-navy);">Get the Portfolio</h3>
-            <p style="color: var(--text-secondary); font-size: 0.95rem;">
-                Please enter your details to unlock the full project brochure.
-            </p>
-        </div>
-
-        <form id="brochure-form">
-            <input type="text" name="name" placeholder="Full Name" required style="width: 100%; margin-bottom: 15px;">
-            <input type="email" name="email" placeholder="Email Address" required style="width: 100%; margin-bottom: 15px;">
-            <input type="tel" name="phone" placeholder="Phone Number" required style="width: 100%; margin-bottom: 20px;">
+    <div id="brochure-modal" class="modal-overlay">
+        <div class="modal-content contact-card" style="max-width: 500px; padding: 40px; margin: 0 20px;">
+            <span class="modal-close" id="brochure-close">&times;</span>
             
-            <button type="submit" class="btn btn-primary" style="width: 100%;">
-                Unlock & Download
-            </button>
-            <div id="brochure-status" style="margin-top: 10px; font-size: 0.9rem; text-align: center;"></div>
-        </form>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="color: var(--brand-navy);">Get the Portfolio</h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                    Please enter your details to unlock the full project brochure.
+                </p>
+            </div>
+
+            <form id="brochure-form">
+                <input type="text" name="name" placeholder="Full Name" required>
+                <input type="email" name="email" placeholder="Email Address" required>
+                <input type="tel" name="phone" placeholder="Phone Number" required>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    Unlock & Download
+                </button>
+                <div id="brochure-status" style="margin-top: 10px; font-size: 0.9rem; text-align: center;"></div>
+            </form>
+        </div>
     </div>
-</div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -675,5 +683,3 @@ for construction-related enquiries.</label>
 </body>
 
 </html>
-
-
