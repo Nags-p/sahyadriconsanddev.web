@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - {{ site.company_name }}</title>
+    <link href="images/logo.png" rel="icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- HEADER PLACEHOLDER -->
+    <header class="header" id="main-header"></header>
+
+    <!-- PAGE HERO -->
+    <section class="services-hero" style="padding-top: 120px; padding-bottom: 80px;">
+        <div class="container reveal">
+            <h1 style="margin-bottom: 10px;">Contact Us</h1>
+            <p style="font-size: 1.2rem; color: rgba(255,255,255,0.8); max-width: 600px; margin: auto;">Let's build something great together. Reach out for a free consultation and quote.</p>
+        </div>
+    </section>
+
+    <!-- CONTACT FORM SECTION -->
+    <section id="contact" style="padding-top: 80px;">
+        <div class="container">
+            <div class="contact-content">
+                <!-- Info Card -->
+                <div class="contact-info contact-card reveal">
+                    <h3>Contact Information</h3>
+                    <p>Ready to start your next project? Contact us today for a free site visit and detailed quote.</p>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i>{{ site.address }}</li>
+                        <li><i class="fas fa-phone"></i><a href="tel:{{ site.phone }}">{{ site.phone }}</a></li>
+                        <li><a href="https://wa.me/{{ site.phone }}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Us</a></li>
+                        <li><i class="fas fa-envelope"></i><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+                    </ul>
+                </div>
+
+                <!-- Form Card -->
+                <div class="contact-form contact-card reveal reveal-delay-100">
+                    <h3>Get a Free Project Quote</h3>
+                    <p style="margin-bottom: 20px; color: var(--text-secondary);">
+                        Share your project details and our engineering team will get back with cost, timeline, and next steps.
+                    </p>
+                    
+                    <form id="contact-form" enctype="multipart/form-data">
+                        <input type="text" name="name" placeholder="Your Name" required>
+                        <input type="email" name="email" placeholder="Your Email" required>
+                        <input type="tel" name="phone" placeholder="Your Contact Number" required>
+                        <select name="project_type" required>
+                            <option value="" disabled selected>Select Project Type</option>
+                            <option>Residential Construction</option>
+                            <option>Commercial Construction</option>
+                            <option>Renovation / Remodeling</option>
+                            <option>Interior Works</option>
+                            <option>Planning & Approval</option>
+                        </select>
+                        <input type="text" name="location" placeholder="Project Location (City / Area)" required>
+                        <textarea name="message" rows="4" placeholder="Your Message" required></textarea>
+                        <button type="submit" class="btn btn-primary" id="submit-btn" style="width:100%">Submit Inquiry</button>
+                        <div id="form-status" style="margin-top:10px;"></div>
+                    </form>
+
+                    <div id="thank-you-message" style="display: none; text-align:center; padding: 20px; background: #f0fdf4; border-radius: 8px; color: #15803d;">
+                        <h3>Thank You!</h3>
+                        <p>Your inquiry has been sent successfully. We will be in touch shortly.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map -->
+            <div class="contact-map reveal">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3894.8745496157094!2d76.8951875101951!3d12.524468787700236!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bafa100368cd609%3A0xda5dcc6df4d1c370!2sSahyadri%20Constructions%20and%20Developers!5e0!3m2!1sen!2sin!4v1731599979457"
+                    allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER PLACEHOLDER -->
+    <footer class="footer" id="main-footer"></footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="main.js" defer></script>
+
+</body>
+</html>
