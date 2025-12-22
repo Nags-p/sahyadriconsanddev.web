@@ -61,3 +61,34 @@
         <p>&copy; 2025 {{ site.company_name }}. All rights reserved.</p>
     </div>
 </div>
+
+
+<!-- UNIVERSAL INQUIRY MODAL -->
+<div id="inquiry-modal" class="modal-overlay">
+    <div class="modal-content contact-card" style="max-width: 500px; padding: 40px; margin: 0 20px;">
+        <span class="modal-close" id="inquiry-close">&times;</span>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h3 id="modal-title" style="color: var(--brand-navy);">Title Here</h3>
+            <p id="modal-subtitle" style="color: var(--text-secondary); font-size: 0.95rem;">
+                Subtitle here.
+            </p>
+        </div>
+
+        <form id="modal-form">
+            <input type="hidden" id="inquiry_type" name="inquiry_type" value="">
+            <input type="text" name="name" placeholder="Full Name" required>
+            <input type="email" name="email" placeholder="Email Address" required>
+            <input type="tel" name="phone" placeholder="Phone Number" required>
+            
+            <div id="quote-fields" style="display: none;">
+                <textarea name="message" rows="3" placeholder="Briefly describe your project..."></textarea>
+            </div>
+            
+            <button type="submit" id="modal-submit-btn" class="btn btn-primary" style="width: 100%;">
+                Submit
+            </button>
+            <div id="modal-status" style="margin-top: 10px; font-size: 0.9rem; text-align: center;"></div>
+        </form>
+    </div>
+</div>
