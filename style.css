@@ -1601,3 +1601,56 @@ section {
 #brochure-close:hover {
     color: #ef4444; /* Red on hover */
 }
+
+/* ===================================
+   NEW: MODAL FORM GRID LAYOUT
+   =================================== */
+
+/* Grid container for the fields */
+#modal-form .modal-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 16px; /* Space between fields */
+    margin-bottom: 20px; /* Space before the submit button */
+}
+
+/* Class to make an item span both columns */
+#modal-form .modal-form-grid .full-span {
+    grid-column: 1 / -1; /* Span from the first to the last grid line */
+}
+
+/* General styling for inputs inside the modal form */
+#modal-form input,
+#modal-form textarea {
+    width: 100%;
+    padding: 14px 16px;
+    margin-bottom: 0; /* Let the grid gap handle spacing */
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-family: var(--font-main);
+    font-size: 0.95rem;
+    background-color: #f8fafc;
+    transition: all 0.2s ease;
+}
+
+#modal-form input:focus,
+#modal-form textarea:focus {
+    outline: none;
+    background-color: #ffffff;
+    border-color: var(--brand-blue);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+/* Ensure textarea within its container is full-width */
+#modal-form #quote-fields textarea {
+    margin-bottom: 0;
+}
+
+
+/* --- Responsive Adjustments for Mobile --- */
+@media (max-width: 500px) {
+    #modal-form .modal-form-grid {
+        grid-template-columns: 1fr; /* Stack everything into a single column */
+        gap: 12px;
+    }
+}
