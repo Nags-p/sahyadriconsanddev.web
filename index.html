@@ -522,18 +522,7 @@
                 <h2>Get In Touch</h2>
             </div>
             <div class="contact-content">
-                <!-- Info -->
-                <div class="contact-info contact-card reveal">
-                    <h3>Contact Information</h3>
-                    <p>Ready to start your next project? Contact us today for a free site visit and detailed quote.</p>
-                    <ul>
-                        <li><i class="fas fa-map-marker-alt"></i>{{ site.address }}</li>
-                        <li><i class="fas fa-phone"></i><a href="tel:{{ site.phone }}">{{ site.phone }}</a></li>
-                        <!-- FIX: Made WhatsApp Us a clickable link -->
-                        <li><a href="https://wa.me/{{ site.phone }}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Us</a></li>
-                        <li><i class="fas fa-envelope"></i><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
-                    </ul>
-                </div>
+                
 
                 <!-- Form -->
                 <div class="contact-form contact-card reveal reveal-delay-100">
@@ -600,6 +589,19 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Info -->
+                <div class="contact-info contact-card reveal">
+                    <h3>Contact Information</h3>
+                    <p>Ready to start your next project? Contact us today for a free site visit and detailed quote.</p>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i>{{ site.address }}</li>
+                        <li><i class="fas fa-phone"></i><a href="tel:{{ site.phone }}">{{ site.phone }}</a></li>
+                        <!-- FIX: Made WhatsApp Us a clickable link -->
+                        <li><a href="https://wa.me/{{ site.phone }}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Us</a></li>
+                        <li><i class="fas fa-envelope"></i><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+                    </ul>
+                </div>
 
             <!-- Map -->
             <div class="contact-map reveal">
