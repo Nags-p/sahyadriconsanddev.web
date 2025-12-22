@@ -158,6 +158,64 @@ img {
     width: 100%;
 }
 
+/* =======================
+   FIX: DROPDOWN MENU STYLES (NEW)
+   ======================= */
+.dropdown {
+    position: relative; /* This is the anchor for the absolute menu */
+}
+
+.dropdown-toggle {
+    cursor: default; /* Change cursor as it doesn't navigate */
+}
+
+.dropdown-menu {
+    position: absolute; /* Takes the menu out of the document flow */
+    top: 100%; /* Positions it right below the toggle */
+    left: 50%; /* Center align the dropdown */
+    transform: translateX(-50%) translateY(10px); /* Adjust position and prep for animation */
+    
+    /* Visibility & Animation */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s var(--ease-out);
+
+    /* Styling */
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    padding: 10px;
+    min-width: 240px; /* Set a minimum width */
+    z-index: 1001; /* Ensure it's above other elements */
+    border: 1px solid rgba(0,0,0,0.07);
+}
+
+/* Show the menu on hover of the parent .dropdown */
+.dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.dropdown-menu a {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 8px; /* Rounded corners for menu items */
+    white-space: nowrap; /* Prevent links from wrapping */
+}
+
+.dropdown-menu a:hover {
+    background-color: var(--light-gray); /* Add a hover effect */
+    color: var(--brand-blue); /* Match brand color on hover */
+}
+
+/* Remove the underline from dropdown links */
+.dropdown-menu a::after {
+    display: none;
+}
+
+
 .header-actions {
     display: flex;
     gap: 12px;
@@ -1200,6 +1258,18 @@ section {
         border-bottom: 1px solid #eee;
         box-shadow: var(--shadow-lg);
         z-index: 999;
+    }
+
+    /* On mobile, make dropdown part of the main menu flow */
+    .dropdown-menu {
+        position: static;
+        transform: none;
+        opacity: 1;
+        visibility: visible;
+        box-shadow: none;
+        background: transparent;
+        padding: 0 0 0 20px;
+        min-width: unset;
     }
     
     .about-content-split { flex-direction: column-reverse; gap: 40px; }
