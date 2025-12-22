@@ -32,6 +32,74 @@
     <section id="contact" style="padding-top: 80px;">
         <div class="container">
             <div class="contact-content">
+                
+
+                <!-- Form Card -->
+                <!-- Form -->
+                <div class="contact-form contact-card reveal reveal-delay-100">
+                    <h3>Get a Free Project Quote</h3>
+                    <p style="margin-bottom: 20px; color: var(--text-secondary);">
+                        Share your project details and our engineering team will get back with cost, timeline, and next steps.
+                    </p>
+                    
+                    <!-- FIX: Added enctype for file uploads to work -->
+                    <form id="contact-form" enctype="multipart/form-data">
+                        <input type="text" name="name" placeholder="Your Name" required>
+                        <input type="email" name="email" placeholder="Your Email" required>
+                        <input type="tel" name="phone" placeholder="Your Contact Number" required>
+
+                        <select name="project_type" required>
+                            <option value="" disabled selected>Select Project Type</option>
+                            <option>Residential Construction</option>
+                            <option>Commercial Construction</option>
+                            <option>Renovation / Remodeling</option>
+                            <option>Interior Works</option>
+                            <option>Planning & Approval</option>
+                        </select>
+
+                        <input type="text" name="location" placeholder="Project Location (City / Area)" required>
+
+                        <select name="budget_range">
+                            <option value="" disabled selected>Budget Range (Optional)</option>
+                            <option>Below ₹5 Lakhs</option>
+                            <option>₹5–20 Lakhs</option>
+                            <option>₹20–50 Lakhs</option>
+                            <option>₹50 Lakhs – 1 Cr</option>
+                            <option>1 Cr+</option>
+                        </select>
+
+                        <select name="start_date">
+                            <option value="" disabled selected>Expected Start Date</option>
+                            <option>Immediately</option>
+                            <option>Within 1–3 months</option>
+                            <option>Within 6 months</option>
+                        </select>
+
+                        <label
+                            style="font-size:0.9rem; margin-bottom:5px; display:block; color: var(--text-secondary);">Attach
+                            Plans/Images (Optional)</label>
+                        <input type="file" name="file_upload" id="file_upload" accept="image/*, .pdf, .doc, .docx">
+
+                        <textarea name="message" rows="4" placeholder="Your Message" required></textarea>
+
+                        <div class="consent-group"
+                            style="margin-bottom:20px; display: flex; gap: 10px; align-items: flex-start;">
+                            <input type="checkbox" id="consent" name="consent" checked required
+                                style="width:auto; margin-top: 5px;">
+                            <label for="consent" style="font-size:0.9rem; color: var(--text-secondary);">I agree to the Privacy Policy and consent to the processing of my information for construction-related enquiries.</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" id="submit-btn" style="width:100%">Request a Free Quote</button>
+                        <div id="form-status" style="margin-top:10px;"></div>
+                    </form>
+
+                    <div id="thank-you-message" class="hidden"
+                        style="display: none; text-align:center; margin-top:20px; padding: 20px; background: #f0fdf4; border-radius: 8px; color: #15803d;">
+                        <h3>Thank You!</h3>
+                        <p>Your inquiry has been sent successfully.</p>
+                    </div>
+                </div>
+
                 <!-- Info Card -->
                 <div class="contact-info contact-card reveal">
                     <h3>Contact Information</h3>
@@ -42,37 +110,6 @@
                         <li><a href="https://wa.me/{{ site.phone }}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Us</a></li>
                         <li><i class="fas fa-envelope"></i><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
                     </ul>
-                </div>
-
-                <!-- Form Card -->
-                <div class="contact-form contact-card reveal reveal-delay-100">
-                    <h3>Get a Free Project Quote</h3>
-                    <p style="margin-bottom: 20px; color: var(--text-secondary);">
-                        Share your project details and our engineering team will get back with cost, timeline, and next steps.
-                    </p>
-                    
-                    <form id="contact-form" enctype="multipart/form-data">
-                        <input type="text" name="name" placeholder="Your Name" required>
-                        <input type="email" name="email" placeholder="Your Email" required>
-                        <input type="tel" name="phone" placeholder="Your Contact Number" required>
-                        <select name="project_type" required>
-                            <option value="" disabled selected>Select Project Type</option>
-                            <option>Residential Construction</option>
-                            <option>Commercial Construction</option>
-                            <option>Renovation / Remodeling</option>
-                            <option>Interior Works</option>
-                            <option>Planning & Approval</option>
-                        </select>
-                        <input type="text" name="location" placeholder="Project Location (City / Area)" required>
-                        <textarea name="message" rows="4" placeholder="Your Message" required></textarea>
-                        <button type="submit" class="btn btn-primary" id="submit-btn" style="width:100%">Submit Inquiry</button>
-                        <div id="form-status" style="margin-top:10px;"></div>
-                    </form>
-
-                    <div id="thank-you-message" style="display: none; text-align:center; padding: 20px; background: #f0fdf4; border-radius: 8px; color: #15803d;">
-                        <h3>Thank You!</h3>
-                        <p>Your inquiry has been sent successfully. We will be in touch shortly.</p>
-                    </div>
                 </div>
             </div>
 
