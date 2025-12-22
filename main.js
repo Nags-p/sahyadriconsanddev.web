@@ -93,6 +93,19 @@ function initHeaderLogic() {
         });
     }
 
+    // FIX: MOBILE DROPDOWN LOGIC (NEW)
+    const dropdowns = document.querySelectorAll('.nav-links .dropdown');
+    dropdowns.forEach(dropdown => {
+        const toggle = dropdown.querySelector('.dropdown-toggle');
+        toggle.addEventListener('click', (e) => {
+            // Only run this accordion logic if the mobile menu is active/visible
+            if (window.innerWidth <= 1200 && navLinksContainer.classList.contains('active')) {
+                e.preventDefault(); // Stop link from navigating
+                dropdown.classList.toggle('active');
+            }
+        });
+    });
+
     // Initial Active Link Highlighting (based on URL)
     const currentPath = window.location.pathname.split("/").pop() || 'index.html';
     const links = document.querySelectorAll('.nav-links a');
