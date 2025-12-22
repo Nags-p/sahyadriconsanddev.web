@@ -25,7 +25,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     trackVisitor();
 
     // --- STEP 3: FORMS ---
-    initContactForm();
+    initContactForm();    // For the main contact section form
+    initInquiryModal();   // For the new universal popup modal
     initCalculator();
 
     // --- STEP 4: DYNAMIC BLOG CONTENT ---
@@ -93,7 +94,7 @@ function initHeaderLogic() {
         });
     }
 
-    // FIX: MOBILE DROPDOWN LOGIC (NEW)
+    // Mobile Dropdown Logic
     const dropdowns = document.querySelectorAll('.nav-links .dropdown');
     dropdowns.forEach(dropdown => {
         const toggle = dropdown.querySelector('.dropdown-toggle');
@@ -243,19 +244,18 @@ async function trackVisitor() {
     }
 }
 
-// --- 9. CONTACT FORM LOGIC ---
+// --- 9. CONTACT FORM LOGIC (For the main section on the page) ---
 function initContactForm() {
     const contactForm = document.querySelector('#contact-form');
-    if (contactForm && !document.querySelector('#career-form')) {
-        const submitBtn = document.querySelector('#submit-btn');
-        const thankYou = document.querySelector('#thank-you-message');
-        const status = document.querySelector('#form-status');
+    if (contactForm) {
+        const submitBtn = contactForm.querySelector('#submit-btn');
+        const thankYou = contactForm.querySelector('#thank-you-message');
+        const status = contactForm.querySelector('#form-status');
 
         contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             submitBtn.disabled = true;
             submitBtn.textContent = 'Sending...';
-
             try {
                 const formData = new FormData(contactForm);
                 const formProps = Object.fromEntries(formData);
@@ -289,7 +289,7 @@ function initContactForm() {
                 if(thankYou) thankYou.style.display = 'block';
 
             } catch (error) {
-                console.error(error);
+                console.error("Main Contact Form Error:", error);
                 if(status) {
                     status.textContent = 'Error sending message. Please try again.';
                     status.style.color = 'red';
@@ -301,7 +301,123 @@ function initContactForm() {
     }
 }
 
-// --- 10. CALCULATOR LOGIC ---
+// --- 10. UNIVERSAL INQUIRY MODAL LOGIC ---
+function initInquiryModal() {
+    const modal = document.getElementById('inquiry-modal');
+    if (!modal) return;
+
+    // Get all modal elements
+    const closeBtn = document.getElementById('inquiry-close');
+    const titleEl = document.getElementById('modal-title');
+    const subtitleEl = document.getElementById('modal-subtitle');
+    const form = document.getElementById('modal-form');
+    const submitBtn = document.getElementById('modal-submit-btn');
+    const statusEl = document.getElementById('modal-status');
+    const inquiryTypeInput = document.getElementById('inquiry_type');
+    const quoteFields = document.getElementById('quote-fields');
+
+    // Function to open and configure the modal
+    function openModal(type) {
+        form.reset();
+        statusEl.textContent = '';
+        submitBtn.disabled = false;
+        
+        if (type === 'brochure') {
+            titleEl.textContent = 'Get the Portfolio';
+            subtitleEl.textContent = 'Please enter your details to unlock the full project brochure.';
+            submitBtn.innerHTML = '<i class="fas fa-download"></i> Unlock & Download';
+            inquiryTypeInput.value = 'Brochure Request';
+            quoteFields.style.display = 'none';
+        } else { // 'quote'
+            titleEl.textContent = 'Get a Free Quote';
+            subtitleEl.textContent = 'Share your details and our team will contact you shortly.';
+            submitBtn.innerHTML = 'Submit Inquiry';
+            inquiryTypeInput.value = 'Quote Request';
+            quoteFields.style.display = 'block';
+        }
+        modal.classList.add('active');
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+    }
+
+    // Attach open listeners to all triggers
+    document.querySelectorAll('.quote-modal-trigger').forEach(trigger => {
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal('quote');
+        });
+    });
+
+    const brochureTrigger = document.getElementById('brochure-modal-trigger');
+    if (brochureTrigger) {
+        brochureTrigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal('brochure');
+        });
+    }
+
+    // Attach close listeners
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    // Handle the modal form submission
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Sending...';
+            statusEl.textContent = '';
+
+            try {
+                const formData = new FormData(form);
+                const inquiryType = formData.get('inquiry_type');
+                
+                // Save lead to Supabase
+                const { error } = await _supabase.from('contact_inquiries').insert([{
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    project_type: inquiryType, // Differentiates the lead type
+                    message: formData.get('message') || `User requested the company brochure.`
+                }]);
+                if (error) throw error;
+
+                // Handle success based on type
+                statusEl.style.color = 'green';
+                if (inquiryType === 'Brochure Request') {
+                    statusEl.textContent = 'Success! Your download will begin shortly...';
+                    const link = document.createElement('a');
+                    link.href = 'brochure.pdf'; 
+                    link.download = 'Sahyadri_Constructions_Brochure.pdf';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    statusEl.textContent = 'Thank you! Your inquiry has been sent successfully.';
+                }
+
+                setTimeout(() => {
+                    closeModal();
+                    submitBtn.innerHTML = originalBtnText; // Reset button text after closing
+                }, 2500);
+
+            } catch (err) {
+                console.error('Modal Submission Error:', err);
+                statusEl.style.color = 'red';
+                statusEl.textContent = 'An error occurred. Please try again.';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        });
+    }
+}
+
+// --- 11. CALCULATOR LOGIC ---
 function initCalculator() {
     const calcForm = document.querySelector('#calc-form');
     if (calcForm) {
@@ -341,7 +457,7 @@ function initCalculator() {
     }
 }
 
-// --- 11. BLOG LOADER (HOME PAGE) ---
+// --- 12. BLOG LOADER (HOME PAGE) ---
 async function loadRecentInsights(container) {
     try {
         const { data: posts, error } = await _supabase
@@ -390,7 +506,7 @@ async function loadRecentInsights(container) {
     }
 }
 
-// --- 12. BLOG LOADER (ALL INSIGHTS PAGE) ---
+// --- 13. BLOG LOADER (ALL INSIGHTS PAGE) ---
 async function loadAllInsights(container) {
     try {
         const { data: posts, error } = await _supabase
@@ -442,92 +558,3 @@ async function loadAllInsights(container) {
         container.innerHTML = '<p style="text-align:center; color: red;">Error loading articles.</p>';
     }
 }
-
-// ==================================================
-    // 12. GATED BROCHURE LOGIC
-    // ==================================================
-    const brochureBtn = document.getElementById('brochure-btn');
-    const brochureModal = document.getElementById('brochure-modal');
-    const brochureClose = document.getElementById('brochure-close');
-    const brochureForm = document.getElementById('brochure-form');
-    const brochureStatus = document.getElementById('brochure-status');
-
-    // Open Modal
-    if (brochureBtn) {
-        brochureBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            brochureModal.classList.add('active');
-        });
-    }
-
-    // Close Modal
-    if (brochureClose) {
-        brochureClose.addEventListener('click', () => {
-            brochureModal.classList.remove('active');
-        });
-    }
-
-    // Close on Outside Click
-    window.addEventListener('click', (e) => {
-        if (e.target === brochureModal) {
-            brochureModal.classList.remove('active');
-        }
-    });
-
-    // Handle Form Submit
-    if (brochureForm) {
-        brochureForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = brochureForm.querySelector('button');
-            const originalText = btn.innerHTML;
-            
-            btn.disabled = true;
-            btn.innerHTML = 'Unlocking...';
-            brochureStatus.textContent = '';
-
-            try {
-                const formData = new FormData(brochureForm);
-                
-                // 1. Save Lead to Supabase (Reusing contact_inquiries table)
-                const { error } = await _supabase.from('contact_inquiries').insert([{
-                    name: formData.get('name'),
-                    email: formData.get('email'),
-                    phone: formData.get('phone'),
-                    project_type: 'Brochure Request', // Special Tag to identify them
-                    message: 'User downloaded the company brochure.',
-                    location: 'Website Download',
-                    status: 'New'
-                }]);
-
-                if (error) throw error;
-
-                // 2. Success & Download
-                brochureStatus.style.color = 'green';
-                brochureStatus.textContent = 'Success! Downloading now...';
-                
-                // Trigger the PDF download programmatically
-                const link = document.createElement('a');
-                link.href = 'brochure.pdf'; // Ensure this file exists in your folder!
-                link.download = 'Sahyadri_Constructions_Brochure.pdf';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-                // Close modal after 2 seconds
-                setTimeout(() => {
-                    brochureModal.classList.remove('active');
-                    brochureForm.reset();
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                    brochureStatus.textContent = '';
-                }, 2000);
-
-            } catch (err) {
-                console.error(err);
-                brochureStatus.style.color = 'red';
-                brochureStatus.textContent = 'Error. Please try again.';
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
-        });
-    }
