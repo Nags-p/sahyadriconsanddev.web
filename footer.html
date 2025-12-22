@@ -63,9 +63,9 @@
 </div>
 
 
-<!-- UNIVERSAL INQUIRY MODAL -->
+<!-- UNIVERSAL INQUIRY MODAL (in footer.html) -->
 <div id="inquiry-modal" class="modal-overlay">
-    <div class="modal-content contact-card" style="max-width: 500px; padding: 40px; margin: 0 20px;">
+    <div class="modal-content contact-card" style="max-width: 550px; padding: 40px; margin: 0 20px;">
         <span class="modal-close" id="inquiry-close">&times;</span>
         
         <div style="text-align: center; margin-bottom: 20px;">
@@ -77,12 +77,19 @@
 
         <form id="modal-form">
             <input type="hidden" id="inquiry_type" name="inquiry_type" value="">
-            <input type="text" name="name" placeholder="Full Name" required>
-            <input type="email" name="email" placeholder="Email Address" required>
-            <input type="tel" name="phone" placeholder="Phone Number" required>
-            
-            <div id="quote-fields" style="display: none;">
-                <textarea name="message" rows="3" placeholder="Briefly describe your project..."></textarea>
+
+            <!-- ▼▼▼ ADD THIS WRAPPER DIV ▼▼▼ -->
+            <div class="modal-form-grid">
+                <input type="text" name="name" placeholder="Full Name" required>
+                <input type="email" name="email" placeholder="Email Address" required>
+                
+                <!-- ▼▼▼ ADD "full-span" CLASS ▼▼▼ -->
+                <input type="tel" name="phone" placeholder="Phone Number" required class="full-span">
+                
+                <!-- ▼▼▼ ADD "full-span" CLASS TO THIS DIV ▼▼▼ -->
+                <div id="quote-fields" style="display: none;" class="full-span">
+                    <textarea name="message" rows="3" placeholder="Briefly describe your project..."></textarea>
+                </div>
             </div>
             
             <button type="submit" id="modal-submit-btn" class="btn btn-primary" style="width: 100%;">
