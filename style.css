@@ -164,7 +164,7 @@ img {
 }
 
 /* =======================
-   FIX: DROPDOWN MENU STYLES (NEW)
+   DROPDOWN MENU STYLES
    ======================= */
 .dropdown {
     position: relative; /* This is the anchor for the absolute menu */
@@ -195,19 +195,22 @@ img {
     border: 1px solid rgba(0,0,0,0.07);
 }
 
-/* Show the menu on hover of the parent .dropdown */
-.dropdown:hover .dropdown-menu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) translateY(0);
+/* Show the menu on hover of the parent .dropdown -- ONLY on desktop */
+@media (min-width: 1201px) {
+    .dropdown:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+    }
 }
 
 .dropdown-menu a {
-    display: block;
+    display: flex;
+    align-items: center;
     width: 100%;
     padding: 10px 15px;
-    border-radius: 8px; /* Rounded corners for menu items */
-    white-space: nowrap; /* Prevent links from wrapping */
+    border-radius: 8px;
+    white-space: nowrap;
 }
 
 .dropdown-menu a:hover {
@@ -583,7 +586,7 @@ section {
 }
 
 /* =======================
-   5. WHY CHOOSE US (Was Missing)
+   5. WHY CHOOSE US
    ======================= */
 .why-grid {
     display: grid;
@@ -676,7 +679,6 @@ section {
     background-color: var(--light-gray);
 }
 
-/* -- Project Filters (Was Missing) -- */
 .project-filters {
     display: flex;
     justify-content: center;
@@ -783,11 +785,10 @@ section {
 }
 
 .client-logo {
-    height: 50px; /* Adjust height as needed */
+    height: 50px;
     width: auto;
-    opacity: 0.7; /* Make them slightly faded */
+    opacity: 0.7;
     transition: all 0.3s ease;
-    /* FIX: Correct filter to make any logo white */
     filter: brightness(0) invert(1);
 }
 
@@ -850,7 +851,6 @@ section {
     font-size: 0.95rem;
     color: var(--text-secondary);
     margin-bottom: 10px;
-    /* Clamp text to 3 lines */
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
@@ -970,10 +970,6 @@ section {
     gap: 15px;
     flex-wrap: wrap;
 }
-
-/* =======================
-   REMOVED UNUSED SAFETY STYLES
-   ======================= */
 
 /* =======================
    TESTIMONIALS
@@ -1246,6 +1242,9 @@ section {
 .reveal-delay-200 { transition-delay: 0.2s; }
 .reveal-delay-300 { transition-delay: 0.3s; }
 
+/* =======================
+   MOBILE RESPONSIVE
+   ======================= */
 @media (max-width: 1200px) {
     .nav-links, .header-actions { display: none; }
     .mobile-toggle { display: block; }
@@ -1263,24 +1262,36 @@ section {
         border-bottom: 1px solid #eee;
         box-shadow: var(--shadow-lg);
         z-index: 999;
+        gap: 15px;
     }
 
-    /* FIX: MOBILE DROPDOWN ACCORDION STYLES (UPDATED) */
+    .nav-links.active a:not(.dropdown-toggle) {
+        justify-content: center;
+    }
+
+    /* MOBILE DROPDOWN ACCORDION STYLES (UPDATED) */
     .dropdown {
-        width: 100%;
+        display: contents;
     }
 
     .dropdown-toggle {
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
         width: 100%;
     }
     
-    /* FIX: HIDE the underline on the dropdown toggle in mobile view */
+    .dropdown-toggle span {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* HIDE the underline on the dropdown toggle in mobile view */
     .dropdown-toggle::after {
         display: none !important;
     }
 
+    /* Animate the chevron icon rotation */
     .dropdown .fa-chevron-down {
         transition: transform 0.3s ease;
     }
@@ -1289,32 +1300,42 @@ section {
         transform: rotate(180deg);
     }
     
+    /* Base styles for the hidden dropdown menu */
     .dropdown-menu {
         position: static;
         box-shadow: none;
         border: none;
         background-color: transparent;
         min-width: auto;
-        width: 100%;
-        
-        /* Accordion Styles */
+        width: 50%;
         max-height: 0;
         overflow: hidden;
-        padding: 0;
+        padding: 0 10px; /* Prepare for vertical padding animation */
         opacity: 1;
         visibility: visible;
         transform: none;
-        transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+        transition: all 0.3s ease-out;
     }
     
+    /* Styles for the VISIBLE dropdown menu container */
     .dropdown.active .dropdown-menu {
         max-height: 500px;
-        padding-top: 10px;
-        padding-left: 20px;
+        margin-top: 10px;
+        margin-left: -20px;
+        margin-right: -20px;
+        padding: 10px 20px;
+        background-color: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        border-bottom: 1px solid #e2e8f0;
+        border-radius: 10;
     }
 
+    /* Styles for the links INSIDE the dropdown */
     .dropdown-menu a {
-        padding: 8px 0;
+        padding: 10px 15px;
+        border-radius: 8px;
+        width: 50%;
+        display: block;
     }
     
     .about-content-split { flex-direction: column-reverse; gap: 40px; }
@@ -1475,7 +1496,6 @@ section {
 .faq-item.active .faq-answer { max-height: 300px; }
 .faq-answer p { padding: 0 20px 20px; color: var(--text-secondary); margin: 0; }
 
-/* FIX: Add animation for the FAQ icon */
 .faq-question .fa-plus {
     transition: transform 0.3s ease;
 }
@@ -1488,34 +1508,26 @@ section {
    MOBILE BUTTON FIX
    ======================= */
 
-/* 1. HIDE on Desktop by default */
 .mobile-contact-btn {
     display: none;
 }
 
-/* 2. SHOW on Mobile (Screens smaller than 1200px) */
 @media (max-width: 1200px) {
     .mobile-contact-btn {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        
-        /* Sizing */
         padding: 6px 12px;
         font-size: 0.8rem;
         height: 34px;
-        
-        /* Positioning */
         margin-left: auto;
         margin-right: 12px;
-        
-        /* Styling */
         border-radius: 50px;
     }
 }
 
 /* =======================
-   BROCHURE MODAL STYLES
+   MODAL & POP-UP STYLES
    ======================= */
 .modal-overlay {
     position: fixed;
@@ -1525,7 +1537,7 @@ section {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2000; /* Higher than header */
+    z-index: 2000;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
@@ -1563,33 +1575,27 @@ section {
 .modal-close:hover {
     color: #333;
 }
-/* =======================
-   BROCHURE MODAL INPUT STYLES
-   ======================= */
 
-/* Style the inputs inside the brochure modal */
 #brochure-form input {
     width: 100%;
-    padding: 14px 16px; /* Comfortable padding */
-    margin-bottom: 16px; /* Space between fields */
-    border: 1px solid #cbd5e1; /* Subtle border */
-    border-radius: 8px; /* Rounded corners */
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
     font-family: var(--font-main);
     font-size: 0.95rem;
     color: var(--text-primary);
-    background-color: #f8fafc; /* Slight grey background */
+    background-color: #f8fafc;
     transition: all 0.2s ease;
 }
 
-/* Style when the user clicks/types */
 #brochure-form input:focus {
     outline: none;
     background-color: #ffffff;
     border-color: var(--brand-blue);
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); /* Blue glow */
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
-/* Add spacing to the close button */
 #brochure-close {
     top: 15px;
     right: 20px;
@@ -1599,32 +1605,38 @@ section {
 }
 
 #brochure-close:hover {
-    color: #ef4444; /* Red on hover */
+    color: #ef4444;
 }
 
-/* ===================================
-   NEW: MODAL FORM GRID LAYOUT
-   =================================== */
+/* MODAL FORM GRID LAYOUT */
+.form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
 
-/* Grid container for the fields */
+.form-row select {
+    flex: 1;
+    margin-bottom: 0;
+}
+
 #modal-form .modal-form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Two equal columns */
-    gap: 16px; /* Space between fields */
-    margin-bottom: 20px; /* Space before the submit button */
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
 }
 
-/* Class to make an item span both columns */
 #modal-form .modal-form-grid .full-span {
-    grid-column: 1 / -1; /* Span from the first to the last grid line */
+    grid-column: 1 / -1;
 }
 
-/* General styling for inputs inside the modal form */
 #modal-form input,
+#modal-form select,
 #modal-form textarea {
     width: 100%;
     padding: 14px 16px;
-    margin-bottom: 0; /* Let the grid gap handle spacing */
+    margin-bottom: 16px;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
     font-family: var(--font-main);
@@ -1634,6 +1646,7 @@ section {
 }
 
 #modal-form input:focus,
+#modal-form select:focus,
 #modal-form textarea:focus {
     outline: none;
     background-color: #ffffff;
@@ -1641,16 +1654,14 @@ section {
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
-/* Ensure textarea within its container is full-width */
 #modal-form #quote-fields textarea {
     margin-bottom: 0;
 }
 
 
-/* --- Responsive Adjustments for Mobile --- */
 @media (max-width: 500px) {
     #modal-form .modal-form-grid {
-        grid-template-columns: 1fr; /* Stack everything into a single column */
+        grid-template-columns: 1fr;
         gap: 12px;
     }
 }

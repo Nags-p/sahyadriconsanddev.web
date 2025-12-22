@@ -82,35 +82,63 @@ async function loadSharedComponents() {
 
 // --- 2. HEADER LOGIC (Mobile Menu & Static Active State) ---
 function initHeaderLogic() {
-    // Mobile Toggle
     const mobileToggle = document.querySelector('.mobile-toggle');
     const navLinksContainer = document.querySelector('.nav-links');
     
-    if (mobileToggle && navLinksContainer) {
-        mobileToggle.addEventListener('click', () => {
-            navLinksContainer.classList.toggle('active');
-            mobileToggle.innerHTML = navLinksContainer.classList.contains('active')
-                ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
-        });
-    }
+    if (!mobileToggle || !navLinksContainer) return;
 
-    // Mobile Dropdown Logic
+    // --- Mobile Menu Toggle ---
+    mobileToggle.addEventListener('click', () => {
+        navLinksContainer.classList.toggle('active');
+        mobileToggle.innerHTML = navLinksContainer.classList.contains('active')
+            ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+    });
+
+    // --- Unified Click Handler for Active State & Accordion ---
+    const allLinks = navLinksContainer.querySelectorAll('a');
     const dropdowns = document.querySelectorAll('.nav-links .dropdown');
-    dropdowns.forEach(dropdown => {
-        const toggle = dropdown.querySelector('.dropdown-toggle');
-        toggle.addEventListener('click', (e) => {
-            // Only run this accordion logic if the mobile menu is active/visible
+
+    allLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // 1. Set Active State
+            // Remove 'active' from all links
+            allLinks.forEach(l => l.classList.remove('active'));
+            // Add 'active' to the clicked link
+            this.classList.add('active');
+            // If it's a child, also activate the parent dropdown toggle
+            const parentDropdown = this.closest('.dropdown');
+            if (parentDropdown) {
+                const parentToggle = parentDropdown.querySelector('.dropdown-toggle');
+                if (parentToggle) {
+                    parentToggle.classList.add('active');
+                }
+            }
+
+            // 2. Handle Accordion & Menu Closing on Mobile
             if (window.innerWidth <= 1200 && navLinksContainer.classList.contains('active')) {
-                e.preventDefault(); // Stop link from navigating
-                dropdown.classList.toggle('active');
+                const isToggle = this.classList.contains('dropdown-toggle');
+                
+                if (isToggle) {
+                    e.preventDefault(); // Prevent navigation on toggle click
+                    const currentDropdown = this.closest('.dropdown');
+                    
+                    // Accordion: close others if this one isn't already open
+                    if (!currentDropdown.classList.contains('active')) {
+                        dropdowns.forEach(d => d.classList.remove('active'));
+                    }
+                    currentDropdown.classList.toggle('active');
+                } else {
+                    // It's a final destination link, so close the menu
+                    navLinksContainer.classList.remove('active');
+                    mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                }
             }
         });
     });
 
-    // Initial Active Link Highlighting (based on URL)
+    // --- Initial Active Link Highlighting (based on URL) ---
     const currentPath = window.location.pathname.split("/").pop() || 'index.html';
     const links = document.querySelectorAll('.nav-links a');
-
     links.forEach(link => {
         const href = link.getAttribute('href');
         // Simple check: matches path, or is index.html on root
@@ -119,6 +147,7 @@ function initHeaderLogic() {
         }
     });
 }
+
 
 // --- 3. SCROLL SPY (Updates Blue Line on Scroll) ---
 function initScrollSpy() {
@@ -249,7 +278,9 @@ function initContactForm() {
     const contactForm = document.querySelector('#contact-form');
     if (contactForm) {
         const submitBtn = contactForm.querySelector('#submit-btn');
-        const thankYou = contactForm.querySelector('#thank-you-message');
+        // FIX: The thankYou message is a sibling of the form, not a child.
+        // We need to select it from a common parent or the document.
+        const thankYou = document.querySelector('#thank-you-message');
         const status = contactForm.querySelector('#form-status');
 
         contactForm.addEventListener('submit', async (e) => {
@@ -329,10 +360,10 @@ function initInquiryModal() {
             inquiryTypeInput.value = 'Brochure Request';
             quoteFields.style.display = 'none';
         } else { // 'quote'
-            titleEl.textContent = 'Get a Free Quote';
-            subtitleEl.textContent = 'Share your details and our team will contact you shortly.';
-            submitBtn.innerHTML = 'Submit Inquiry';
-            inquiryTypeInput.value = 'Quote Request';
+            titleEl.textContent = 'Get a Free Project Quote';
+            subtitleEl.textContent = 'Share your project details and our team will get back with cost, timeline, and next steps.';
+            submitBtn.innerHTML = 'Request a Free Quote';
+            inquiryTypeInput.value = 'Quote Request (Modal)';
             quoteFields.style.display = 'block';
         }
         modal.classList.add('active');
@@ -350,13 +381,12 @@ function initInquiryModal() {
         });
     });
 
-    const brochureTrigger = document.getElementById('brochure-modal-trigger');
-    if (brochureTrigger) {
-        brochureTrigger.addEventListener('click', (e) => {
+    document.querySelectorAll('.brochure-modal-trigger').forEach(trigger => {
+        trigger.addEventListener('click', (e) => {
             e.preventDefault();
             openModal('brochure');
         });
-    }
+    });
 
     // Attach close listeners
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
@@ -376,18 +406,37 @@ function initInquiryModal() {
             try {
                 const formData = new FormData(form);
                 const inquiryType = formData.get('inquiry_type');
+                let publicFileUrl = null;
+
+                // 1. Handle File Upload (if it exists)
+                const file = formData.get('file_upload');
+                if (file && file.size > 0) {
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}_modal_${Math.random().toString(36).substring(2)}.${fileExt}`;
+                    
+                    const { error: uploadError } = await _supabase.storage.from('contact_uploads').upload(fileName, file);
+                    if (uploadError) throw uploadError;
+
+                    const { data } = _supabase.storage.from('contact_uploads').getPublicUrl(fileName);
+                    publicFileUrl = data.publicUrl;
+                }
                 
-                // Save lead to Supabase
+                // 2. Save lead to Supabase with all fields
                 const { error } = await _supabase.from('contact_inquiries').insert([{
                     name: formData.get('name'),
                     email: formData.get('email'),
                     phone: formData.get('phone'),
-                    project_type: inquiryType, // Differentiates the lead type
-                    message: formData.get('message') || `User requested the company brochure.`
+                    project_type: formData.get('project_type') || inquiryType,
+                    location: formData.get('location'),
+                    budget_range: formData.get('budget_range'),
+                    start_date: formData.get('start_date'),
+                    message: formData.get('message') || `User requested the company brochure.`,
+                    file_url: publicFileUrl,
+                    consent_given: formData.get('consent') === 'on'
                 }]);
                 if (error) throw error;
 
-                // Handle success based on type
+                // 3. Handle success based on type
                 statusEl.style.color = 'green';
                 if (inquiryType === 'Brochure Request') {
                     statusEl.textContent = 'Success! Your download will begin shortly...';

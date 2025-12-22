@@ -63,13 +63,13 @@
 </div>
 
 
-<!-- UNIVERSAL INQUIRY MODAL (in footer.html) -->
+<!-- UNIVERSAL INQUIRY MODAL (in footer.html) - UPDATED -->
 <div id="inquiry-modal" class="modal-overlay">
     <div class="modal-content contact-card" style="max-width: 550px; padding: 40px; margin: 0 20px;">
         <span class="modal-close" id="inquiry-close">&times;</span>
         
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h3 id="modal-title" style="color: var(--brand-navy);">Title Here</h3>
+        <div style="text-align: left; margin-bottom: 25px;">
+            <h3 id="modal-title" style="color: var(--brand-navy); font-size: 1.8rem;">Title Here</h3>
             <p id="modal-subtitle" style="color: var(--text-secondary); font-size: 0.95rem;">
                 Subtitle here.
             </p>
@@ -78,18 +78,52 @@
         <form id="modal-form">
             <input type="hidden" id="inquiry_type" name="inquiry_type" value="">
 
-            <!-- ▼▼▼ ADD THIS WRAPPER DIV ▼▼▼ -->
-            <div class="modal-form-grid">
-                <input type="text" name="name" placeholder="Full Name" required>
-                <input type="email" name="email" placeholder="Email Address" required>
-                
-                <!-- ▼▼▼ ADD "full-span" CLASS ▼▼▼ -->
-                <input type="tel" name="phone" placeholder="Phone Number" required class="full-span">
-                
-                <!-- ▼▼▼ ADD "full-span" CLASS TO THIS DIV ▼▼▼ -->
-                <div id="quote-fields" style="display: none;" class="full-span">
-                    <textarea name="message" rows="3" placeholder="Briefly describe your project..."></textarea>
+            <div class="modal-form-fields-container" style="max-height: 60vh; overflow-y: auto; padding-right: 15px; margin-right: -15px;">
+                <input type="text" name="name" placeholder="Your Name" required>
+                <input type="email" name="email" placeholder="Your Email" required>
+                <input type="tel" name="phone" placeholder="Your Contact Number" required>
+
+                <div id="quote-fields" style="display: none;">
+                    <select name="project_type" required>
+                        <option value="" disabled selected>Select Project Type</option>
+                        <option>Residential Construction</option>
+                        <option>Commercial Construction</option>
+                        <option>Renovation / Remodeling</option>
+                        <option>Interior Works</option>
+                        <option>Planning & Approval</option>
+                    </select>
+
+                    <input type="text" name="location" placeholder="Project Location (City / Area)" required>
+
+                    <!-- Side-by-side row -->
+                    <div class="form-row">
+                        <select name="budget_range">
+                            <option value="" disabled selected>Budget Range (Optional)</option>
+                            <option>Below ₹5 Lakhs</option>
+                            <option>₹5–20 Lakhs</option>
+                            <option>₹20–50 Lakhs</option>
+                            <option>₹50 Lakhs – 1 Cr</option>
+                            <option>1 Cr+</option>
+                        </select>
+    
+                        <select name="start_date">
+                            <option value="" disabled selected>Expected Start Date (Optional)</option>
+                            <option>Immediately</option>
+                            <option>Within 1–3 months</option>
+                            <option>Within 6 months</option>
+                        </select>
+                    </div>
+
+                    <label style="font-size:0.9rem; margin-bottom:5px; display:block; color: var(--text-secondary);">Attach Plans/Images (Optional)</label>
+                    <input type="file" name="file_upload" id="modal_file_upload" accept="image/*, .pdf, .doc, .docx">
+
+                    <textarea name="message" rows="4" placeholder="Your Message / Project Details" required></textarea>
                 </div>
+            </div>
+
+            <div class="consent-group" style="margin-top:20px; margin-bottom:20px; display: flex; gap: 10px; align-items: flex-start;">
+                <input type="checkbox" id="modal_consent" name="consent" checked required style="width:auto; margin-top: 5px;">
+                <label for="modal_consent" style="font-size:0.9rem; color: var(--text-secondary);">I agree to the Privacy Policy and consent to being contacted.</label>
             </div>
             
             <button type="submit" id="modal-submit-btn" class="btn btn-primary" style="width: 100%;">
