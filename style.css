@@ -166,7 +166,7 @@ img {
 }
 
 .dropdown-toggle {
-    cursor: default; /* Change cursor as it doesn't navigate */
+    cursor: pointer; /* Change cursor as it doesn't navigate */
 }
 
 .dropdown-menu {
@@ -1260,16 +1260,51 @@ section {
         z-index: 999;
     }
 
-    /* On mobile, make dropdown part of the main menu flow */
+    /* FIX: MOBILE DROPDOWN ACCORDION STYLES (UPDATED) */
+    .dropdown {
+        width: 100%;
+    }
+
+    .dropdown-toggle {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    .dropdown .fa-chevron-down {
+        transition: transform 0.3s ease;
+    }
+
+    .dropdown.active .fa-chevron-down {
+        transform: rotate(180deg);
+    }
+    
     .dropdown-menu {
         position: static;
-        transform: none;
+        box-shadow: none;
+        border: none;
+        background-color: transparent;
+        min-width: auto;
+        width: 100%;
+        
+        /* Accordion Styles */
+        max-height: 0;
+        overflow: hidden;
+        padding: 0;
         opacity: 1;
         visibility: visible;
-        box-shadow: none;
-        background: transparent;
-        padding: 0 0 0 20px;
-        min-width: unset;
+        transform: none;
+        transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+    }
+    
+    .dropdown.active .dropdown-menu {
+        max-height: 500px;
+        padding-top: 10px;
+        padding-left: 20px;
+    }
+
+    .dropdown-menu a {
+        padding: 8px 0;
     }
     
     .about-content-split { flex-direction: column-reverse; gap: 40px; }
