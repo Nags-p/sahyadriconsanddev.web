@@ -1271,6 +1271,11 @@ section {
         width: 100%;
     }
     
+    /* FIX: HIDE the underline on the dropdown toggle in mobile view */
+    .dropdown-toggle::after {
+        display: none !important;
+    }
+
     .dropdown .fa-chevron-down {
         transition: transform 0.3s ease;
     }
