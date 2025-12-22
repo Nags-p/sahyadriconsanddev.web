@@ -141,6 +141,11 @@ img {
 .nav-links a.active i {
     color: var(--brand-blue);
 }
+/* When the dropdown is open on mobile, color the toggle link blue */
+.dropdown.active > .dropdown-toggle,
+.dropdown.active > .dropdown-toggle i {
+    color: var(--brand-blue);
+}
 
 .nav-links a::after {
     content: '';
