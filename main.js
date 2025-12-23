@@ -5,7 +5,7 @@
 
 // 1. SUPABASE CONFIGURATION
 const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2_ns-yio';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2ns-yio';
 
 // Initialize Client
 const { createClient } = supabase;
@@ -27,8 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- STEP 3: FORMS ---
     initContactForm();    // For the main contact section form
     initInquiryModal();   // For the new universal popup modal
-    initCalculator();
-
+    
     // --- STEP 4: DYNAMIC BLOG CONTENT ---
     const homeInsightsContainer = document.getElementById('home-insights-container');
     const allInsightsContainer = document.getElementById('all-insights-container');
@@ -277,8 +276,6 @@ function initContactForm() {
     const contactForm = document.querySelector('#contact-form');
     if (contactForm) {
         const submitBtn = contactForm.querySelector('#submit-btn');
-        // FIX: The thankYou message is a sibling of the form, not a child.
-        // We need to select it from a common parent or the document.
         const thankYou = document.querySelector('#thank-you-message');
         const status = contactForm.querySelector('#form-status');
 
@@ -406,15 +403,23 @@ function initInquiryModal() {
                 const formData = new FormData(form);
                 const inquiryType = formData.get('inquiry_type');
                 
-                // Save lead to Supabase with the simplified fields
+                // --- FIX STARTS HERE ---
+                // Save lead to Supabase, providing default values for missing fields
                 const { error } = await _supabase.from('contact_inquiries').insert([{
                     name: formData.get('name'),
                     email: formData.get('email'),
                     phone: formData.get('phone'),
                     project_type: formData.get('project_type') || inquiryType,
                     message: formData.get('message') || `User requested the company brochure.`,
-                    consent_given: formData.get('consent') === 'on'
+                    consent_given: formData.get('consent') === 'on',
+                    // Add default values for columns that exist in the DB but not in this simplified form
+                    location: 'Not specified (Modal)',
+                    budget_range: null,
+                    start_date: null,
+                    file_url: null
                 }]);
+                // --- FIX ENDS HERE ---
+
                 if (error) throw error;
 
                 // Handle success based on type
@@ -447,47 +452,8 @@ function initInquiryModal() {
     }
 }
 
-// --- 11. CALCULATOR LOGIC ---
-function initCalculator() {
-    const calcForm = document.querySelector('#calc-form');
-    if (calcForm) {
-        const calcAreaInput = document.querySelector('#calc-area');
-        const calcTypeSelect = document.querySelector('#calc-type');
-        const calcResultCard = document.querySelector('#calc-result');
-        const finishRadios = document.getElementsByName('finish');
 
-        const rateMatrix = {
-            standard: { residential: 1650, commercial: 1850, interiors: 900 },
-            premium: { residential: 2150, commercial: 2350, interiors: 1200 },
-            luxury: { residential: 2550, commercial: 2750, interiors: 1500 }
-        };
-
-        calcForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const area = parseFloat(calcAreaInput.value || '0');
-            const type = calcTypeSelect.value;
-            const finish = Array.from(finishRadios).find(r => r.checked)?.value || 'standard';
-
-            if (!area || area <= 0) {
-                calcResultCard.innerHTML = `<h4>Estimated Budget</h4><p>Please enter a valid area.</p>`;
-                return;
-            }
-
-            const rate = rateMatrix[finish][type] || 0;
-            const estimate = Math.round(area * rate);
-            const formatted = estimate.toLocaleString('en-IN');
-            const monthly = Math.round(estimate / 12).toLocaleString('en-IN');
-
-            calcResultCard.innerHTML = `
-                <h4>Estimated Budget</h4>
-                <p><strong>₹${formatted}</strong> (±7%)</p>
-                <p style="font-size:0.9rem; color: var(--text-secondary);">Indicative milestone of ₹${monthly}/month across 12 months.</p>
-            `;
-        });
-    }
-}
-
-// --- 12. BLOG LOADER (HOME PAGE) ---
+// --- 11. BLOG LOADER (HOME PAGE) ---
 async function loadRecentInsights(container) {
     try {
         const { data: posts, error } = await _supabase
@@ -536,7 +502,7 @@ async function loadRecentInsights(container) {
     }
 }
 
-// --- 13. BLOG LOADER (ALL INSIGHTS PAGE) ---
+// --- 12. BLOG LOADER (ALL INSIGHTS PAGE) ---
 async function loadAllInsights(container) {
     try {
         const { data: posts, error } = await _supabase
@@ -559,6 +525,7 @@ async function loadAllInsights(container) {
             let plainText = tempDiv.textContent || tempDiv.innerText || "";
             let excerpt = plainText.substring(0, 100) + "...";
 
+            // --- FIX IS HERE ---
             const dateStr = new Date(post.created_at).toLocaleDateString('en-IN', {
                 year: 'numeric', month: 'short', day: 'numeric'
             });
