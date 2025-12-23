@@ -737,7 +737,7 @@ section {
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 100%;
+    width: 350px;
     background: rgba(255, 255, 255, 0.95);
     padding: 24px;
     transform: translateY(100%);
