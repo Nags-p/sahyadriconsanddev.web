@@ -93,8 +93,8 @@
 
     <!-- SCRIPTS (Order is Important) -->
     <script src="projects-data.js"></script> <!-- 1. Data loads first -->
-    <script src="project.js"></script> <!-- 2. Logic loads second -->
-    <script src="main.js"></script> <!-- 3. Shared logic (Nav) -->
+    <script src="project.js" defer></script> <!-- 2. Page-specific logic -->
+    <script src="main.js" defer></script> <!-- 3. Shared logic (Header, Footer, Modals) -->
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
