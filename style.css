@@ -714,7 +714,7 @@ section {
 }
 
 .project-item {
-    position: relative;
+    position: static;
     border-radius: 16px;
     width: 350px;
     overflow: hidden;
