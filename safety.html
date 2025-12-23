@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Safety Standards - Sahyadri Constructions</title>
+    <title>Safety Standards - {{ site.company_name}}</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -71,6 +71,8 @@
 
     <footer class="footer" id="main-footer"></footer>
 
+    <!-- FIX: Added Supabase script which is required by main.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="main.js" defer></script>
 </body>
 
