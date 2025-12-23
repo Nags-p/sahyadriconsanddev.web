@@ -80,9 +80,10 @@
 
             <div class="modal-form-fields-container" style="max-height: 60vh; overflow-y: auto; padding-right: 15px; margin-right: -15px;">
                 <input type="text" name="name" placeholder="Your Name" required>
-                <input type="email" name="email" placeholder="Your Email" required>
                 <input type="tel" name="phone" placeholder="Your Contact Number" required>
+                <input type="email" name="email" placeholder="Your Email (Optional)">
 
+                <!-- Simplified Quote Fields -->
                 <div id="quote-fields" style="display: none;">
                     <select name="project_type" required>
                         <option value="" disabled selected>Select Project Type</option>
@@ -91,31 +92,8 @@
                         <option>Renovation / Remodeling</option>
                         <option>Interior Works</option>
                         <option>Planning & Approval</option>
+                        <option>Other Inquiry</option>
                     </select>
-
-                    <input type="text" name="location" placeholder="Project Location (City / Area)" required>
-
-                    <!-- Side-by-side row -->
-                    <div class="form-row">
-                        <select name="budget_range">
-                            <option value="" disabled selected>Budget Range (Optional)</option>
-                            <option>Below ₹5 Lakhs</option>
-                            <option>₹5–20 Lakhs</option>
-                            <option>₹20–50 Lakhs</option>
-                            <option>₹50 Lakhs – 1 Cr</option>
-                            <option>1 Cr+</option>
-                        </select>
-    
-                        <select name="start_date">
-                            <option value="" disabled selected>Expected Start Date (Optional)</option>
-                            <option>Immediately</option>
-                            <option>Within 1–3 months</option>
-                            <option>Within 6 months</option>
-                        </select>
-                    </div>
-
-                    <label style="font-size:0.9rem; margin-bottom:5px; display:block; color: var(--text-secondary);">Attach Plans/Images (Optional)</label>
-                    <input type="file" name="file_upload" id="modal_file_upload" accept="image/*, .pdf, .doc, .docx">
 
                     <textarea name="message" rows="4" placeholder="Your Message / Project Details" required></textarea>
                 </div>

@@ -5,7 +5,7 @@
 
 // 1. SUPABASE CONFIGURATION
 const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2ns-yio';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2_ns-yio';
 
 // Initialize Client
 const { createClient } = supabase;
@@ -57,8 +57,6 @@ const response = await fetch('header.html');
 if (response.ok) {
 const html = await response.text();
 headerPlaceholder.innerHTML = html;
-code
-Code
 // Initialize Header Logic (Mobile Menu & Initial Active State)
             initHeaderLogic(); 
             
@@ -407,37 +405,19 @@ function initInquiryModal() {
             try {
                 const formData = new FormData(form);
                 const inquiryType = formData.get('inquiry_type');
-                let publicFileUrl = null;
-
-                // 1. Handle File Upload (if it exists)
-                const file = formData.get('file_upload');
-                if (file && file.size > 0) {
-                    const fileExt = file.name.split('.').pop();
-                    const fileName = `${Date.now()}_modal_${Math.random().toString(36).substring(2)}.${fileExt}`;
-                    
-                    const { error: uploadError } = await _supabase.storage.from('contact_uploads').upload(fileName, file);
-                    if (uploadError) throw uploadError;
-
-                    const { data } = _supabase.storage.from('contact_uploads').getPublicUrl(fileName);
-                    publicFileUrl = data.publicUrl;
-                }
                 
-                // 2. Save lead to Supabase with all fields
+                // Save lead to Supabase with the simplified fields
                 const { error } = await _supabase.from('contact_inquiries').insert([{
                     name: formData.get('name'),
                     email: formData.get('email'),
                     phone: formData.get('phone'),
                     project_type: formData.get('project_type') || inquiryType,
-                    location: formData.get('location'),
-                    budget_range: formData.get('budget_range'),
-                    start_date: formData.get('start_date'),
                     message: formData.get('message') || `User requested the company brochure.`,
-                    file_url: publicFileUrl,
                     consent_given: formData.get('consent') === 'on'
                 }]);
                 if (error) throw error;
 
-                // 3. Handle success based on type
+                // Handle success based on type
                 statusEl.style.color = 'green';
                 if (inquiryType === 'Brochure Request') {
                     statusEl.textContent = 'Success! Your download will begin shortly...';
