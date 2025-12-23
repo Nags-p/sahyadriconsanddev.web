@@ -723,7 +723,7 @@ section {
 }
 
 .project-item img {
-    width: 100%;
+    width: 350px;
     height: 280px;
     object-fit: cover;
     transition: 0.5s ease;
