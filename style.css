@@ -1623,8 +1623,8 @@ section {
 #modal-form .modal-form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 20px;
+    gap: 10px;
+    margin-bottom: 50px;
 }
 
 #modal-form .modal-form-grid .full-span {
