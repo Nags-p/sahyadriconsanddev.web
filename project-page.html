@@ -1,10 +1,12 @@
+---
+---
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Details - Sahyadri Constructions</title>
+    <title>Project Details - {{ site.company.name }}</title>
     <link href="images/logo.png" rel="icon">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -14,27 +16,8 @@
 
 <body>
 
-    <!-- HEADER -->
-    <header class="header">
-        <div class="container nav-wrapper">
-            <a href="index.html" class="logo">
-                <img src="images/header.png" alt="Logo">
-                <span>Sahyadri</span>
-            </a>
-            <nav>
-                <div class="nav-links">
-                    <a href="index.html" style="color: var(--brand-blue); font-weight: 600;">
-                        <i class="fas fa-arrow-left"></i> Back to Home
-                    </a>
-                </div>
-            </nav>
-            <div class="header-actions">
-                <a href="index.html#contact" class="btn btn-primary">Start Your Project <i
-                        class="fas fa-arrow-right"></i></a>
-            </div>
-            <button class="mobile-toggle"><i class="fas fa-bars"></i></button>
-        </div>
-    </header>
+    <!-- HEADER PLACEHOLDER -->
+    <header class="header" id="main-header"></header>
 
     <!-- MAIN CONTENT -->
     <main style="padding-top: 140px; padding-bottom: 100px;">
@@ -59,8 +42,8 @@
                     </ul>
 
                     <div class="project-cta-buttons">
-                        <a href="index.html#contact" class="btn btn-primary">Get Free Quote</a>
-                        <a href="tel:+917975676745" class="btn btn-secondary"><i class="fas fa-phone"></i> Call Now</a>
+                        <a href="#" class="btn btn-primary quote-modal-trigger">Get Free Quote</a>
+                        <a href="tel:{{site.phone}}" class="btn btn-secondary"><i class="fas fa-phone"></i> Call Now</a>
                     </div>
                 </div>
 
@@ -94,9 +77,9 @@
                 <!-- Sidebar Details Card -->
                 <div class="project-details-card">
                     <div class="project-detail-cta">
-                        <p>Need a similar outcome?</p>
-                        <a href="index.html#contact" class="btn btn-primary btn-sm" style="width:100%;">Request a Quote</a>
-                        <a href="tel:+917975676745" class="btn btn-secondary btn-sm" style="width:100%; margin-top:10px;"><i class="fas fa-phone"></i> Call Sahyadri</a>
+                        <h2>Need a similar outcome?</h2>
+                        <a href="#" class="btn btn-primary btn-sm quote-modal-trigger" style="width:100%;">Request a Quote</a>
+                        <a href="tel:{{site.phone}}" class="btn btn-secondary btn-sm" style="width:100%; margin-top:10px;"><i class="fas fa-phone"></i> Call Sahyadri</a>
                     </div>
                 </div>
             </div>
@@ -104,12 +87,8 @@
         </div>
     </main>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-        <div class="container">
-            <p style="text-align: center;">&copy; 2025 Sahyadri Constructions. All Rights Reserved.</p>
-        </div>
-    </footer>
+    <!-- FOOTER PLACEHOLDER -->
+    <footer class="footer" id="main-footer"></footer>
 
     <!-- SCRIPTS (Order is Important) -->
     <script src="projects-data.js"></script> <!-- 1. Data loads first -->
