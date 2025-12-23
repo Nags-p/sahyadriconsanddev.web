@@ -49,34 +49,36 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // --- 1. HEADER & FOOTER INJECTION ---
 async function loadSharedComponents() {
-    // IMPORTANT: Replace 'your-repo-name' with your repository's actual name
-    const repoName = 'sahyadriconsanddev.web'; 
-
-    try {
-        // Load Header
-        const headerPlaceholder = document.getElementById('main-header');
-        if (headerPlaceholder) {
-            // Prepending the repository name to the path
-            const response = await fetch(`/${repoName}/header.html`); 
-            if (!response.ok) throw new Error(`Failed to fetch header: ${response.statusText}`);
-            const html = await response.text();
-            headerPlaceholder.innerHTML = html;
+try {
+// Load Header
+const headerPlaceholder = document.getElementById('main-header');
+if (headerPlaceholder) {
+const response = await fetch('header.html');
+if (response.ok) {
+const html = await response.text();
+headerPlaceholder.innerHTML = html;
+code
+Code
+// Initialize Header Logic (Mobile Menu & Initial Active State)
             initHeaderLogic(); 
+            
+            // Initialize ScrollSpy (Live Active State on Scroll)
             initScrollSpy();
         }
+    }
 
-        // Load Footer
-        const footerPlaceholder = document.getElementById('main-footer');
-        if (footerPlaceholder) {
-            // Prepending the repository name to the path
-            const response = await fetch(`/${repoName}/footer.html`);
-            if (!response.ok) throw new Error(`Failed to fetch footer: ${response.statusText}`);
+    // Load Footer
+    const footerPlaceholder = document.getElementById('main-footer');
+    if (footerPlaceholder) {
+        const response = await fetch('footer.html');
+        if (response.ok) {
             const html = await response.text();
             footerPlaceholder.innerHTML = html;
         }
-    } catch (error) {
-        console.error("Error loading shared components:", error);
     }
+} catch (error) {
+    console.error("Error loading shared components:", error);
+   }
 }
 
 // --- 2. HEADER LOGIC (Mobile Menu & Static Active State) ---
