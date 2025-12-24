@@ -148,50 +148,69 @@ function initHeaderLogic() {
 
 
 // --- 3. SCROLL SPY (Updates Blue Line on Scroll) ---
+// --- 3. SCROLL SPY (Updates Blue Line on Scroll) ---
 function initScrollSpy() {
-    // Only run on Homepage
+    // Only run on the Homepage
     const path = window.location.pathname;
-    const isHome = path.endsWith('index.html') || path === '/' || path.endsWith('/');
+    const isHome = path.endsWith('index.html') || path.endsWith('/') || path === '';
     
     if (!isHome) return;
 
-    const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.nav-links a');
+    const sections = Array.from(document.querySelectorAll('section[id]'));
+    const navLinks = Array.from(document.querySelectorAll('.nav-links a'));
+    const headerHeight = document.querySelector('.header')?.offsetHeight || 80;
 
     window.addEventListener('scroll', () => {
-        let current = '';
+        const scrollY = window.scrollY;
+        let currentSectionId = '';
 
-        // Determine which section is currently in view
+        // Step 1: Determine which section is currently in view.
+        // We find the LAST section whose top edge is above the current scroll position.
         sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            // 150px offset for the fixed header
-            if (pageYOffset >= (sectionTop - 150)) {
-                current = section.getAttribute('id');
+            if (scrollY >= section.offsetTop - headerHeight - 5) { // Added a 5px buffer for accuracy
+                currentSectionId = section.getAttribute('id');
             }
         });
 
-        // Special check for top of page (Home)
-        if (window.scrollY < 100) {
-            current = 'home'; 
-        }
-
-        // Remove active class from all and add to current
+        // Step 2: Clear the 'active' state from ALL links and their parent toggles first.
+        // This is the crucial fix to prevent conflicts.
         navLinks.forEach(link => {
             link.classList.remove('active');
-            const href = link.getAttribute('href');
-
-            // If we are at top, highlight Home
-            if (current === 'home' && (!href.includes('#') || href.includes('#hero'))) {
-                link.classList.add('active');
-            }
-            // Otherwise match the section ID
-            else if (current && href.includes('#' + current)) {
-                link.classList.add('active');
+            const parentToggle = link.closest('.dropdown')?.querySelector('.dropdown-toggle');
+            if (parentToggle) {
+                parentToggle.classList.remove('active');
             }
         });
+
+        // Step 3: Find the specific link to activate based on the current section.
+        let activeLinkFound = false;
+        navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (!href) return;
+
+            // Check if the link's hash (#) matches the current section's ID
+            if (href.includes('#' + currentSectionId)) {
+                link.classList.add('active');
+                activeLinkFound = true;
+                
+                // If this link is inside a dropdown, activate its parent toggle as well.
+                const parentToggle = link.closest('.dropdown')?.querySelector('.dropdown-toggle');
+                if (parentToggle) {
+                    parentToggle.classList.add('active');
+                }
+            }
+        });
+
+        // Step 4: If no section link was activated (e.g., we are at the top in the 'hero' section),
+        // explicitly activate the main "Home" link.
+        if (!activeLinkFound) {
+            const homeLink = navLinks.find(link => link.getAttribute('href') === 'index.html');
+            if (homeLink) {
+                homeLink.classList.add('active');
+            }
+        }
     });
 }
-
 // --- 4. SCROLL ANIMATIONS ---
 function initScrollAnimations() {
     const revealElements = document.querySelectorAll('.reveal');
