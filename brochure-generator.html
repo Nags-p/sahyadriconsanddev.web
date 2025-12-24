@@ -1,8 +1,10 @@
+---
+---
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sahyadri Constructions Brochure</title>
+    <title>{{ site.company_name }} Brochure</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         /* A4 Paper Setup */
@@ -102,11 +104,11 @@
             <div class="cover-overlay"></div>
         </div>
         <div class="cover-content">
-            <h1 class="logo-text">Sahyadri<br><span style="color:#3b82f6">Constructions</span></h1>
+            <h1 class="logo-text">{{ site.company_surname }}<br><span style="color:#3b82f6">Constructions</span></h1>
             <p class="tagline">Engineering Excellence. Building Trust.</p>
             <p class="year">EST. 2025</p>
             <div style="margin-top:auto; font-size: 14px; opacity: 0.7;">
-                www.sahyadriconstructions.com
+                {{ site.domain }}
             </div>
         </div>
     </div>
@@ -116,7 +118,7 @@
         <div class="header-strip"><h2>Who We Are</h2></div>
         <div class="content-pad">
             <p class="about-text">
-                <b>Sahyadri Constructions</b> is a premier engineering and development firm dedicated to delivering structural integrity and aesthetic excellence. From soil testing to final handover, we handle every aspect of construction with transparency and precision.
+                <b>{{ site.company_name }}</b> is a premier engineering and development firm dedicated to delivering structural integrity and aesthetic excellence. From soil testing to final handover, we handle every aspect of construction with transparency and precision.
             </p>
 
             <h3 class="brand-navy" style="margin-bottom:20px;">Our Services</h3>
@@ -180,18 +182,18 @@
             <h1 class="brand-navy" style="font-size:36px; margin-bottom:40px;">Let's Build Together</h1>
             
             <div class="contact-item">
-                <i class="fas fa-phone"></i> +91 79756 76745
+                <i class="fas fa-phone"></i> {{ site.phone }}
             </div>
             <div class="contact-item">
-                <i class="fas fa-envelope"></i> sahyadriconstructions449@gmail.com
+                <i class="fas fa-envelope"></i> {{ site.email }}
             </div>
             <div class="contact-item">
-                <i class="fas fa-map-marker-alt"></i> 2nd Main Road, Ashok Nagar, Mandya
+                <i class="fas fa-map-marker-alt"></i> {{ site.address }}
             </div>
 
             <div style="margin-top:50px; padding:20px; background:#f8fafc; display:inline-block;">
                 <p style="margin:0; font-weight:bold; color:#2563eb;">VISIT OUR WEBSITE</p>
-                <p style="margin:5px 0 0 0; color:#64748b;">sahyadriconstructions.com</p>
+                <p style="margin:5px 0 0 0; color:#64748b;">{{ site.domain }}</p>
             </div>
         </div>
     </div>
