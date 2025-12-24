@@ -1,0 +1,53 @@
+---
+---
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Portfolio - {{ site.company_name }}</title>
+    <link href="images/logo.png" rel="icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- HEADER PLACEHOLDER -->
+    <header class="header" id="main-header"></header>
+
+    <!-- PAGE HERO -->
+    <section class="services-hero" style="padding-top: 120px; padding-bottom: 80px;">
+        <div class="container reveal">
+            <h1>Our Portfolio</h1>
+            <p style="font-size: 1.2rem; color: rgba(255,255,255,0.8); max-width: 600px; margin: auto;">A showcase of our finest residential, commercial, and renovation work.</p>
+        </div>
+    </section>
+    
+    <!-- PROJECTS SECTION -->
+    <section id="all-projects" style="padding-top: 80px;">
+        <div class="container">
+             <!-- Filter Buttons -->
+            <div class="project-filters reveal">
+                <!-- Buttons will be populated by JS -->
+            </div>
+
+            <div class="projects-grid" id="all-projects-grid">
+                <!-- Projects will be loaded here by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER PLACEHOLDER -->
+    <footer class="footer" id="main-footer"></footer>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="main.js" defer></script> 
+    <script src="projects-loader.js" defer></script> <!-- New JS file for this page -->
+
+</body>
+</html>

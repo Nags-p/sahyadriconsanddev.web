@@ -24,6 +24,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     initSwiper(); 
     trackVisitor();
 
+    // --- NEW STEP: LOAD FEATURED PROJECTS ON HOME PAGE ---
+    initProjectsSection(); // ADD THIS LINE
+
     // --- STEP 3: FORMS ---
     initContactForm();    // For the main contact section form
     initInquiryModal();   // For the new universal popup modal
@@ -573,4 +576,94 @@ async function loadAllInsights(container) {
         console.error('Error fetching all blogs:', err);
         container.innerHTML = '<p style="text-align:center; color: red;">Error loading articles.</p>';
     }
+}
+
+// Add this new function to main.js
+// ===================================================================
+// --- 12. DYNAMIC PROJECTS SECTION (HOMEPAGE) ---
+// ===================================================================
+let allProjectsData = []; // This will store all projects for filtering
+
+async function initProjectsSection() {
+    const container = document.querySelector('#projects .projects-grid');
+    const filters = document.querySelector('.project-filters');
+
+    if (!container || !filters) return;
+
+    container.innerHTML = '<p style="text-align:center; grid-column: 1 / -1;">Loading our portfolio...</p>';
+
+    try {
+        // Fetch all projects from Supabase
+        const { data, error } = await _supabase
+            .from('projects')
+            .select('id, title, type, scope, gallery_images, is_featured')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            // This will show an error in the browser console if RLS is misconfigured
+            console.error("Supabase Error:", error);
+            throw new Error("Could not fetch projects.");
+        }
+        
+        allProjectsData = data || [];
+
+        // Initially, display only the featured projects
+        const featuredProjects = allProjectsData.filter(p => p.is_featured);
+        renderProjects(featuredProjects.length > 0 ? featuredProjects : allProjectsData.slice(0, 4)); // Fallback to first 4 if none are featured
+
+        // Setup filter button event listeners
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const filterValue = btn.getAttribute('data-filter');
+                
+                let filteredProjects;
+                if (filterValue === 'all') {
+                    filteredProjects = allProjectsData;
+                } else {
+                    // Match the 'type' field from Supabase (case-insensitive)
+                    filteredProjects = allProjectsData.filter(p => p.type && p.type.toLowerCase() === filterValue);
+                }
+                renderProjects(filteredProjects);
+            });
+        });
+
+    } catch (err) {
+        console.error('Error initializing projects section:', err);
+        container.innerHTML = '<p style="text-align:center; color:red; grid-column: 1 / -1;">Could not load portfolio at this time.</p>';
+    }
+}
+
+function renderProjects(projectsToRender) {
+    const container = document.querySelector('#projects .projects-grid');
+    container.innerHTML = ''; // Clear previous projects
+
+    if (projectsToRender.length === 0) {
+        container.innerHTML = '<p style="text-align:center; grid-column: 1 / -1;">No projects match this category.</p>';
+        return;
+    }
+
+    projectsToRender.forEach(project => {
+        const projectCard = document.createElement('div');
+        projectCard.className = 'project-item reveal';
+        // Use project type for the category, defaulting to 'general'
+        projectCard.setAttribute('data-category', (project.type || 'general').toLowerCase());
+        
+        const thumbnailUrl = (project.gallery_images && project.gallery_images.length > 0) ? project.gallery_images[0] : 'images/project-placeholder.jpg'; // A fallback image is good practice
+
+        projectCard.innerHTML = `
+            <img src="${thumbnailUrl}" alt="${project.title}" loading="lazy">
+            <div class="project-overlay">
+                <h3>${project.title}</h3>
+                <p>${project.type || 'Project'} • ${project.scope || 'Details'}</p>
+                <a href="project-page.html?id=${project.id}" class="btn btn-primary btn-sm">View Details</a>
+            </div>
+        `;
+        container.appendChild(projectCard);
+    });
+    
+    // Re-initialize scroll animations for the newly added items
+    initScrollAnimations();
 }

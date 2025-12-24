@@ -1,14 +1,35 @@
 // project.js
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // 1. Get ID from URL
     const urlParams = new URLSearchParams(window.location.search);
     const projectId = parseInt(urlParams.get('id'));
 
-    // 2. Find Project in Data
-    const project = projectsData.find(p => p.id === projectId);
+    if (isNaN(projectId)) {
+        displayProjectError('Invalid Project ID.');
+        return;
+    }
 
-    // 3. Populate HTML
-    if (project) {
+    try {
+        // 2. Initialize Supabase Client
+        // Note: Assumes main.js has already initialized the global _supabase client
+        if (typeof _supabase === 'undefined') {
+            console.error('Supabase client not found. Make sure main.js is loaded.');
+            displayProjectError('Configuration error.');
+            return;
+        }
+
+        // 3. Find Project in Supabase
+        const { data: project, error } = await _supabase
+            .from('projects')
+            .select('*')
+            .eq('id', projectId)
+            .single();
+
+        if (error || !project) {
+            throw new Error(error ? error.message : 'Project not found.');
+        }
+
+        // 4. Populate HTML if project is found
         document.title = `${project.title} - Sahyadri Constructions`;
 
         // Text Content
@@ -26,61 +47,50 @@ document.addEventListener('DOMContentLoaded', () => {
         setText('project-type', project.type);
         setText('project-scope', project.scope);
 
-        // Hero pills
-        setText('project-type-pill', project.type);
-        setText('project-year-pill', project.year);
-        setText('project-scope-pill', project.scope);
-        setText('project-location-pill', project.location);
-
         // Services List
         const servicesList = document.getElementById('project-services-list');
         if (servicesList) {
             servicesList.innerHTML = '';
             (project.services || []).forEach(service => {
                 const li = document.createElement('li');
-                li.textContent = service;
+                li.innerHTML = `<i class="fas fa-check-circle" style="color:var(--brand-blue); margin-right:8px;"></i> ${service}`;
                 servicesList.appendChild(li);
             });
-
-            if (!project.services || project.services.length === 0) {
-                const li = document.createElement('li');
-                li.textContent = 'Turnkey design & build services';
-                servicesList.appendChild(li);
-            }
         }
 
         // Images Logic
         const gallery = document.getElementById('project-gallery');
         if (gallery) {
             gallery.innerHTML = ''; // Clear loading text
-            project.galleryImages.forEach((imgSrc, index) => {
-                const img = document.createElement('img');
-                img.src = imgSrc;
-                img.alt = project.title;
-                
-                // Add 'reveal' class for animation styling
-                img.classList.add('reveal');
-                
-                // FORCE VISIBILITY: Add 'active' class after a tiny delay
-                // This fixes the invisible image bug
-                setTimeout(() => {
-                    img.classList.add('active');
-                }, index * 200); // Staggered animation (200ms delay per image)
-
-                gallery.appendChild(img);
+            (project.gallery_images || []).forEach((imgSrc, index) => {
+                const imgContainer = document.createElement('div');
+                imgContainer.className = 'reveal';
+                imgContainer.innerHTML = `<img src="${imgSrc}" alt="${project.title} - Image ${index + 1}" loading="lazy">`;
+                gallery.appendChild(imgContainer);
             });
+            // Re-run animation observer for newly added elements
+            if (typeof initScrollAnimations === 'function') {
+                initScrollAnimations();
+            }
         }
-    } else {
-        // Handle Not Found
-        setText('project-title', 'Project Not Found');
-        setText('project-subtitle', 'The project you are looking for does not exist.');
-        const content = document.querySelector('.project-info-grid');
-        if (content) content.style.display = 'none';
+    } catch (err) {
+        console.error("Error loading project:", err);
+        displayProjectError(err.message);
     }
 });
 
-// Helper to safely set text
+// Helper to safely set text content
 function setText(id, text) {
     const el = document.getElementById(id);
-    if (el) el.textContent = text || '';
+    if (el) el.textContent = text || '-';
+}
+
+// Helper to display error state
+function displayProjectError(message) {
+    setText('project-title', 'Project Not Found');
+    setText('project-subtitle', message);
+    const content = document.querySelector('.project-info-grid');
+    if (content) content.style.display = 'none';
+    const gallery = document.getElementById('project-gallery');
+    if (gallery) gallery.style.display = 'none';
 }

@@ -291,6 +291,14 @@
                 </div>
             </div>
 
+            <!-- ... after the .projects-grid div ... -->
+            <div class="reveal" style="text-align: center; margin-top: 50px;">
+                <a href="projects.html" class="btn btn-secondary">
+                    View All Projects <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+<!-- ... before the closing div of the container ... -->
+
             <div style="text-align: center; margin-top: 50px;">
                 <a href="#contact" class="btn btn-primary">Request a Free Site Visit & Quote</a>
                 <p style="margin-top: 10px; color: var(--text-secondary); font-size: 0.95rem;">
@@ -605,36 +613,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="projects-data.js"></script>
     <script src="main.js" defer></script>
-    <script>
-        // Project Filter Logic
-        document.addEventListener('DOMContentLoaded', () => {
-            const filterBtns = document.querySelectorAll('.filter-btn');
-            const projectItems = document.querySelectorAll('.project-item');
-
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    // Remove active class from all
-                    filterBtns.forEach(b => b.classList.remove('active'));
-                    // Add active to clicked
-                    btn.classList.add('active');
-
-                    const filterValue = btn.getAttribute('data-filter');
-
-                    projectItems.forEach(item => {
-                        const category = item.getAttribute('data-category');
-
-                        if (filterValue === 'all' || filterValue === category) {
-                            item.style.display = 'block';
-                            // Re-trigger animation if needed, or just let it be
-                            item.classList.add('reveal');
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
-                });
-            });
-        });
-    </script>
+    
 
 
 </body>

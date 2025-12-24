@@ -14,6 +14,8 @@ const IMAGE_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/promotional_ima
 const WEBSITE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/';
 const MASTER_TEMPLATE_URL = 'https://raw.githubusercontent.com/Nags-p/sahyadriconsanddev.web/main/email_templates/master-promo.html';
 let masterTemplateHtml = '', allCustomers = [], customerHeaders = [], availableSegments = [];
+let selectedProjectFiles = []; // For new uploads
+let imagesToDelete = []; // For existing images marked for deletion
 
 // ===================================================================
 // --- 2. CORE & HELPER FUNCTIONS ---
@@ -87,6 +89,7 @@ function showPage(pageId, dom, params = null) {
     if (pageId === 'page-inquiries') fetchInquiries(dom, 'New');
     if (pageId === 'page-archived-inquiries') fetchInquiries(dom, 'Archived');
     if (pageId === 'page-image-manager') fetchImages(dom);
+    if (pageId === 'page-projects') fetchAdminProjects(dom); // ADD THIS LINE
     
     // Analytics Specific Logic
     if (pageId === 'page-analytics') {
@@ -492,6 +495,274 @@ async function deleteCurrentBlog() {
         showStatusMessage(statusEl, `Error deleting article: ${err.message}`, false);
     }
     setLoading(false);
+}
+
+// ===================================================================
+// --- 5. PROJECT MANAGEMENT ---
+// ===================================================================
+
+async function fetchAdminProjects(dom) {
+    setLoading(true);
+    dom.projectsListContainer.innerHTML = '<p>Loading projects...</p>';
+    try {
+        const { data, error } = await _supabase
+            .from('projects')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        renderAdminProjects(data, dom);
+    } catch (error) {
+        showStatusMessage(dom.projectsStatus, `Error fetching projects: ${error.message}`, false);
+    }
+    setLoading(false);
+}
+
+function renderAdminProjects(projects, dom) {
+    dom.projectsListContainer.innerHTML = '';
+    if (projects.length === 0) {
+        dom.projectsListContainer.innerHTML = '<p>No projects found. Click "New Project" to add one.</p>';
+        return;
+    }
+
+    projects.forEach(project => {
+        const card = document.createElement('div');
+        card.className = 'project-admin-card';
+        const thumbnailUrl = (project.gallery_images && project.gallery_images.length > 0) ? project.gallery_images[0] : '';
+
+        card.innerHTML = `
+            <div class="project-admin-card-thumb" style="background-image: url('${thumbnailUrl}')">
+                ${project.is_featured ? '<span class="featured-badge">Featured</span>' : ''}
+            </div>
+            <div class="project-admin-card-details">
+                <h4>${project.title}</h4>
+                <p>${project.type || 'N/A'} - ${project.year || 'N/A'}</p>
+                <button class="btn-secondary" style="width:100%; margin-top:15px;" onclick="openProjectModal(${project.id})">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+            </div>
+        `;
+        dom.projectsListContainer.appendChild(card);
+    });
+}
+
+window.openProjectModal = async (projectId = null) => {
+    const dom = window.dashboardDom;
+    dom.projectForm.reset();
+    dom.projectFormStatus.style.display = 'none';
+    document.getElementById('project-id').value = '';
+    
+    // Reset image management state
+    selectedProjectFiles = [];
+    imagesToDelete = [];
+    document.getElementById('p-image-upload').value = '';
+    document.getElementById('p-current-images').innerHTML = '';
+    document.getElementById('p-image-previews').innerHTML = '<small>No new images selected.</small>';
+
+    const title = document.getElementById('project-modal-title');
+    
+    if (projectId) {
+        title.textContent = 'Edit Project';
+        setLoading(true);
+        const { data, error } = await _supabase.from('projects').select('*').eq('id', projectId).single();
+        setLoading(false);
+        if (error) {
+            showStatusMessage(dom.projectFormStatus, `Error fetching project: ${error.message}`, false);
+            return;
+        }
+        
+        // Populate form fields
+        document.getElementById('project-id').value = data.id;
+        document.getElementById('p-title').value = data.title || '';
+        document.getElementById('p-subtitle').value = data.subtitle || '';
+        document.getElementById('p-type').value = data.type || '';
+        document.getElementById('p-scope').value = data.scope || '';
+        document.getElementById('p-client').value = data.client || '';
+        document.getElementById('p-location').value = data.location || '';
+        document.getElementById('p-year').value = data.year || '';
+        document.getElementById('p-vision').value = data.vision || '';
+        document.getElementById('p-challenge').value = data.challenge || '';
+        document.getElementById('p-solution').value = data.solution || '';
+        document.getElementById('p-results').value = data.results || '';
+        document.getElementById('p-services').value = (data.services || []).join(', ');
+        document.getElementById('p-is-featured').checked = data.is_featured;
+        
+        // RENDER CURRENT IMAGES with "Make Primary" buttons
+        const currentImagesContainer = document.getElementById('p-current-images');
+        const validImages = (data.gallery_images || []).filter(Boolean);
+        
+        if (validImages.length > 0) {
+            validImages.forEach((imgUrl, index) => {
+                const imgItem = document.createElement('div');
+                imgItem.className = 'img-preview-item';
+                imgItem.style.backgroundImage = `url('${imgUrl}')`;
+                
+                // Add star icon. Make the first one primary by default.
+                const primaryClass = index === 0 ? 'is-primary' : '';
+                imgItem.innerHTML = `
+                    <button type="button" class="make-primary-btn ${primaryClass}" data-url="${imgUrl}" title="Make Primary"><i class="fas fa-star"></i></button>
+                    <button type="button" class="remove-img-btn" data-url="${imgUrl}" title="Delete Image">&times;</button>
+                `;
+                currentImagesContainer.appendChild(imgItem);
+            });
+        } else {
+             currentImagesContainer.innerHTML = '<small>No images uploaded yet.</small>';
+        }
+
+        dom.btnDeleteProject.style.display = 'block';
+
+    } else {
+        title.textContent = 'Create New Project';
+        dom.btnDeleteProject.style.display = 'none';
+        document.getElementById('p-current-images').innerHTML = '<small>Save project first to upload images.</small>';
+    }
+    dom.projectModalOverlay.classList.add('active');
+};
+
+function closeProjectModal() {
+    window.dashboardDom.projectModalOverlay.classList.remove('active');
+}
+
+async function saveProject(e) {
+    e.preventDefault();
+    setLoading(true);
+    const dom = window.dashboardDom;
+    const id = document.getElementById('project-id').value;
+
+    try {
+        // Step 1: Handle Image Deletions
+        if (imagesToDelete.length > 0) {
+            const filePaths = imagesToDelete.map(url => {
+                try {
+                    const path = new URL(url).pathname.split('/project-images/')[1];
+                    return path;
+                } catch { return null; }
+            }).filter(Boolean);
+
+            if (filePaths.length > 0) {
+                await _supabase.storage.from('project-images').remove(filePaths);
+            }
+            imagesToDelete = [];
+        }
+
+        // Step 2: Handle New Image Uploads
+        const newImageUrls = [];
+        if (selectedProjectFiles.length > 0) {
+            for (const file of selectedProjectFiles) {
+                const fileName = `projects/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                const { error: uploadError } = await _supabase.storage.from('project-images').upload(fileName, file);
+                if (uploadError) throw new Error(`Image upload failed: ${uploadError.message}`);
+                
+                const { data } = _supabase.storage.from('project-images').getPublicUrl(fileName);
+                if (data && data.publicUrl) {
+                    newImageUrls.push(data.publicUrl);
+                }
+            }
+            selectedProjectFiles = [];
+        }
+
+        // Step 3: GET IMAGE URLs IN THE NEW ORDER and Prepare DB Data
+        const currentImageItems = document.querySelectorAll('#p-current-images .img-preview-item');
+        const orderedImageUrls = Array.from(currentImageItems).map(item => {
+            return item.querySelector('.remove-img-btn')?.dataset.url;
+        }).filter(Boolean);
+
+        const finalImageUrls = [...orderedImageUrls, ...newImageUrls];
+
+        const csvToArray = (str) => str ? str.split(',').map(item => item.trim()).filter(Boolean) : [];
+        const projectData = {
+            title: document.getElementById('p-title').value,
+            subtitle: document.getElementById('p-subtitle').value,
+            gallery_images: finalImageUrls, // Save the newly ordered array
+            type: document.getElementById('p-type').value,
+            scope: document.getElementById('p-scope').value,
+            client: document.getElementById('p-client').value,
+            location: document.getElementById('p-location').value,
+            year: document.getElementById('p-year').value,
+            vision: document.getElementById('p-vision').value,
+            challenge: document.getElementById('p-challenge').value,
+            solution: document.getElementById('p-solution').value,
+            results: document.getElementById('p-results').value,
+            services: csvToArray(document.getElementById('p-services').value),
+            is_featured: document.getElementById('p-is-featured').checked
+        };
+
+        // Step 4: Upsert Data in Database
+        let result;
+        if (id) {
+            result = await _supabase.from('projects').update(projectData).eq('id', id);
+        } else {
+            result = await _supabase.from('projects').insert([projectData]);
+        }
+        if (result.error) throw result.error;
+
+        showStatusMessage(dom.projectsStatus, 'Project saved successfully!', true);
+        closeProjectModal();
+        fetchAdminProjects(dom);
+
+    } catch (error) {
+        showStatusMessage(dom.projectFormStatus, `Error saving project: ${error.message}`, false);
+    } finally {
+        setLoading(false);
+    }
+}
+
+async function deleteProject() {
+    const id = document.getElementById('project-id').value;
+    const title = document.getElementById('p-title').value;
+    if (!id || !confirm(`Are you sure you want to permanently delete the project "${title}"? This will also delete all its images.`)) {
+        return;
+    }
+    setLoading(true);
+    const dom = window.dashboardDom;
+
+    try {
+        // Step 1: Fetch the project record to get the list of image URLs
+        const { data: projectToDelete, error: fetchError } = await _supabase
+            .from('projects')
+            .select('gallery_images')
+            .eq('id', id)
+            .single();
+
+        if (fetchError) {
+            throw new Error(`Could not retrieve project to delete images: ${fetchError.message}`);
+        }
+
+        // Step 2: If images exist, delete them from Supabase Storage
+        const images = projectToDelete?.gallery_images?.filter(Boolean) || [];
+        if (images.length > 0) {
+            // Extract the file path from the full public URL
+            // e.g., "projects/12345-image.jpg" from "https://.../project-images/projects/12345-image.jpg"
+            const filePaths = images.map(url => {
+                try {
+                    return new URL(url).pathname.split('/project-images/')[1];
+                } catch {
+                    return null;
+                }
+            }).filter(Boolean);
+
+            if (filePaths.length > 0) {
+                const { error: storageError } = await _supabase.storage.from('project-images').remove(filePaths);
+                if (storageError) {
+                    // Log a warning but don't stop the process. It's better to delete the DB record.
+                    console.warn('Failed to delete some images from storage:', storageError.message);
+                }
+            }
+        }
+
+        // Step 3: Delete the project record from the database
+        const { error: deleteDbError } = await _supabase.from('projects').delete().eq('id', id);
+        if (deleteDbError) throw deleteDbError;
+
+        showStatusMessage(dom.projectsStatus, 'Project and its images deleted successfully.', true);
+        closeProjectModal();
+        fetchAdminProjects(dom);
+
+    } catch (error) {
+         showStatusMessage(dom.projectFormStatus, `Error deleting project: ${error.message}`, false);
+    } finally {
+        setLoading(false);
+    }
 }
 
 
@@ -1014,8 +1285,18 @@ document.addEventListener('DOMContentLoaded', () => {
         analyticsClicksList: document.getElementById('analytics-clicks-list'),
         blogForm: document.getElementById('blog-form'),
         blogNewBtn: document.getElementById('blog-new-btn'),
-        blogDeleteBtn: document.getElementById('blog-delete-btn')
+        blogDeleteBtn: document.getElementById('blog-delete-btn'),
+        btnNewProject: document.getElementById('btn-new-project'),
+        projectModalOverlay: document.getElementById('project-modal-overlay'),
+        projectModalClose: document.getElementById('project-modal-close'),
+        projectForm: document.getElementById('project-form'),
+        projectFormStatus: document.getElementById('project-form-status'),
+        btnDeleteProject: document.getElementById('btn-delete-project'),
+        projectsListContainer: document.getElementById('projects-list-container'),
+        projectsStatus: document.getElementById('projects-status')
     };
+
+    window.dashboardDom = dom; // <<<<<<<< ADD THIS LINE
 
     function handleHashChange() {
         const hash = window.location.hash.substring(1);
@@ -1106,6 +1387,83 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dom.blogDeleteBtn) {
         dom.blogDeleteBtn.addEventListener('click', deleteCurrentBlog);
     }
+
+    // =========================================================
+    // --- PASTE THE NEW EVENT LISTENERS HERE ---
+    // =========================================================
+    if (dom.btnNewProject) {
+        dom.btnNewProject.addEventListener('click', () => openProjectModal());
+    }
+    if (dom.projectModalClose) {
+        dom.projectModalClose.addEventListener('click', closeProjectModal);
+    }
+    if (dom.projectForm) {
+        dom.projectForm.addEventListener('submit', saveProject);
+    }
+    if (dom.btnDeleteProject) {
+        dom.btnDeleteProject.addEventListener('click', deleteProject);
+    }
+    
+
+    // --- ADD THIS NEW CODE ---
+// Handle new file selection
+const imageUploadInput = document.getElementById('p-image-upload');
+imageUploadInput.addEventListener('change', (e) => {
+    selectedProjectFiles = Array.from(e.target.files);
+    const previewContainer = document.getElementById('p-image-previews');
+    previewContainer.innerHTML = '';
+    if (selectedProjectFiles.length > 0) {
+        selectedProjectFiles.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const imgItem = document.createElement('div');
+                imgItem.className = 'img-preview-item';
+                imgItem.style.backgroundImage = `url(${event.target.result})`;
+                previewContainer.appendChild(imgItem);
+            };
+            reader.readAsDataURL(file);
+        });
+    } else {
+        previewContainer.innerHTML = '<small>No new images selected.</small>';
+    }
+});
+
+// =========================================================
+    // --- AND PASTE THE NEW, COMBINED LISTENER HERE ---
+    // =========================================================
+    // Handle "Make Primary" image selection AND deletion (Event Delegation)
+    const currentImagesContainer = document.getElementById('p-current-images');
+    currentImagesContainer.addEventListener('click', (e) => {
+        // Handle clicking the star icon
+        const starBtn = e.target.closest('.make-primary-btn');
+        if (starBtn) {
+            // Remove 'is-primary' from all other stars in this modal
+            currentImagesContainer.querySelectorAll('.make-primary-btn').forEach(btn => btn.classList.remove('is-primary'));
+            
+            // Add 'is-primary' to the clicked star
+            starBtn.classList.add('is-primary');
+            
+            // Move the parent image item to the front of the grid for visual feedback
+            const imageItem = starBtn.closest('.img-preview-item');
+            currentImagesContainer.prepend(imageItem);
+        }
+
+        // Handle clicking the 'x' remove icon
+        const removeBtn = e.target.closest('.remove-img-btn');
+        if (removeBtn) {
+            const urlToDelete = removeBtn.dataset.url;
+            imagesToDelete.push(urlToDelete);
+            removeBtn.parentElement.style.display = 'none'; // Hide the item instead of just dimming
+        }
+    });
+    // =========================================================
+
+// --- END OF NEW CODE ---
+
+
+
+// ... (rest of the file)
+    // =========================================================
 
     dom.navItems.forEach(item => item.addEventListener('click', (e) => {
         const page = e.currentTarget.dataset.page.replace('page-','');
@@ -1258,6 +1616,7 @@ document.addEventListener('DOMContentLoaded', () => {
             allCheckbox.checked = otherCheckboxes.length > 0 && otherCheckboxes.every(cb => cb.checked);
         }
     }
+    
 
     // Add this function at the bottom of dashboard.js
     // 1. ONLY fetch the Total Count on load (Fast)
