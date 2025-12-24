@@ -20,73 +20,76 @@
     <!-- HEADER PLACEHOLDER -->
     <header class="header" id="main-header"></header>
 
-    <!-- MAIN CONTENT -->
-    <main style="padding-top: 140px; padding-bottom: 100px;">
-        <div class="container">
+    <!-- REPLACE THE ENTIRE <main> ... </main> SECTION in project-page.html -->
 
-            <!-- Title -->
-            <div class="project-hero">
-                <div class="project-hero-text">
-                    <h1 id="project-title">Loading...</h1>
-                    <p id="project-subtitle"></p>
-                </div>
+<!-- REPLACE THE ENTIRE <main> ... </main> SECTION in project-page.html -->
+
+<main style="padding-top: 120px; padding-bottom: 100px;">
+    <div class="container">
+
+        <!-- Project Header -->
+        <div class="project-hero" style="margin-bottom: 30px; text-align: left;">
+            <div class="project-hero-text">
+                <h1 id="project-title">Loading...</h1>
+                <p id="project-subtitle"></p>
             </div>
+        </div>
+        
+        <!-- NEW: Project Details Card moved to the top -->
+        <div class="project-details-card-top">
+            <ul class="project-details-list">
+                <li><strong>Client:</strong> <span id="project-client">-</span></li>
+                <li><strong>Location:</strong> <span id="project-location">-</span></li>
+                <li><strong>Year:</strong> <span id="project-year">-</span></li>
+                <li><strong>Type:</strong> <span id="project-type">-</span></li>
+                <li><strong>Scope:</strong> <span id="project-scope">-</span></li>
+            </ul>
+            <div class="project-cta-buttons">
+                <a href="#" class="btn btn-primary quote-modal-trigger">Get Free Quote</a>
+                <a href="tel:{{site.phone}}" class="btn btn-secondary"><i class="fas fa-phone"></i> Call Now</a>
+            </div>
+        </div>
 
-            <div class="project-details-card">
-                    <h3 style="margin-bottom: 20px; color: var(--brand-navy);">Project Details</h3>
-                    <ul style="list-style: none; padding: 0;">
-                        <li><strong>Client:</strong> <span id="project-client">-</span></li>
-                        <li><strong>Location:</strong> <span id="project-location">-</span></li>
-                        <li><strong>Year:</strong> <span id="project-year">-</span></li>
-                        <li><strong>Type:</strong> <span id="project-type">-</span></li>
-                        <li><strong>Scope:</strong> <span id="project-scope">-</span></li>
-                    </ul>
+        <!-- TWO-COLUMN LAYOUT for Media and Story -->
+        <div class="project-layout-grid" style="margin-top: 50px;">
 
-                    <div class="project-cta-buttons" style="margin-bottom: 40px;">
-                        <a href="#" class="btn btn-primary quote-modal-trigger">Get Free Quote</a>
-                        <a href="tel:{{site.phone}}" class="btn btn-secondary"><i class="fas fa-phone"></i> Call Now</a>
+            <!-- LEFT COLUMN: Media (Video & Gallery) -->
+            <div class="project-media-column">
+                <!-- VIDEO PLAYER -->
+                <div id="project-video-container" class="project-video-container" style="display: none;">
+                    <div class="video-responsive-wrapper">
+                        <iframe id="project-video-iframe" src="" title="Project Video Player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                     </div>
                 </div>
-
-            <!-- Gallery -->
-            <div id="project-gallery" class="project-gallery-grid">
-                <!-- Images injected by JS -->
+                <!-- IMAGE GALLERY -->
+                <div id="project-gallery" class="project-gallery-grid"></div>
             </div>
 
-            <!-- Project Info Grid -->
-            <div class="project-info-grid" style="margin-top: 60px;">
-                <!-- Main Content -->
-                <div>
+            <!-- RIGHT COLUMN: Story -->
+            <div class="project-info-column">
+                <div class="project-story-content">
                     <h2>Project Vision</h2>
-                    <p id="project-vision" style="margin-bottom: 40px;">-</p>
+                    <p id="project-vision">-</p>
 
                     <h2>The Challenge</h2>
-                    <p id="project-challenge" style="margin-bottom: 40px;">-</p>
+                    <p id="project-challenge">-</p>
 
                     <h2>Our Solution</h2>
-                    <p id="project-solution" style="margin-bottom: 40px;">-</p>
+                    <p id="project-solution">-</p>
 
                     <h2>The Results</h2>
-                    <p id="project-results" style="margin-bottom: 30px;">-</p>
+                    <p id="project-results">-</p>
 
                     <h2>Services Provided</h2>
-                    <ul id="project-services-list" class="project-services-list" style="margin-bottom: 30px;">
+                    <ul id="project-services-list" class="project-services-list">
                         <li>Loading...</li>
                     </ul>
                 </div>
-
-                <!-- Sidebar Details Card -->
-                <div class="project-details-card">
-                    <div class="project-detail-cta">
-                        <h2>Need a similar outcome?</h2>
-                        <a href="#" class="btn btn-primary btn-sm quote-modal-trigger" style="width:100%;">Request a Quote</a>
-                        <a href="tel:{{site.phone}}" class="btn btn-secondary btn-sm" style="width:100%; margin-top:10px;"><i class="fas fa-phone"></i> Call Sahyadri</a>
-                    </div>
-                </div>
             </div>
 
-        </div>
-    </main>
+        </div> <!-- End of project-layout-grid -->
+    </div> <!-- End of container -->
+</main>
 
     <!-- FOOTER PLACEHOLDER -->
     <footer class="footer" id="main-footer"></footer>

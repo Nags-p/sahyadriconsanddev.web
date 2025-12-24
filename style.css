@@ -716,7 +716,7 @@ section {
 .project-item {
     position: static;
     border-radius: 16px;
-    width: 350px;
+    width: 425px;
     overflow: hidden;
     background: white;
     box-shadow: var(--shadow-md);
@@ -724,7 +724,7 @@ section {
 }
 
 .project-item img {
-    width: 350px;
+    width: 100%;
     height: 280px;
     object-fit: cover;
     transition: 0.5s ease;
@@ -1795,5 +1795,159 @@ section {
     #modal-form .modal-form-grid {
         grid-template-columns: 1fr;
         gap: 12px;
+    }
+}
+/* --- PROJECT PAGE VIDEO PLAYER --- */
+.project-video-container {
+    margin-bottom: 40px;
+    background-color: #000;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.video-responsive-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+}
+
+.video-responsive-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* ==================================================
+   PROJECT PAGE LAYOUT STYLES (UPDATED - Details Card on Top)
+   ================================================== */
+
+/* New styles for the top details card */
+.project-details-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+    gap: 20px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px 30px;
+    margin-bottom: 40px;
+}
+
+.project-details-card-top .project-details-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px 30px; /* Row and column gap */
+    padding: 0;
+    margin: 0;
+}
+
+.project-details-card-top .project-details-list li {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.project-details-card-top .project-details-list li strong {
+    color: var(--text-primary);
+    width: auto; /* Remove fixed width */
+}
+
+.project-details-card-top .project-cta-buttons {
+    display: flex;
+    flex-direction: row; /* Buttons side-by-side */
+    gap: 12px;
+    margin-left: auto; /* Push buttons to the right */
+}
+
+/* Updated styles for the main two-column layout */
+.project-layout-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr; 
+    gap: 60px;
+    align-items: flex-start;
+}
+
+/* --- Left Column (Media) --- */
+.project-media-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.project-gallery-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+.project-gallery-grid img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+/* --- Right Column (Info) --- */
+.project-info-column {
+    position: sticky; /* Make the text column sticky */
+    top: 120px;
+}
+
+.project-story-content h2 {
+    font-size: 1.8rem;
+    color: var(--brand-navy);
+    margin-top: 0; /* Remove top margin from the first heading */
+    margin-bottom: 15px;
+}
+.project-story-content p {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: 30px;
+}
+
+.project-services-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.project-services-list li {
+    display: flex;
+    align-items: center;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+    .project-layout-grid {
+        grid-template-columns: 1fr; /* Stack columns */
+        gap: 40px;
+    }
+    .project-info-column {
+        position: static; /* Un-stick the info column */
+    }
+}
+
+@media (max-width: 768px) {
+    .project-details-card-top {
+        flex-direction: column;
+        align-items: flex-start; /* Align content to the start on mobile */
+    }
+    .project-details-card-top .project-cta-buttons {
+        width: 100%;
+        margin-left: 0;
+        flex-direction: column;
+    }
+    .project-details-card-top .project-cta-buttons a {
+        width: 100%;
     }
 }

@@ -575,6 +575,7 @@ window.openProjectModal = async (projectId = null) => {
         document.getElementById('project-id').value = data.id;
         document.getElementById('p-title').value = data.title || '';
         document.getElementById('p-subtitle').value = data.subtitle || '';
+        document.getElementById('p-video-url').value = data.video_url || '';
         document.getElementById('p-type').value = data.type || '';
         document.getElementById('p-scope').value = data.scope || '';
         document.getElementById('p-client').value = data.client || '';
@@ -673,6 +674,7 @@ async function saveProject(e) {
         const projectData = {
             title: document.getElementById('p-title').value,
             subtitle: document.getElementById('p-subtitle').value,
+            video_url: document.getElementById('p-video-url').value.trim(), // ADD THIS LINE
             gallery_images: finalImageUrls, // Save the newly ordered array
             type: document.getElementById('p-type').value,
             scope: document.getElementById('p-scope').value,

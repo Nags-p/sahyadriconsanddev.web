@@ -1,4 +1,28 @@
 // project.js
+// Add this helper function at the top of project.js
+function getVideoEmbedUrl(url) {
+    if (!url) return null;
+    let videoId;
+    
+    // YouTube
+    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const youtubeMatch = url.match(youtubeRegex);
+    if (youtubeMatch && youtubeMatch[1]) {
+        videoId = youtubeMatch[1];
+        return `https://www.youtube.com/embed/${videoId}?rel=0`;
+    }
+    
+    // Vimeo
+    const vimeoRegex = /(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|)(\d+)/;
+    const vimeoMatch = url.match(vimeoRegex);
+    if (vimeoMatch && vimeoMatch[3]) {
+        videoId = vimeoMatch[3];
+        return `https://player.vimeo.com/video/${videoId}`;
+    }
+    
+    return null; // Return null if it's not a recognized YouTube or Vimeo URL
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Get ID from URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -28,6 +52,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (error || !project) {
             throw new Error(error ? error.message : 'Project not found.');
         }
+
+        
+    // --- ADD THIS NEW VIDEO LOGIC ---
+    const videoContainer = document.getElementById('project-video-container');
+    const videoIframe = document.getElementById('project-video-iframe');
+    
+    if (project.video_url && videoContainer && videoIframe) {
+        const embedUrl = getVideoEmbedUrl(project.video_url);
+        if (embedUrl) {
+            videoIframe.src = embedUrl;
+            videoContainer.style.display = 'block'; // Show the video player
+        }
+    }
 
         // 4. Populate HTML if project is found
         document.title = `${project.title} - Sahyadri Constructions`;
