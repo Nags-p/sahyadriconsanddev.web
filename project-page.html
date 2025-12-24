@@ -27,28 +27,32 @@
 <main style="padding-top: 120px; padding-bottom: 100px;">
     <div class="container">
 
-        <!-- Project Header -->
-        <div class="project-hero" style="margin-bottom: 30px; text-align: left;">
-            <div class="project-hero-text">
-                <h1 id="project-title">Loading...</h1>
-                <p id="project-subtitle"></p>
-            </div>
+<!-- Project Header -->
+<div class="project-hero" style="margin-bottom: 20px; text-align: left;">
+    <div class="project-hero-text">
+        <h1 id="project-title">Loading...</h1>
+        <p id="project-subtitle" style="margin-bottom: 15px;"></p>
+        <!-- NEW container for the Type pill -->
+        <div class="project-pills">
+            <span id="project-type-pill" class="project-pill"></span>
         </div>
+    </div>
+</div>
         
-        <!-- NEW: Project Details Card moved to the top -->
-        <div class="project-details-card-top">
-            <ul class="project-details-list">
-                <li><strong>Client:</strong> <span id="project-client">-</span></li>
-                <li><strong>Location:</strong> <span id="project-location">-</span></li>
-                <li><strong>Year:</strong> <span id="project-year">-</span></li>
-                <li><strong>Type:</strong> <span id="project-type">-</span></li>
-                <li><strong>Scope:</strong> <span id="project-scope">-</span></li>
-            </ul>
-            <div class="project-cta-buttons">
-                <a href="#" class="btn btn-primary quote-modal-trigger">Get Free Quote</a>
-                <a href="tel:{{site.phone}}" class="btn btn-secondary"><i class="fas fa-phone"></i> Call Now</a>
-            </div>
-        </div>
+        <!-- Project Details Card (with 2-column grid) -->
+<div class="project-details-card-top">
+    <!-- The list now has only 4 items for the grid -->
+    <ul class="project-details-list">
+        <li><strong>Client:</strong> <span id="project-client">-</span></li>
+        <li><strong>Location:</strong> <span id="project-location">-</span></li>
+        <li><strong>Year:</strong> <span id="project-year">-</span></li>
+        <li><strong>Scope:</strong> <span id="project-scope">-</span></li>
+    </ul>
+    <div class="project-cta-buttons">
+        <a href="#" class="btn btn-primary quote-modal-trigger">Get Free Quote</a>
+        <a href="tel:{{site.phone}}" class="btn btn-secondary"><i class="fas fa-phone"></i> Call Now</a>
+    </div>
+</div>
 
         <!-- TWO-COLUMN LAYOUT for Media and Story -->
         <div class="project-layout-grid" style="margin-top: 50px;">

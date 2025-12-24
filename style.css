@@ -1822,53 +1822,72 @@ section {
 }
 
 /* ==================================================
-   PROJECT PAGE LAYOUT STYLES (UPDATED - Details Card on Top)
+   PROJECT PAGE LAYOUT STYLES (UPDATED - 2-Column Details)
    ================================================== */
 
-/* New styles for the top details card */
+/* New styles for the "pill" element */
+.project-pills {
+    margin-bottom: 25px;
+}
+.project-pill {
+    display: inline-block;
+    background: #eff6ff; /* Light blue */
+    color: var(--brand-blue);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Styles for the top details card */
 .project-details-card-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+    flex-wrap: wrap;
     gap: 20px;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
-    padding: 20px 30px;
+    padding: 25px 30px;
     margin-bottom: 40px;
 }
 
+/* NEW: Two-column grid for the details list */
 .project-details-card-top .project-details-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px 30px; /* Row and column gap */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two equal columns */
+    gap: 15px 40px; /* Row and column gap */
     padding: 0;
     margin: 0;
+    flex-grow: 1; /* Allow the grid to take up available space */
 }
 
 .project-details-card-top .project-details-list li {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: var(--text-secondary);
     margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 
 .project-details-card-top .project-details-list li strong {
     color: var(--text-primary);
-    width: auto; /* Remove fixed width */
+    display: block; /* Label on top of value */
+    margin-bottom: 2px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
 .project-details-card-top .project-cta-buttons {
     display: flex;
-    flex-direction: row; /* Buttons side-by-side */
+    flex-direction: row;
     gap: 12px;
-    margin-left: auto; /* Push buttons to the right */
+    margin-left: auto;
 }
 
-/* Updated styles for the main two-column layout */
+/* Main two-column layout for media and story */
 .project-layout-grid {
     display: grid;
     grid-template-columns: 1.5fr 1fr; 
@@ -1876,78 +1895,33 @@ section {
     align-items: flex-start;
 }
 
-/* --- Left Column (Media) --- */
-.project-media-column {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
+/* --- (The rest of the project page CSS remains the same) --- */
+/* Media Column Styles */
+.project-media-column { display: flex; flex-direction: column; gap: 20px; }
+.project-gallery-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+.project-gallery-grid img { width: 100%; height: auto; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
 
-.project-gallery-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-}
-
-.project-gallery-grid img {
-    width: 100%;
-    height: auto;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-}
-
-/* --- Right Column (Info) --- */
-.project-info-column {
-    position: sticky; /* Make the text column sticky */
-    top: 120px;
-}
-
-.project-story-content h2 {
-    font-size: 1.8rem;
-    color: var(--brand-navy);
-    margin-top: 0; /* Remove top margin from the first heading */
-    margin-bottom: 15px;
-}
-.project-story-content p {
-    color: var(--text-secondary);
-    line-height: 1.8;
-    margin-bottom: 30px;
-}
-
-.project-services-list {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.project-services-list li {
-    display: flex;
-    align-items: center;
-}
+/* Info Column Styles */
+.project-info-column { position: sticky; top: 120px; }
+.project-story-content h2 { font-size: 1.8rem; color: var(--brand-navy); margin-top: 0; margin-bottom: 15px; }
+.project-story-content p { color: var(--text-secondary); line-height: 1.8; margin-bottom: 30px; }
+.project-services-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.project-services-list li { display: flex; align-items: center; }
 
 /* --- Responsive Adjustments --- */
 @media (max-width: 992px) {
-    .project-layout-grid {
-        grid-template-columns: 1fr; /* Stack columns */
-        gap: 40px;
-    }
-    .project-info-column {
-        position: static; /* Un-stick the info column */
-    }
+    .project-layout-grid { grid-template-columns: 1fr; gap: 40px; }
+    .project-info-column { position: static; }
 }
 
 @media (max-width: 768px) {
-    .project-details-card-top {
-        flex-direction: column;
-        align-items: flex-start; /* Align content to the start on mobile */
-    }
-    .project-details-card-top .project-cta-buttons {
-        width: 100%;
-        margin-left: 0;
-        flex-direction: column;
-    }
-    .project-details-card-top .project-cta-buttons a {
-        width: 100%;
+    .project-details-card-top { flex-direction: column; align-items: flex-start; }
+    .project-details-card-top .project-cta-buttons { width: 100%; margin-left: 0; flex-direction: column; }
+    .project-details-card-top .project-cta-buttons a { width: 100%; }
+}
+
+@media (max-width: 500px) {
+    .project-details-card-top .project-details-list {
+        grid-template-columns: 1fr; /* Stack to a single column on small screens */
     }
 }

@@ -81,8 +81,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         setText('project-client', project.client);
         setText('project-location', project.location);
         setText('project-year', project.year);
-        setText('project-type', project.type);
         setText('project-scope', project.scope);
+
+        
+        setText('project-type-pill', project.type);
 
         // Services List
         const servicesList = document.getElementById('project-services-list');
