@@ -298,10 +298,25 @@
             <!-- CAREERS PAGE -->
             <div id="page-careers" class="page">
                 <div class="content-box">
-                    <div class="analytics-header" style="justify-content: space-between;">
-                        <h2>Job Applications</h2>
-                        <button class="btn-secondary" onclick="fetchCareers(dom)">Refresh List</button>
-                    </div>
+                    <!-- Inside #page-careers > .content-box > .analytics-header -->
+<div class="analytics-header" style="justify-content: space-between;">
+    <h2>Job Applications & Postings</h2>
+    <div> <!-- Wrap buttons in a div for better layout -->
+        <button id="btn-new-job-post" class="btn-primary" style="margin-right: 10px;"><i class="fas fa-plus"></i> New Job Post</button>
+        <button class="btn-secondary" onclick="fetchCareers(dom)">Refresh Applications</button>
+    </div>
+</div>
+
+<!-- Inside #page-careers > .content-box, right after the .analytics-header -->
+<div id="job-postings-admin-container" style="margin-bottom: 40px;">
+    <h3>Manage Job Postings</h3>
+    <div id="job-postings-list" style="margin-top: 15px;">
+        <!-- Admin list of job posts will be loaded here -->
+    </div>
+</div>
+<hr style="margin: 30px 0;"> <!-- Add a separator -->
+<h3>Recent Applications</h3>
+
                     <div style="overflow-x: auto;">
                         <table id="careers-table">
                             <thead>
@@ -422,6 +437,47 @@
                 <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Project</button>
             </div>
             <div id="project-form-status" class="status-message"></div>
+        </form>
+    </div>
+</div>
+
+<!-- PASTE AT THE BOTTOM OF <body> -->
+
+<!-- Job Post Edit/Create Modal -->
+<div id="job-post-modal-overlay" class="modal-overlay">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3 id="job-post-modal-title">Create New Job Post</h3>
+            <button type="button" class="modal-close" id="job-post-modal-close"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="job-post-form">
+            <input type="hidden" id="job-post-id">
+            
+            <label>Job Title</label>
+            <input type="text" id="jp-title" required>
+
+            <label>Location</label>
+            <input type="text" id="jp-location" placeholder="e.g., Mandya/Mysore">
+            
+            <label>Job Type</label>
+            <input type="text" id="jp-type" placeholder="e.g., Full Time, Internship">
+
+            <!-- Inside #job-post-form -->
+
+            <label>Description (enter each point on a new line)</label>
+            <textarea id="jp-description" rows="5" placeholder="Oversee daily site operations...&#10;Manage labor and material procurement...&#10;Ensure quality control standards..."></textarea>
+
+            <div class="checkbox-item" style="margin-top: 15px;">
+                <input type="checkbox" id="jp-is-active" checked>
+                <span class="checkmark"></span>
+                <label for="jp-is-active" style="font-weight: bold; color: var(--primary-color);">Show this job posting publicly?</label>
+            </div>
+
+            <div class="button-group" style="margin-top:20px;">
+                <button type="button" id="btn-delete-job-post" class="btn-danger" style="display:none;"><i class="fas fa-trash-alt"></i> Delete</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Job Post</button>
+            </div>
+            <div id="job-post-form-status" class="status-message"></div>
         </form>
     </div>
 </div>

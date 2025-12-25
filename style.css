@@ -1925,3 +1925,17 @@ section {
         grid-template-columns: 1fr; /* Stack to a single column on small screens */
     }
 }
+
+
+/* --- CAREERS PAGE - JOB DESCRIPTION LIST --- */
+.job-description-list {
+    list-style-type: disc;
+    padding-left: 20px; /* Indent the list */
+    margin-top: 10px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.job-description-list li {
+    margin-bottom: 8px; /* Space between points */
+}

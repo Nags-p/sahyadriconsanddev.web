@@ -99,7 +99,10 @@ function showPage(pageId, dom, params = null) {
     // Careers Logic
     if (pageId === 'page-careers') {
         fetchCareers(dom);
+        fetchJobPostingsAdmin(dom);
     }
+
+    
 
     // Blog Logic
     if (pageId === 'page-blog') {
@@ -222,6 +225,120 @@ window.deleteApplication = async (id) => {
         fetchCareers({}); // Refresh table
     }
 };
+
+// ===================================================================
+// --- JOB POSTING MANAGEMENT ---
+// ===================================================================
+
+async function fetchJobPostingsAdmin(dom) {
+    const container = document.getElementById('job-postings-list');
+    container.innerHTML = '<p>Loading job postings...</p>';
+    try {
+        // Fetch ALL jobs, including inactive ones for admin view
+        const { data, error } = await _supabase
+            .from('job_postings')
+            .select('*')
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        renderJobPostingsAdmin(data);
+    } catch (error) {
+        container.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+    }
+}
+
+function renderJobPostingsAdmin(postings) {
+    const container = document.getElementById('job-postings-list');
+    container.innerHTML = '';
+    if (postings.length === 0) {
+        container.innerHTML = '<p>No job posts created yet.</p>';
+        return;
+    }
+    
+    postings.forEach(post => {
+        const postDiv = document.createElement('div');
+        postDiv.className = 'job-card'; // Reuse existing style
+        postDiv.style.opacity = post.is_active ? '1' : '0.5';
+        postDiv.innerHTML = `
+            <div class="job-info">
+                <h3>${post.title} ${post.is_active ? '' : '(Hidden)'}</h3>
+                <p class="job-meta">
+                    <i class="fas fa-map-marker-alt"></i> ${post.location || 'N/A'} &nbsp;|&nbsp; 
+                    <i class="fas fa-clock"></i> ${post.job_type || 'N/A'}
+                </p>
+            </div>
+            <button class="btn-secondary" onclick="openJobPostModal(${post.id})">Edit</button>
+        `;
+        container.appendChild(postDiv);
+    });
+}
+
+window.openJobPostModal = async (postId = null) => {
+    const dom = window.dashboardDom;
+    dom.jobPostForm.reset();
+    document.getElementById('job-post-id').value = '';
+    
+    if (postId) {
+        document.getElementById('job-post-modal-title').textContent = 'Edit Job Post';
+        const { data, error } = await _supabase.from('job_postings').select('*').eq('id', postId).single();
+        if (error) { alert('Error fetching data'); return; }
+        
+        document.getElementById('job-post-id').value = data.id;
+        document.getElementById('jp-title').value = data.title;
+        document.getElementById('jp-location').value = data.location;
+        document.getElementById('jp-type').value = data.job_type;
+        document.getElementById('jp-description').value = data.description;
+        document.getElementById('jp-is-active').checked = data.is_active;
+        dom.btnDeleteJobPost.style.display = 'block';
+    } else {
+        document.getElementById('job-post-modal-title').textContent = 'Create New Job Post';
+        dom.btnDeleteJobPost.style.display = 'none';
+    }
+    dom.jobPostModalOverlay.classList.add('active');
+};
+
+function closeJobPostModal() {
+    window.dashboardDom.jobPostModalOverlay.classList.remove('active');
+}
+
+async function saveJobPost(e) {
+    e.preventDefault();
+    setLoading(true);
+    const id = document.getElementById('job-post-id').value;
+    const postData = {
+        title: document.getElementById('jp-title').value,
+        location: document.getElementById('jp-location').value,
+        job_type: document.getElementById('jp-type').value,
+        description: document.getElementById('jp-description').value,
+        is_active: document.getElementById('jp-is-active').checked
+    };
+    
+    const { error } = id
+        ? await _supabase.from('job_postings').update(postData).eq('id', id)
+        : await _supabase.from('job_postings').insert([postData]);
+    
+    if (error) {
+        alert(`Error saving: ${error.message}`);
+    } else {
+        closeJobPostModal();
+        fetchJobPostingsAdmin(window.dashboardDom);
+    }
+    setLoading(false);
+}
+
+async function deleteJobPost() {
+    const id = document.getElementById('job-post-id').value;
+    if (!confirm('Are you sure you want to delete this job posting?')) return;
+    
+    setLoading(true);
+    const { error } = await _supabase.from('job_postings').delete().eq('id', id);
+    if (error) {
+        alert(`Error deleting: ${error.message}`);
+    } else {
+        closeJobPostModal();
+        fetchJobPostingsAdmin(window.dashboardDom);
+    }
+    setLoading(false);
+}
 
 
 // ===================================================================
@@ -1295,7 +1412,15 @@ document.addEventListener('DOMContentLoaded', () => {
         projectFormStatus: document.getElementById('project-form-status'),
         btnDeleteProject: document.getElementById('btn-delete-project'),
         projectsListContainer: document.getElementById('projects-list-container'),
-        projectsStatus: document.getElementById('projects-status')
+        projectsStatus: document.getElementById('projects-status'),
+
+        //... inside the dom object in DOMContentLoaded
+        jobPostModalOverlay: document.getElementById('job-post-modal-overlay'),
+        jobPostModalClose: document.getElementById('job-post-modal-close'),
+        jobPostForm: document.getElementById('job-post-form'),
+        btnNewJobPost: document.getElementById('btn-new-job-post'),
+        btnDeleteJobPost: document.getElementById('btn-delete-job-post'),
+
     };
 
     window.dashboardDom = dom; // <<<<<<<< ADD THIS LINE
@@ -1405,6 +1530,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dom.btnDeleteProject) {
         dom.btnDeleteProject.addEventListener('click', deleteProject);
     }
+
+    // Inside DOMContentLoaded
+    if(dom.btnNewJobPost) {
+        dom.btnNewJobPost.addEventListener('click', () => openJobPostModal());
+        dom.jobPostModalClose.addEventListener('click', closeJobPostModal);
+        dom.jobPostForm.addEventListener('submit', saveJobPost);
+        dom.btnDeleteJobPost.addEventListener('click', deleteJobPost);
+    }
+// ...
     
 
     // --- ADD THIS NEW CODE ---

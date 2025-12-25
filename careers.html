@@ -20,7 +20,7 @@
     <section id="hero" style="padding-bottom: 80px; min-height: 60vh;">
         <div class="container hero-grid" style="text-align: center;">
             <div class="hero-text">
-                <h1>Build Your Future with <span>Sahyadri</span></h1>
+                <h1>Build Your Future with <span>{{ site.company_surname}}</span></h1>
                 <p>Join a team of engineers, architects, and builders dedicated to quality and innovation. We don't just build structures; we build careers.</p>
                 <div class="hero-buttons">
                     <a href="#openings" class="btn btn-primary">View Openings</a>
@@ -92,45 +92,17 @@
     </section>
 
     <!-- 4. CURRENT OPENINGS -->
-    <section id="openings" style="background-color: var(--light-gray);">
-        <div class="container">
-            <h2 class="section-title">Current Openings</h2>
-            
-            <div class="job-list">
-                
-                <!-- Job Card 1 -->
-                <div class="job-card">
-                    <div class="job-info">
-                        <h3>Site Supervisor</h3>
-                        <p class="job-meta"><i class="fas fa-map-marker-alt"></i> Mandya/Mysore &nbsp;|&nbsp; <i class="fas fa-clock"></i> Full Time</p>
-                        <p>Oversee daily site operations, manage labor, and ensure quality control standards are met.</p>
-                    </div>
-                    <a href="#apply" class="btn btn-secondary">Apply Now</a>
-                </div>
-
-                <!-- Job Card 2 -->
-                <div class="job-card">
-                    <div class="job-info">
-                        <h3>Civil Engineer</h3>
-                        <p class="job-meta"><i class="fas fa-map-marker-alt"></i> Mandya &nbsp;|&nbsp; <i class="fas fa-clock"></i> Full Time</p>
-                        <p>Plan, design, and oversee construction and maintenance of building structures and infrastructure.</p>
-                    </div>
-                    <a href="#apply" class="btn btn-secondary">Apply Now</a>
-                </div>
-
-                <!-- Job Card 3 -->
-                <div class="job-card">
-                    <div class="job-info">
-                        <h3>Architectural Intern</h3>
-                        <p class="job-meta"><i class="fas fa-map-marker-alt"></i> Remote/Hybrid &nbsp;|&nbsp; <i class="fas fa-clock"></i> Internship</p>
-                        <p>Assist in creating blueprints, 3D visualizations, and client presentations.</p>
-                    </div>
-                    <a href="#apply" class="btn btn-secondary">Apply Now</a>
-                </div>
-
-            </div>
+    <!-- In careers.html -->
+<section id="openings" style="background-color: var(--light-gray);">
+    <div class="container">
+        <h2 class="section-title">Current Openings</h2>
+        
+        <div class="job-list">
+            <!-- JOB CARDS WILL BE LOADED HERE DYNAMICALLY -->
+            <!-- DELETE THE HARD-CODED CARDS THAT WERE HERE -->
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- 5. APPLICATION FORM -->
     <section id="apply">
@@ -146,12 +118,10 @@
         <input type="tel" name="phone" placeholder="Phone Number" required>
         
         <div class="form-group select-wrapper">
+        <!-- The name="position" is important -->
             <select name="position" required style="width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 16px; font-family: var(--font-main);">
-                <option value="" disabled selected>Position Applying For</option>
-                <option value="Site Supervisor">Site Supervisor</option>
-                <option value="Civil Engineer">Civil Engineer</option>
-                <option value="Architectural Intern">Architectural Intern</option>
-                <option value="General Application">General Application</option>
+            <!-- LEAVE THIS EMPTY - JS WILL POPULATE IT -->
+            <option value="">Loading positions...</option>
             </select>
         </div>
         
