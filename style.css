@@ -1250,94 +1250,109 @@ section {
     .nav-links, .header-actions { display: none; }
     .mobile-toggle { display: block; }
     
-    .nav-links.active {
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        top: var(--nav-height);
-        left: 0;
-        width: 100%;
-        background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(10px);
-        padding: 20px;
-        border-bottom: 1px solid #eee;
-        box-shadow: var(--shadow-lg);
-        z-index: 999;
-        gap: 15px;
-    }
+    /* === NEW, REFINED MOBILE NAVIGATION STYLES === */
+.nav-links.active {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Key change for left-alignment */
+    position: fixed;
+    top: var(--nav-height);
+    left: 100px;
+    width: 75%;
+    height: calc(68vh - var(--nav-height));
+    background: rgba(255, 247, 247, 0.936);
+    backdrop-filter: blur(1px);
+    padding: 20px 30px; /* More horizontal padding */
+    border-top: 1px solid #f1f5f9;
+    box-shadow: var(--shadow-lg);
+    z-index: 999;
+    border-radius: 20px;
+    gap: 0; /* Remove gap, use padding/borders instead */
+    overflow-y: auto; /* Allow scrolling if menu is long */
+}
 
-    .nav-links.active a:not(.dropdown-toggle) {
-        justify-content: center;
-    }
+/* Style for all top-level menu items */
+.nav-links.active > a, 
+.nav-links.active .dropdown-toggle {
+    width: 100%;
+    justify-content: flex-start; /* Left-align content within the link */
+    padding: 16px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 1rem; /* Slightly larger font */
+}
 
-    /* MOBILE DROPDOWN ACCORDION STYLES (UPDATED) */
-    .dropdown {
-        display: contents;
-    }
+/* Remove the desktop underline effect on mobile */
+.nav-links.active a::after {
+    display: none !important;
+}
 
-    .dropdown-toggle {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-    }
-    
-    .dropdown-toggle span {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
+/* Style for the dropdown container */
+.dropdown {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
 
-    /* HIDE the underline on the dropdown toggle in mobile view */
-    .dropdown-toggle::after {
-        display: none !important;
-    }
+/* Style for the dropdown trigger (e.g., "About") */
+.dropdown-toggle {
+    display: flex;
+    justify-content: space-between; /* Pushes chevron to the right */
+    align-items: center;
+    width: 100%;
+}
 
-    /* Animate the chevron icon rotation */
-    .dropdown .fa-chevron-down {
-        transition: transform 0.3s ease;
-    }
+.dropdown-toggle span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
-    .dropdown.active .fa-chevron-down {
-        transform: rotate(180deg);
-    }
-    
-    /* Base styles for the hidden dropdown menu */
-    .dropdown-menu {
-        position: static;
-        box-shadow: none;
-        border: none;
-        background-color: transparent;
-        min-width: auto;
-        width: 50%;
-        max-height: 0;
-        overflow: hidden;
-        padding: 0 10px; /* Prepare for vertical padding animation */
-        opacity: 1;
-        visibility: visible;
-        transform: none;
-        transition: all 0.3s ease-out;
-    }
-    
-    /* Styles for the VISIBLE dropdown menu container */
-    .dropdown.active .dropdown-menu {
-        max-height: 500px;
-        margin-top: 10px;
-        margin-left: -20px;
-        margin-right: -20px;
-        padding: 10px 20px;
-        background-color: #f8fafc;
-        border-top: 1px solid #e2e8f0;
-        border-bottom: 1px solid #e2e8f0;
-        border-radius: 10;
-    }
+/* Chevron animation */
+.dropdown .fa-chevron-down {
+    transition: transform 0.3s ease;
+}
 
-    /* Styles for the links INSIDE the dropdown */
-    .dropdown-menu a {
-        padding: 10px 15px;
-        border-radius: 8px;
-        width: 50%;
-        display: block;
-    }
+.dropdown.active .fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+/* The sub-menu itself (hidden by default) */
+.dropdown-menu {
+    position: static;
+    box-shadow: none;
+    border: none;
+    background-color: transparent;
+    min-width: auto;
+    width: 100%;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: all 0.3s ease-out;
+}
+
+/* When the dropdown is active, expand the sub-menu */
+.dropdown.active .dropdown-menu {
+    max-height: 500px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+/* Style for the links inside the dropdown */
+.dropdown-menu a {
+    padding: 10px 0 10px 25px; /* Indent the sub-menu links */
+    width: 100%;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    border-radius: 6px;
+}
+
+.dropdown-menu a:hover {
+    background-color: var(--light-gray);
+    color: var(--brand-blue);
+}
     
     .about-content-split { flex-direction: column-reverse; gap: 40px; }
     .contact-content { flex-direction: column; }
