@@ -625,6 +625,7 @@ async function fetchAdminProjects(dom) {
         const { data, error } = await _supabase
             .from('projects')
             .select('*')
+            .order('sort_order', { ascending: true })
             .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -649,6 +650,8 @@ function renderAdminProjects(projects, dom) {
 
         card.innerHTML = `
             <div class="project-admin-card-thumb" style="background-image: url('${thumbnailUrl}')">
+            <!-- ADD THIS BADGE -->
+                <span class="sort-order-badge">#${project.sort_order || 'N/A'}</span>
                 ${project.is_featured ? '<span class="featured-badge">Featured</span>' : ''}
             </div>
             <div class="project-admin-card-details">
@@ -692,6 +695,7 @@ window.openProjectModal = async (projectId = null) => {
         document.getElementById('project-id').value = data.id;
         document.getElementById('p-title').value = data.title || '';
         document.getElementById('p-subtitle').value = data.subtitle || '';
+        document.getElementById('p-sort-order').value = data.sort_order || 99; 
         document.getElementById('p-video-url').value = data.video_url || '';
         document.getElementById('p-type').value = data.type || '';
         document.getElementById('p-scope').value = data.scope || '';
@@ -791,6 +795,7 @@ async function saveProject(e) {
         const projectData = {
             title: document.getElementById('p-title').value,
             subtitle: document.getElementById('p-subtitle').value,
+            sort_order: parseInt(document.getElementById('p-sort-order').value, 10) || 99, // ADD THIS LINE
             video_url: document.getElementById('p-video-url').value.trim(), // ADD THIS LINE
             gallery_images: finalImageUrls, // Save the newly ordered array
             type: document.getElementById('p-type').value,
