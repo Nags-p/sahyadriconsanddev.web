@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             .from('projects')
             .select('title, scope, gallery_images')
             .eq('is_featured', true)
+            .order('sort_order', { ascending: true })
             .order('created_at', { ascending: false })
             .limit(4);
 
