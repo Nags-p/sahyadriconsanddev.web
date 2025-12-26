@@ -84,6 +84,7 @@ function showPage(pageId, dom, params = null) {
     if (activeNav) activeNav.classList.add('active');
     
     // Page Specific Data Loading
+    if (pageId === 'page-dashboard') loadDashboardData(); // ADD THIS LINE
     if (pageId === 'page-customers') fetchCustomerData(dom);
     if (pageId === 'page-archive') fetchCampaignArchive(dom);
     if (pageId === 'page-inquiries') fetchInquiries(dom, 'New');
@@ -107,6 +108,74 @@ function showPage(pageId, dom, params = null) {
     // Blog Logic
     if (pageId === 'page-blog') {
         fetchBlogPosts(dom);
+    }
+}
+
+// ===================================================================
+// --- DASHBOARD HOME PAGE LOGIC ---
+// ===================================================================
+
+async function loadDashboardData() {
+    // Set loading states
+    document.getElementById('stat-new-inquiries').textContent = '...';
+    document.getElementById('stat-new-apps').textContent = '...';
+    document.getElementById('stat-total-visits').textContent = '...';
+    document.getElementById('recent-inquiries-list').innerHTML = '<li>Loading...</li>';
+    document.getElementById('recent-apps-list').innerHTML = '<li>Loading...</li>';
+
+    try {
+        // Fetch all data in parallel for speed
+        const [
+            inquiriesCount,
+            appsCount,
+            visitsCount,
+            recentInquiries,
+            recentApps
+        ] = await Promise.all([
+            _supabase.from('contact_inquiries').select('id', { count: 'exact' }).eq('status', 'New'),
+            _supabase.from('job_applications').select('id', { count: 'exact' }).eq('status', 'New'),
+            _supabase.from('site_traffic').select('id', { count: 'exact', head: true }),
+            _supabase.from('contact_inquiries').select('name, created_at').eq('status', 'New').order('created_at', { ascending: false }).limit(5),
+            _supabase.from('job_applications').select('name, position, created_at').eq('status', 'New').order('created_at', { ascending: false }).limit(5)
+        ]);
+
+        // Update Stat Cards
+        document.getElementById('stat-new-inquiries').textContent = inquiriesCount.count || 0;
+        document.getElementById('stat-new-apps').textContent = appsCount.count || 0;
+        document.getElementById('stat-total-visits').textContent = visitsCount.count || 0;
+
+        // Update Recent Inquiries List
+        const inquiriesList = document.getElementById('recent-inquiries-list');
+        inquiriesList.innerHTML = '';
+        if (recentInquiries.data.length > 0) {
+            recentInquiries.data.forEach(item => {
+                const li = document.createElement('li');
+                const date = new Date(item.created_at).toLocaleDateString();
+                li.innerHTML = `${item.name} <span class="list-item-meta">${date}</span>`;
+                inquiriesList.appendChild(li);
+            });
+        } else {
+            inquiriesList.innerHTML = '<li>No new inquiries.</li>';
+        }
+
+        // Update Recent Applications List
+        const appsList = document.getElementById('recent-apps-list');
+        appsList.innerHTML = '';
+        if (recentApps.data.length > 0) {
+            recentApps.data.forEach(item => {
+                const li = document.createElement('li');
+                const date = new Date(item.created_at).toLocaleDateString();
+                li.innerHTML = `${item.name} <span class="list-item-meta">Applied for ${item.position} on ${date}</span>`;
+                appsList.appendChild(li);
+            });
+        } else {
+            appsList.innerHTML = '<li>No new applications.</li>';
+        }
+
+    } catch (error) {
+        console.error("Error loading dashboard data:", error);
+        document.getElementById('recent-inquiries-list').innerHTML = '<li>Error loading data.</li>';
+        document.getElementById('recent-apps-list').innerHTML = '<li>Error loading data.</li>';
     }
 }
 
@@ -646,16 +715,20 @@ function renderAdminProjects(projects, dom) {
     projects.forEach(project => {
         const card = document.createElement('div');
         card.className = 'project-admin-card';
+        // NEW: Add style for hidden projects
+        if (!project.is_active) {
+            card.style.opacity = '0.5';
+        }
         const thumbnailUrl = (project.gallery_images && project.gallery_images.length > 0) ? project.gallery_images[0] : '';
 
         card.innerHTML = `
             <div class="project-admin-card-thumb" style="background-image: url('${thumbnailUrl}')">
-            <!-- ADD THIS BADGE -->
                 <span class="sort-order-badge">#${project.sort_order || 'N/A'}</span>
                 ${project.is_featured ? '<span class="featured-badge">Featured</span>' : ''}
             </div>
             <div class="project-admin-card-details">
-                <h4>${project.title}</h4>
+                <!-- NEW: Add (Hidden) text -->
+                <h4>${project.title} ${!project.is_active ? '(Hidden)' : ''}</h4>
                 <p>${project.type || 'N/A'} - ${project.year || 'N/A'}</p>
                 <button class="btn-secondary" style="width:100%; margin-top:15px;" onclick="openProjectModal(${project.id})">
                     <i class="fas fa-edit"></i> Edit
@@ -708,6 +781,7 @@ window.openProjectModal = async (projectId = null) => {
         document.getElementById('p-results').value = data.results || '';
         document.getElementById('p-services').value = (data.services || []).join(', ');
         document.getElementById('p-is-featured').checked = data.is_featured;
+        document.getElementById('p-is-active').checked = data.is_active; // ADD THIS LINE
         
         // RENDER CURRENT IMAGES with "Make Primary" buttons
         const currentImagesContainer = document.getElementById('p-current-images');
@@ -808,7 +882,8 @@ async function saveProject(e) {
             solution: document.getElementById('p-solution').value,
             results: document.getElementById('p-results').value,
             services: csvToArray(document.getElementById('p-services').value),
-            is_featured: document.getElementById('p-is-featured').checked
+            is_featured: document.getElementById('p-is-featured').checked,
+            is_active: document.getElementById('p-is-active').checked // ADD THIS LINE
         };
 
         // Step 4: Upsert Data in Database
@@ -1438,11 +1513,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const campaignId = parts.length > 1 ? parts[1] : null;
             showPage('page-analytics', dom, { campaignId });
         } else {
-            const pageId = `page-${hash || 'inquiries'}`; 
+            const pageId = `page-${hash || 'dashboard'}`; 
             if (document.getElementById(pageId)) {
                 showPage(pageId, dom);
             } else {
-                showPage('page-inquiries', dom);
+                showPage('page-dashboard', dom);
             }
         }
     }
@@ -1603,7 +1678,7 @@ imageUploadInput.addEventListener('change', (e) => {
 
 
 
-// ... (rest of the file)
+
     // =========================================================
 
     dom.navItems.forEach(item => item.addEventListener('click', (e) => {

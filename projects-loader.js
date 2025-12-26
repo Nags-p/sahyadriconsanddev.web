@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const { data: projects, error } = await _supabase
             .from('projects')
             .select('id, title, type, scope, gallery_images')
+            .eq('is_active', true) 
             .order('sort_order', { ascending: true })
             .order('created_at', { ascending: false });
 

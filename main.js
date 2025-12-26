@@ -597,6 +597,7 @@ async function initProjectsSection() {
         const { data, error } = await _supabase
             .from('projects')
             .select('id, title, type, scope, gallery_images, is_featured')
+            .eq('is_active', true) // <<<<<< ADD THIS LINE
             .order('sort_order', { ascending: true })
             .order('created_at', { ascending: false });
 

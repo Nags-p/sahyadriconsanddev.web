@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             .from('projects')
             .select('id, title, scope, gallery_images') // THE FIX IS HERE
             .eq('is_featured', true)
+            .eq('is_active', true) 
             .order('sort_order', { ascending: true })
             .order('created_at', { ascending: false })
             .limit(4);

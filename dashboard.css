@@ -1517,3 +1517,37 @@ a.btn-info:hover {
     font-weight: 600;
     border-radius: 4px;
 }
+
+/* --- DASHBOARD HOME PAGE --- */
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.quick-action-btn {
+    display: block;
+    text-decoration: none;
+    padding: 15px 20px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 15px;
+    border-radius: var(--border-radius);
+    background-color: var(--primary-color);
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.quick-action-btn:hover {
+    background-color: var(--primary-dark-color);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-light);
+}
+
+.stats-list .list-item-meta {
+    display: block;
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 2px;
+}
