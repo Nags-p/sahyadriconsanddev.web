@@ -1,7 +1,7 @@
 // brochure-logic.js
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // --- SUPABASE CONFIG (You can also use a shared config.js file if you have one) ---
+    // --- SUPABASE CONFIG ---
     const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2ns-yio';
     const { createClient } = supabase;
@@ -10,11 +10,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const projectGrid = document.getElementById('brochure-project-grid');
     if (!projectGrid) return;
 
+    // Inside brochure-logic.js
+
     try {
-        // Fetch the 4 most recent, featured projects
+        // Fetch the 4 best-ranked, featured projects
         const { data: projects, error } = await _supabase
             .from('projects')
-            .select('title, scope, gallery_images')
+            .select('id, title, scope, gallery_images') // THE FIX IS HERE
             .eq('is_featured', true)
             .order('sort_order', { ascending: true })
             .order('created_at', { ascending: false })
@@ -35,10 +37,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const projectItem = document.createElement('div');
             projectItem.className = 'project-item';
+            
+            // NEW STRUCTURE: Link wraps everything, no hover overlay
             projectItem.innerHTML = `
-                <img src="${thumbnailUrl}" alt="${project.title}">
-                <h4>${project.title}</h4>
-                <p>${project.scope || 'Details'}</p>
+                <a href="project-page.html?id=${project.id}" target="_blank" class="project-link">
+                    <img src="${thumbnailUrl}" alt="${project.title}">
+                    <div class="project-item-details">
+                        <h4>${project.title}</h4>
+                        <p>${project.scope || 'Details'}</p>
+                        <span class="view-details-link">View Details &rarr;</span>
+                    </div>
+                </a>
             `;
             projectGrid.appendChild(projectItem);
         });
