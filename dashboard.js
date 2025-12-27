@@ -53,11 +53,14 @@ async function callEmailApi(action, payload, callback, errorElementId = 'campaig
     }
 }
 
+// ===================================================================
+// --- 2. CORE & HELPER FUNCTIONS ---
+// ===================================================================
+
 function setLoading(isLoading) {
     document.querySelectorAll('button').forEach(btn => btn.disabled = isLoading);
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) logoutBtn.disabled = false;
-
     const loader = document.getElementById('campaign-loader');
     if (loader) loader.style.display = isLoading ? 'block' : 'none';
 }
@@ -67,14 +70,11 @@ function showStatusMessage(element, message, isSuccess) {
     element.textContent = message;
     element.className = isSuccess ? 'status-message success' : 'status-message error';
     element.style.display = 'block';
-    setTimeout(() => {
-        element.style.display = 'none'; 
-    }, 5000);
+    setTimeout(() => { element.style.display = 'none'; }, 5000);
 }
 
 function showPage(pageId, dom, params = null) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    
     const targetPage = document.getElementById(pageId);
     if (targetPage) targetPage.classList.add('active');
     
@@ -84,28 +84,20 @@ function showPage(pageId, dom, params = null) {
     if (activeNav) activeNav.classList.add('active');
     
     // Page Specific Data Loading
-    if (pageId === 'page-dashboard') loadDashboardData(); // ADD THIS LINE
+    if (pageId === 'page-dashboard') loadDashboardData();
+    if (pageId === 'page-notes') fetchNotesList(); // Corrected call
     if (pageId === 'page-customers') fetchCustomerData(dom);
     if (pageId === 'page-archive') fetchCampaignArchive(dom);
-    if (pageId === 'page-inquiries') fetchInquiries(dom, 'New');
-    if (pageId === 'page-archived-inquiries') fetchInquiries(dom, 'Archived');
+    if (pageId === 'page-inquiries') fetchInquiries('New');
     if (pageId === 'page-image-manager') fetchImages(dom);
-    if (pageId === 'page-projects') fetchAdminProjects(dom); // ADD THIS LINE
+    if (pageId === 'page-projects') fetchAdminProjects(dom);
     
-    // Analytics Specific Logic
     if (pageId === 'page-analytics') {
-        loadAnalyticsDropdown(dom, params ? params.campaignId : null);
+        loadAnalyticsPageData(dom, params);
     }
-
-    // Careers Logic
     if (pageId === 'page-careers') {
-        fetchCareers(dom);
-        fetchJobPostingsAdmin(dom);
+        fetchCareers(); // Corrected call (no 'dom' parameter)
     }
-
-    
-
-    // Blog Logic
     if (pageId === 'page-blog') {
         fetchBlogPosts(dom);
     }
@@ -144,6 +136,19 @@ async function loadDashboardData() {
         document.getElementById('stat-new-apps').textContent = appsCount.count || 0;
         document.getElementById('stat-total-visits').textContent = visitsCount.count || 0;
 
+        // Update Sidebar Badges
+        const inquiryBadge = document.getElementById('sidebar-inquiry-badge');
+        const careerBadge = document.getElementById('sidebar-career-badge');
+
+        if (inquiryBadge) {
+            inquiryBadge.textContent = inquiriesCount.count || 0;
+            inquiryBadge.style.display = (inquiriesCount.count > 0) ? 'inline-block' : 'none';
+        }
+        if (careerBadge) {
+            careerBadge.textContent = appsCount.count || 0;
+            careerBadge.style.display = (appsCount.count > 0) ? 'inline-block' : 'none';
+        }
+
         // Update Recent Inquiries List
         const inquiriesList = document.getElementById('recent-inquiries-list');
         inquiriesList.innerHTML = '';
@@ -180,15 +185,166 @@ async function loadDashboardData() {
 }
 
 // ===================================================================
+// --- NOTES PAGE LOGIC ---
+// ===================================================================
+
+// ===================================================================
+// --- NOTES MANAGER LOGIC (MULTI-NOTE VERSION) ---
+// ===================================================================
+
+// Fetch all notes and render the list
+async function fetchNotesList() {
+    const listEl = document.getElementById('notes-list');
+    listEl.innerHTML = '<li>Loading notes...</li>';
+    try {
+        const { data, error } = await _supabase
+            .from('dashboard_notes')
+            .select('id, title, created_at')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        
+        listEl.innerHTML = '';
+        if (data.length === 0) {
+            listEl.innerHTML = '<li>No notes found.</li>';
+        } else {
+            data.forEach(note => {
+                const li = document.createElement('li');
+                li.dataset.noteId = note.id;
+                const date = new Date(note.created_at).toLocaleDateString();
+                li.innerHTML = `
+                    ${note.title || 'Untitled Note'}
+                    <span class="note-item-date">${date}</span>
+                `;
+                listEl.appendChild(li);
+            });
+        }
+    } catch (error) {
+        console.error("Error fetching notes list:", error);
+        listEl.innerHTML = '<li>Error loading notes.</li>';
+    }
+}
+
+// Load a single note's content into the editor
+async function loadNoteIntoEditor(noteId) {
+    if (!noteId) return;
+
+    // Visually mark the active note
+    document.querySelectorAll('#notes-list li').forEach(li => {
+        li.classList.toggle('active', li.dataset.noteId == noteId);
+    });
+    
+    try {
+        const { data, error } = await _supabase
+            .from('dashboard_notes')
+            .select('title, content')
+            .eq('id', noteId)
+            .single();
+
+        if (error) throw error;
+        
+        document.getElementById('note-id').value = noteId;
+        document.getElementById('note-title-input').value = data.title || '';
+        document.getElementById('note-content-input').value = data.content || '';
+        document.getElementById('btn-delete-note').style.display = 'block';
+        document.getElementById('notes-status').style.display = 'none';
+
+    } catch (error) {
+        alert('Could not load the selected note.');
+    }
+}
+
+// Reset the form for a new note
+function resetNoteForm() {
+    document.getElementById('note-form').reset();
+    document.getElementById('note-id').value = '';
+    document.getElementById('btn-delete-note').style.display = 'none';
+    document.getElementById('notes-status').style.display = 'none';
+    document.querySelectorAll('#notes-list li').forEach(li => li.classList.remove('active'));
+    document.getElementById('note-title-input').focus();
+}
+
+// Save or create a note
+async function saveNote(e) {
+    e.preventDefault();
+    setLoading(true);
+
+    const id = document.getElementById('note-id').value;
+    const title = document.getElementById('note-title-input').value;
+    const content = document.getElementById('note-content-input').value;
+    const statusEl = document.getElementById('notes-status');
+    
+    const noteData = { title, content };
+
+    try {
+        let result;
+        if (id) { // Update existing note
+            result = await _supabase.from('dashboard_notes').update(noteData).eq('id', id);
+        } else { // Create new note
+            result = await _supabase.from('dashboard_notes').insert([noteData]).select().single();
+            if (result.data) {
+                document.getElementById('note-id').value = result.data.id; // Set ID for subsequent saves
+                document.getElementById('btn-delete-note').style.display = 'block';
+            }
+        }
+
+        if (result.error) throw result.error;
+        
+        showStatusMessage(statusEl, 'Note saved successfully!', true);
+        fetchNotesList(); // Refresh the list to show new title or note
+
+    } catch (error) {
+        showStatusMessage(statusEl, `Error: ${error.message}`, false);
+    }
+    setLoading(false);
+}
+
+// Delete the currently active note
+async function deleteNote() {
+    const id = document.getElementById('note-id').value;
+    if (!id || !confirm('Are you sure you want to permanently delete this note?')) return;
+    
+    setLoading(true);
+    try {
+        const { error } = await _supabase.from('dashboard_notes').delete().eq('id', id);
+        if (error) throw error;
+        resetNoteForm();
+        fetchNotesList();
+    } catch (error) {
+        alert(`Error deleting note: ${error.message}`);
+    }
+    setLoading(false);
+}
+
+// ===================================================================
 // --- 3. CAREERS LOGIC (NEW) ---
 // ===================================================================
 
-async function fetchCareers(dom) {
+// In dashboard.js, find and replace the fetchCareers function
+
+async function fetchCareers() {
     setLoading(true);
     const tbody = document.querySelector('#careers-table tbody');
-    if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">Loading applicants...</td></tr>';
+    
+    try {
+        // Fetch the count of new applications for the badge
+        const { count } = await _supabase
+            .from('job_applications')
+            .select('id', { count: 'exact' })
+            .eq('status', 'New');
+        
+        const countBadge = document.getElementById('new-apps-count');
+        countBadge.textContent = count || 0;
+        countBadge.style.display = (count > 0) ? 'inline-block' : 'none';
 
+        // Update the sidebar badge
+        const sidebarBadge = document.getElementById('sidebar-career-badge');
+        if (sidebarBadge) {
+            sidebarBadge.textContent = count || 0;
+            sidebarBadge.style.display = (count > 0) ? 'inline-block' : 'none';
+        }
+
+        // Fetch the full application data
         const { data, error } = await _supabase
             .from('job_applications')
             .select('*')
@@ -201,6 +357,9 @@ async function fetchCareers(dom) {
         } else {
             renderCareersTable(data, tbody);
         }
+    } catch (error) {
+        console.error("Error fetching careers data:", error);
+        if (tbody) tbody.innerHTML = `<tr><td colspan="6">Error fetching data.</td></tr>`;
     }
     setLoading(false);
 }
@@ -964,6 +1123,78 @@ async function deleteProject() {
     }
 }
 
+// ===================================================================
+// --- ANALYTICS PAGE LOADER ---
+// ===================================================================
+
+async function loadAnalyticsPageData(dom, params) {
+    // 1. Load the campaign selection dropdown
+    loadAnalyticsDropdown(dom, params ? params.campaignId : null);
+
+    // 2. Load the total site visits stat card
+    const visitsEl = document.getElementById('analytics-total-visits');
+    if (visitsEl) visitsEl.textContent = 'Loading...';
+
+    try {
+        const { count, error } = await _supabase
+            .from('site_traffic')
+            .select('id', { count: 'exact', head: true });
+
+        if (error) throw error;
+        
+        if (visitsEl) {
+            visitsEl.textContent = count || '0';
+        }
+    } catch (error) {
+        console.error("Failed to load site visits count:", error);
+        if (visitsEl) visitsEl.textContent = 'Error';
+    }
+}
+
+
+// ===================================================================
+// --- ANALYTICS TAB LOGIC (This is a helper for the function above) ---
+// ===================================================================
+
+async function loadAnalyticsDropdown(dom, selectedId = null) {
+    const { data: campaigns, error } = await _supabase
+        .from('campaign_archive')
+        .select('id, subject, created_at')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Error loading campaign list:", error);
+        return;
+    }
+
+    const select = document.getElementById('analytics-campaign-select'); // Directly get element
+    if (!select) return;
+    
+    select.innerHTML = '<option value="" disabled selected>Select a campaign...</option>';
+
+    campaigns.forEach(c => {
+        const date = new Date(c.created_at).toLocaleDateString();
+        const option = document.createElement('option');
+        option.value = c.id;
+        option.textContent = `${date} - ${c.subject}`;
+        select.appendChild(option);
+    });
+
+    if (selectedId) {
+        select.value = selectedId;
+        fetchCampaignAnalytics(dom, selectedId);
+    } else {
+        const analyticsContent = document.getElementById('analytics-dashboard-content');
+        if(analyticsContent) analyticsContent.style.display = 'none';
+    }
+
+    select.onchange = (e) => {
+        const newId = e.target.value;
+        history.pushState(null, null, `#analytics-${newId}`);
+        fetchCampaignAnalytics(dom, newId);
+    };
+}
+
 
 // ===================================================================
 // --- 5. ANALYTICS TAB LOGIC ---
@@ -1204,24 +1435,54 @@ function renderImageGrid(images, dom) {
     });
 }
 
-async function fetchInquiries(dom, status) {
+// REPLACE the old fetchInquiries function in dashboard.js
+
+async function fetchInquiries(status = 'New') {
     setLoading(true);
-    const containerId = status === 'New' ? 'inquiries-container' : 'archived-inquiries-container';
-    const container = document.getElementById(containerId);
+    const container = document.getElementById('inquiries-container');
     container.innerHTML = `<p style="text-align: center;">Loading...</p>`;
+    
     try {
-        const { data, error } = await _supabase.from('contact_inquiries').select('*').eq('status', status).order('created_at', { ascending: false });
+        // Fetch the count of new inquiries for the badge
+        const { count } = await _supabase
+            .from('contact_inquiries')
+            .select('id', { count: 'exact' })
+            .eq('status', 'New');
+        
+        // Update the badge
+        const countBadge = document.getElementById('new-inquiry-count');
+        countBadge.textContent = count || 0;
+        countBadge.style.display = (count > 0) ? 'inline-block' : 'none';
+
+        // Update the sidebar badge
+        const sidebarBadge = document.getElementById('sidebar-inquiry-badge');
+        if (sidebarBadge) {
+            sidebarBadge.textContent = count || 0;
+            sidebarBadge.style.display = (count > 0) ? 'inline-block' : 'none';
+        }
+
+        // Fetch the actual inquiry data for the selected tab
+        const { data, error } = await _supabase
+            .from('contact_inquiries')
+            .select('*')
+            .eq('status', status)
+            .order('created_at', { ascending: false });
+        
         if (error) throw error;
-        renderInquiries(data, dom, status);
+        
+        // Re-use the existing renderInquiries function
+        renderInquiries(data, status); 
+
     } catch (error) {
         container.innerHTML = `<p style="color: var(--danger-color); text-align: center;">Error: ${error.message}</p>`;
     }
     setLoading(false);
 }
 
-function renderInquiries(inquiries, dom, status) {
-    const containerId = status === 'New' ? 'inquiries-container' : 'archived-inquiries-container';
-    const container = document.getElementById(containerId);
+// REPLACE the existing renderInquiries function in dashboard.js
+
+function renderInquiries(inquiries, status) {
+    const container = document.getElementById('inquiries-container');
     container.innerHTML = '';
 
     if (inquiries.length === 0) {
@@ -1235,6 +1496,7 @@ function renderInquiries(inquiries, dom, status) {
         
         let fileLink = 'None';
         if (inquiry.file_url) {
+            // ... (file link logic remains the same)
             let publicUrl;
             if (inquiry.file_url.startsWith('http')) {
                 publicUrl = inquiry.file_url;
@@ -1259,26 +1521,28 @@ function renderInquiries(inquiries, dom, status) {
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'inquiry-actions';
 
+        // --- THIS IS THE CORRECTED LOGIC ---
         if (status === 'New') {
             const addBtn = document.createElement('button');
-            addBtn.innerHTML = '<i class="fas fa-user-plus"></i> Add to Customers';
+            addBtn.innerHTML = '<i class="fas fa-user-plus"></i> Add to Customers & Archive';
             addBtn.className = 'btn-primary';
             addBtn.addEventListener('click', async () => {
-                if (confirm(`Add ${inquiry.name} to customers?`)) {
+                if (confirm(`Add ${inquiry.name} to customers? This will also archive the inquiry.`)) {
                     setLoading(true);
                     const { data: existing } = await _supabase.from('customers').select('id').eq('email', inquiry.email).single();
                     if (existing) {
-                        showStatusMessage(dom.inquiriesStatus, `Customer already exists.`, false);
-                        setLoading(false); return;
+                        showStatusMessage(document.getElementById('inquiries-status'), `Customer already exists. Archiving inquiry.`, false);
+                    } else {
+                         await _supabase.from('customers').insert([{ name: inquiry.name, email: inquiry.email, phone: inquiry.phone, city: inquiry.location, segment: 'New Lead' }]);
                     }
-                    await _supabase.from('customers').insert([{ name: inquiry.name, email: inquiry.email, phone: inquiry.phone, city: inquiry.location, segment: 'New Lead' }]);
                     await _supabase.from('contact_inquiries').update({ status: 'Archived' }).eq('id', inquiry.id);
-                    fetchInquiries(dom, 'New');
+                    fetchInquiries('New'); // Refresh the 'New' tab
                     setLoading(false);
                 }
             });
             actionsDiv.appendChild(addBtn);
         }
+        // --- END OF CORRECTION ---
 
         const deleteBtn = document.createElement('button');
         deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete Forever';
@@ -1287,7 +1551,7 @@ function renderInquiries(inquiries, dom, status) {
              if (confirm(`PERMANENTLY DELETE this inquiry?`)) {
                 setLoading(true);
                 await _supabase.from('contact_inquiries').delete().eq('id', inquiry.id);
-                fetchInquiries(dom, status);
+                fetchInquiries(status); // Refresh the current tab (either 'New' or 'Archived')
                 setLoading(false);
              }
         });
@@ -1505,6 +1769,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.dashboardDom = dom; // <<<<<<<< ADD THIS LINE
 
+    async function initializeDashboard() {
+        setLoading(true);
+        dom.loginOverlay.style.display = 'none';
+        dom.dashboardLayout.style.display = 'flex';
+        try {
+            dom.campaignLoader.textContent = 'Fetching dashboard data...';
+            const [segmentsRes, imagesRes, templateRes] = await Promise.all([
+                _supabase.from('customers').select('segment'),
+                _supabase.storage.from('promotional_images').list('', { limit: 100, offset: 0, sortBy: { column: 'created_at', order: 'desc' } }),
+                fetch(MASTER_TEMPLATE_URL).then(res => res.text())
+            ]);
+            availableSegments = [...new Set(segmentsRes.data.map(item => item.segment))].filter(Boolean);
+            masterTemplateHtml = templateRes;
+            populateCheckboxes(availableSegments);
+            populateImages(imagesRes.data);
+            
+            // CORRECTED: The call to fetchSiteTraffic was removed from here.
+            
+            handleHashChange();
+        } catch(error) {
+            alert(`Critical Error: Could not fetch dashboard data. ${error.message}`);
+        }
+        setLoading(false);
+    }
+
+
     function handleHashChange() {
         const hash = window.location.hash.substring(1);
         
@@ -1536,30 +1826,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function initializeDashboard() {
-        setLoading(true);
-        // Inside initializeDashboard()
-        
-        dom.loginOverlay.style.display = 'none';
-        dom.dashboardLayout.style.display = 'flex';
-        try {
-            dom.campaignLoader.textContent = 'Fetching dashboard data...';
-            const [segmentsRes, imagesRes, templateRes] = await Promise.all([
-                _supabase.from('customers').select('segment'),
-                _supabase.storage.from('promotional_images').list('', { limit: 100, offset: 0, sortBy: { column: 'created_at', order: 'desc' } }),
-                fetch(MASTER_TEMPLATE_URL).then(res => res.text())
-            ]);
-            availableSegments = [...new Set(segmentsRes.data.map(item => item.segment))].filter(Boolean);
-            masterTemplateHtml = templateRes;
-            populateCheckboxes(availableSegments);
-            populateImages(imagesRes.data);
-            fetchSiteTraffic(dom);
-            handleHashChange();
-        } catch(error) {
-            alert(`Critical Error: Could not fetch dashboard data. ${error.message}`);
-        }
-        setLoading(false);
-    }
+    
     
     async function logout() {
         setLoading(true);
@@ -1674,7 +1941,7 @@ imageUploadInput.addEventListener('change', (e) => {
     });
     // =========================================================
 
-// --- END OF NEW CODE ---
+    
 
 
 
@@ -1836,14 +2103,30 @@ imageUploadInput.addEventListener('change', (e) => {
 
     // Add this function at the bottom of dashboard.js
     // 1. ONLY fetch the Total Count on load (Fast)
-async function fetchSiteTraffic(dom) {
-    const { count, error } = await _supabase
-        .from('site_traffic')
-        .select('*', { count: 'exact', head: true });
+// ===================================================================
+// --- ANALYTICS PAGE LOADER ---
+// ===================================================================
+async function loadAnalyticsPageData(dom, params) {
+    // 1. Load the campaign selection dropdown
+    loadAnalyticsDropdown(dom, params ? params.campaignId : null);
 
-    const el = document.getElementById('stat-total-visits');
-    if (el) {
-        el.textContent = count || 0;
+    // 2. Load the total site visits stat card
+    const visitsEl = document.getElementById('analytics-total-visits');
+    if (visitsEl) visitsEl.textContent = 'Loading...';
+
+    try {
+        const { count, error } = await _supabase
+            .from('site_traffic')
+            .select('id', { count: 'exact', head: true });
+
+        if (error) throw error;
+        
+        if (visitsEl) {
+            visitsEl.textContent = count || '0';
+        }
+    } catch (error) {
+        console.error("Failed to load site visits count:", error);
+        if (visitsEl) visitsEl.textContent = 'Error';
     }
 }
 
@@ -1907,6 +2190,77 @@ async function fetchTrafficTableData() {
         tbody.appendChild(row);
     });
 }
+    const notesList = document.getElementById('notes-list');
+if (notesList) {
+    notesList.addEventListener('click', (e) => {
+        const li = e.target.closest('li');
+        if (li && li.dataset.noteId) {
+            loadNoteIntoEditor(li.dataset.noteId);
+        }
+    });
+}
+
+const noteForm = document.getElementById('note-form');
+if (noteForm) {
+    noteForm.addEventListener('submit', saveNote);
+}
+
+const btnNewNote = document.getElementById('btn-new-note');
+if (btnNewNote) {
+    btnNewNote.addEventListener('click', resetNoteForm);
+}
+
+const btnDeleteNote = document.getElementById('btn-delete-note');
+if (btnDeleteNote) {
+    btnDeleteNote.addEventListener('click', deleteNote);
+}
+
+
+// Inside DOMContentLoaded at the bottom of dashboard.js
+
+    // ... after all other event listeners
+
+    // --- ADD THIS NEW CODE for Inquiry Tabs ---
+    const inquiryTabs = document.querySelectorAll('.tab-btn');
+    if (inquiryTabs.length > 0) {
+        inquiryTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Update active button state
+                inquiryTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Fetch data for the selected status
+                const status = tab.dataset.status;
+                fetchInquiries(status);
+            });
+        });
+    }
+
+
+    const careerTabs = document.querySelectorAll('#page-careers .tab-btn');
+    careerTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Update active button state
+            careerTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            const targetTabPaneId = `tab-pane-${tab.dataset.tab}`;
+            
+            // Hide all panes and show the target one
+            document.querySelectorAll('#page-careers .tab-pane').forEach(pane => {
+                pane.classList.toggle('active', pane.id === targetTabPaneId);
+            });
+
+            // Load data for the active tab if needed
+            if (tab.dataset.tab === 'postings') {
+                fetchJobPostingsAdmin();
+            } else {
+                fetchCareers();
+            }
+        });
+    });
+
+
     
     handleUserSession();
 });

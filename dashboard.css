@@ -1551,3 +1551,126 @@ a.btn-info:hover {
     color: var(--text-light);
     margin-top: 2px;
 }
+
+/* --- NOTES MANAGER PAGE --- */
+.notes-list-ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.notes-list-ul li {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.notes-list-ul li:last-child {
+    border-bottom: none;
+}
+
+.notes-list-ul li:hover {
+    background-color: #f8fafc;
+}
+
+.notes-list-ul li.active {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+}
+
+.notes-list-ul li.active .note-item-date {
+    color: rgba(255,255,255,0.8);
+}
+
+.note-item-date {
+    display: block;
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 4px;
+}
+
+/* --- INQUIRIES PAGE - HORIZONTAL TABS (RECTANGLE STYLE) --- */
+.tab-nav-horizontal {
+    display: flex;
+    gap: 5px; /* Reduce gap for a tighter look */
+    margin-top: 30px;
+    background-color: #f1f5f9; /* Add a light gray background for the container */
+    padding: 5px;
+    border-radius: var(--border-radius); /* Rounded container */
+}
+
+.tab-btn {
+    width: auto;
+    flex: 1; /* Make buttons share the space equally */
+    justify-content: center;
+    border: none;
+    /* Remove the old border-bottom */
+    background-color: transparent; /* Inactive tabs are transparent */
+    color: var(--text-secondary);
+    border-radius: 6px; /* Add rounding to the buttons themselves */
+    padding: 10px 15px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    background-color: #e2e8f0; /* A subtle hover for inactive tabs */
+    color: var(--primary-color);
+}
+
+.tab-btn.active {
+    color: white; /* White text for active tab */
+    background-color: var(--primary-color); /* This creates the solid rectangle */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Add a subtle shadow to lift it */
+    border-bottom-color: transparent; /* Ensure no underline */
+}
+
+/* Badge styling for horizontal tabs */
+.tab-badge {
+    margin-left: 8px;
+    background-color: var(--danger-color);
+    color: white;
+    font-size: 12px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+/* Invert badge colors on the active tab for contrast */
+.tab-btn.active .tab-badge {
+    background-color: white;
+    color: var(--primary-color);
+}
+
+/* Content area below the tabs */
+.tab-content-horizontal {
+    padding-top: 30px;
+    min-height: 50vh;
+}
+
+/* --- CAREERS PAGE - TAB PANES --- */
+.tab-pane {
+    display: none; /* Hide all panes by default */
+}
+.tab-pane.active {
+    display: block; /* Show only the active one */
+    animation: fadeIn 0.3s ease-out; /* Add a nice fade-in effect */
+}
+
+/* --- SIDEBAR NOTIFICATION BADGES --- */
+.sidebar-badge {
+    display: none; /* Hidden by default */
+    margin-left: auto; /* Pushes the badge to the right */
+    background-color: var(--danger-color);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    line-height: 1.5;
+}

@@ -38,8 +38,8 @@
             <nav class="sidebar-nav">
                 <ul>
                     <li id="nav-dashboard" data-page="page-dashboard" class="active"><i class="fas fa-home"></i> Dashboard</li> 
-                    <li id="nav-inquiries" data-page="page-inquiries" class="active"><i class="fas fa-comment-dots"></i> New Inquiries</li>
-                    <li id="nav-archived-inquiries" data-page="page-archived-inquiries"><i class="fas fa-archive"></i> Archived Inquiries</li>
+                    <!-- Inside the sidebar nav <ul> -->
+                    <li id="nav-inquiries" data-page="page-inquiries"><i class="fas fa-comment-dots"></i> Inquiries <span id="sidebar-inquiry-badge" class="sidebar-badge"></span></li>
                     <li id="nav-projects" data-page="page-projects"><i class="fas fa-building"></i> Projects</li> <!-- ADD THIS LINE -->
                     <li id="nav-analytics" data-page="page-analytics"><i class="fas fa-chart-pie"></i> Analytics</li>
                     <li id="nav-image-manager" data-page="page-image-manager"><i class="fas fa-images"></i> Image Manager</li>
@@ -47,7 +47,8 @@
                     <li id="nav-customers" data-page="page-customers"><i class="fas fa-users"></i> Customers</li>
                     <li id="nav-archive" data-page="page-archive"><i class="fas fa-history"></i> Campaign History</li>
                     <li id="nav-blog" data-page="page-blog"><i class="fas fa-newspaper"></i> Blog / Insights</li>
-                    <li id="nav-careers" data-page="page-careers"><i class="fas fa-briefcase"></i> Careers <span id="career-badge" class="badge-new">New</span></li>
+                    <li id="nav-careers" data-page="page-careers"><i class="fas fa-briefcase"></i> Careers <span id="sidebar-career-badge" class="sidebar-badge"></span></li>
+                    <li id="nav-notes" data-page="page-notes"><i class="fas fa-sticky-note"></i> Notes</li>
                 </ul>
             </nav>
             <div class="sidebar-footer">
@@ -114,23 +115,80 @@
 <!-- === END OF NEW PAGE === -->
 
 
+<!-- === ADD THIS NEW PAGE === -->
+<!-- REPLACE THE ENTIRE CONTENTS of <div id="page-notes" ...> -->
 
-            <div id="page-inquiries" class="page active">
-                <div class="content-box">
-                    <h2>New Website Inquiries</h2>
-                    <p>New leads from your website contact form appear here. Add them to your main customer list or delete them.</p>
-                    <div id="inquiries-container"></div>
-                    <div id="inquiries-status" class="status-message"></div>
-                </div>
+<div id="page-notes" class="page">
+    <div class="content-box">
+        <div class="analytics-header">
+            <h2>Notes Manager</h2>
+            <button id="btn-new-note" class="btn-primary"><i class="fas fa-plus"></i> New Note</button>
+        </div>
+        
+        <div class="blog-layout"> <!-- We can reuse the blog layout style -->
+            
+            <!-- LEFT: NOTES LIST -->
+            <div class="blog-list-panel">
+                <ul id="notes-list" class="notes-list-ul">
+                    <li>Loading notes...</li>
+                </ul>
             </div>
 
-            <div id="page-archived-inquiries" class="page">
-                <div class="content-box">
-                    <h2>Archived Inquiries</h2>
-                    <p>These are inquiries that you have already converted to customers.</p>
-                    <div id="archived-inquiries-container"></div>
-                </div>
+            <!-- RIGHT: NOTE EDITOR -->
+            <div class="blog-editor-panel">
+                <form id="note-form">
+                    <input type="hidden" id="note-id">
+
+                    <label for="note-title-input">Title</label>
+                    <input type="text" id="note-title-input" placeholder="Enter a title for your note" required>
+
+                    <label for="note-content-input">Content</label>
+                    <textarea id="note-content-input" rows="15" placeholder="Type your notes here..."></textarea>
+                    
+                    <div class="button-group" style="margin-top: 15px;">
+                        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Note</button>
+                        <button type="button" id="btn-delete-note" class="btn-danger" style="display: none;"><i class="fas fa-trash-alt"></i> Delete</button>
+                    </div>
+                    <div id="notes-status" class="status-message"></div>
+                </form>
             </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+            <!-- REPLACE THE ENTIRE CONTENTS of <div id="page-inquiries" ...> -->
+
+<!-- REPLACE THE ENTIRE CONTENTS of <div id="page-inquiries" ...> -->
+
+<div id="page-inquiries" class="page">
+    <div class="content-box">
+        <h2>Website Inquiries</h2>
+        <p>Manage new leads and view archived inquiries from your website contact forms.</p>
+
+        <!-- Horizontal Tab Navigation -->
+        <div class="tab-nav-horizontal">
+            <button class="tab-btn active" data-status="New">
+                <i class="fas fa-inbox"></i> New Inquiries <span id="new-inquiry-count" class="tab-badge"></span>
+            </button>
+            <button class="tab-btn" data-status="Archived">
+                <i class="fas fa-archive"></i> Archived
+            </button>
+        </div>
+
+        <!-- Tab Content Area -->
+        <div class="tab-content-horizontal">
+            <div id="inquiries-container">
+                <!-- Inquiry cards will be loaded here by JS -->
+            </div>
+        </div>
+        
+        <div id="inquiries-status" class="status-message"></div>
+    </div>
+</div>
 
             <div id="page-image-manager" class="page">
                 <div class="content-box">
@@ -285,7 +343,8 @@
                     <div class="stats-summary" style="margin-bottom: 20px;">
                         <div class="stat-card" style="background: #e0f2fe; border: 1px solid #bae6fd;">
                             <h3 style="color: #0284c7;">Total Site Visits</h3>
-                            <p id="stat-total-visits" style="color: #0369a1;">Loading...</p>
+                            <!-- Inside #page-analytics -->
+                            <p id="analytics-total-visits" style="color: #0369a1;">Loading...</p>
                         </div>
                     </div>
 
@@ -350,48 +409,62 @@
                 </div>
             </div>
 
-            <!-- CAREERS PAGE -->
-            <div id="page-careers" class="page">
-                <div class="content-box">
-                    <!-- Inside #page-careers > .content-box > .analytics-header -->
-<div class="analytics-header" style="justify-content: space-between;">
-    <h2>Job Applications & Postings</h2>
-    <div> <!-- Wrap buttons in a div for better layout -->
-        <button id="btn-new-job-post" class="btn-primary" style="margin-right: 10px;"><i class="fas fa-plus"></i> New Job Post</button>
-        <button class="btn-secondary" onclick="fetchCareers(dom)">Refresh Applications</button>
-    </div>
-</div>
+            <!-- REPLACE THE ENTIRE CONTENTS of <div id="page-careers" ...> -->
 
-<!-- Inside #page-careers > .content-box, right after the .analytics-header -->
-<div id="job-postings-admin-container" style="margin-bottom: 40px;">
-    <h3>Manage Job Postings</h3>
-    <div id="job-postings-list" style="margin-top: 15px;">
-        <!-- Admin list of job posts will be loaded here -->
-    </div>
-</div>
-<hr style="margin: 30px 0;"> <!-- Add a separator -->
-<h3>Recent Applications</h3>
+<div id="page-careers" class="page">
+    <div class="content-box">
+        <h2>Careers Management</h2>
+        <p>Manage open job postings and review incoming applications.</p>
 
-                    <div style="overflow-x: auto;">
-                        <table id="careers-table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Applicant</th>
-                                    <th>Position</th>
-                                    <th>Status</th>
-                                    <th>Resume</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                    <div id="careers-status" class="status-message"></div>
+        <!-- Horizontal Tab Navigation -->
+        <div class="tab-nav-horizontal">
+            <button class="tab-btn active" data-tab="applications">
+                <i class="fas fa-users"></i> Recent Applications <span id="new-apps-count" class="tab-badge"></span>
+            </button>
+            <button class="tab-btn" data-tab="postings">
+                <i class="fas fa-bullhorn"></i> Manage Postings
+            </button>
+        </div>
+
+        <!-- Tab Content Area -->
+        <div class="tab-content-horizontal">
+            <!-- Applications Tab Pane -->
+            <div id="tab-pane-applications" class="tab-pane active">
+                 <div class="analytics-header" style="border-bottom: none; margin-bottom: 15px;">
+                    <h3 style="margin: 0; border: none; font-size: 1.5rem;">Incoming Applications</h3>
+                    <button class="btn-secondary" onclick="fetchCareers()"><i class="fas fa-sync-alt"></i> Refresh List</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="careers-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Applicant</th>
+                                <th>Position</th>
+                                <th>Status</th>
+                                <th>Resume</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- Applications table body --></tbody>
+                    </table>
+                </div>
+                <div id="careers-status" class="status-message"></div>
+            </div>
+
+            <!-- Postings Tab Pane -->
+            <div id="tab-pane-postings" class="tab-pane">
+                <div class="analytics-header" style="border-bottom: none; margin-bottom: 15px;">
+                    <h3 style="margin: 0; border: none; font-size: 1.5rem;">Job Postings</h3>
+                    <button id="btn-new-job-post" class="btn-primary"><i class="fas fa-plus"></i> New Job Post</button>
+                </div>
+                <div id="job-postings-list">
+                    <!-- Admin list of job posts will be loaded here -->
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Edit Customer Modal -->
     <div id="edit-customer-modal-overlay" class="modal-overlay">
