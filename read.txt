@@ -3,3 +3,56 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw5QZHHMbkKKEgH8Lx34
 
 
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybm1udWx6YWpteHJzcnpnbWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzOTg0NTEsImV4cCI6MjA3ODk3NDQ1MX0.BLlRbin09uEFtwsJNTAr8h-JSy1QofEKbW-F2ns-yio';
+
+
+
+
+
+
+
+if needed add later
+
+
+    <div class="md-profile reveal reveal-delay-100">
+                        <img src="images/md-photo.jpg" alt="Managing Director">
+                        <div class="md-details">
+                            <h4>{{ site.founder }}</h4>
+                            <span class="md-role">Managing Director</span>
+                            <p class="md-quote">"We don't just construct buildings; we build trust, one brick at a
+                                time."</p>
+                        </div>
+                    </div>
+
+
+
+                    <!-- Team Section -->
+            <div class="team-section reveal">
+                <div class="section-title" style="margin-bottom: 40px;">
+                    <h2>Meet Our Team</h2>
+                    <p>The experts behind our success.</p>
+                </div>
+                <div class="team-grid">
+                    <div class="team-card">
+                        <div class="team-img-wrapper">
+                            <img src="images/md-photo.jpg" alt="Founder">
+                        </div>
+                        <!-- FIX: Use variable for consistency and better placeholders -->
+                        <h3>Name1</h3>
+                        <span>Designation 1</span>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-img-wrapper">
+                            <img src="images/md-photo.jpg" alt="Engineer">
+                        </div>
+                        <h3>Name2</h3>
+                        <span>Designation2</span>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-img-wrapper">
+                            <img src="images/md-photo.jpg" alt="Supervisor">
+                        </div>
+                        <h3>Name2</h3>
+                        <span>Designation3</span>
+                    </div>
+                </div>
+            </div>
