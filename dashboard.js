@@ -487,12 +487,65 @@ window.updateCareerStatus = async (id, newStatus) => {
     }
 };
 
+// REPLACE the existing window.deleteApplication function with this one
+
 window.deleteApplication = async (id) => {
-    if(!confirm("Permanently delete this application?")) return;
-    const { error } = await _supabase.from('job_applications').delete().eq('id', id);
-    if(error) alert(`Error deleting: ${error.message}`);
-    else {
-        fetchCareers({}); // Refresh table
+    if (!confirm("Permanently delete this application? This will also delete the attached resume.")) {
+        return;
+    }
+
+    setLoading(true);
+    try {
+        // Step 1: Fetch the application record to get the resume_url
+        const { data: application, error: fetchError } = await _supabase
+            .from('job_applications')
+            .select('resume_url')
+            .eq('id', id)
+            .single();
+
+        if (fetchError) {
+            throw new Error(`Failed to fetch application details before deleting: ${fetchError.message}`);
+        }
+
+        // Step 2: If a resume URL exists, delete the file from Supabase Storage
+        if (application && application.resume_url) {
+            
+            // --- THIS IS THE CRITICAL FIX ---
+            // Extract the file path including the subfolder (e.g., "resumes/1766822833260-1.pdf")
+            let filePath = '';
+            try {
+                 // Create a URL object to safely parse the path
+                 const url = new URL(application.resume_url);
+                 // The path will be something like "/storage/v1/object/public/contact_uploads/resumes/..."
+                 // We want the part after "/contact_uploads/"
+                 filePath = url.pathname.split('/contact_uploads/')[1];
+            } catch (e) {
+                console.error("Could not parse file URL:", e);
+            }
+            // --- END OF FIX ---
+            
+            if (filePath) {
+                const { error: storageError } = await _supabase.storage
+                    .from('contact_uploads')
+                    .remove([filePath]); // This now correctly sends ["resumes/1766... .pdf"]
+
+                if (storageError) {
+                    console.warn(`Could not delete resume from storage: ${storageError.message}`);
+                }
+            }
+        }
+
+        // Step 3: Delete the application record from the database
+        const { error: dbError } = await _supabase.from('job_applications').delete().eq('id', id);
+        if (dbError) throw dbError;
+
+        // Step 4: Refresh the UI
+        fetchCareers();
+
+    } catch (error) {
+        alert(`Error deleting application: ${error.message}`);
+    } finally {
+        setLoading(false);
     }
 };
 
