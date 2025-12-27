@@ -385,7 +385,7 @@ button:disabled {
 }
 
 /* --- Tables --- */
-#customer-table,
+#client-table,
 #archive-table {
     width: 100%;
     border-collapse: separate; /* Use separate to allow border-radius on cells */
@@ -398,7 +398,7 @@ button:disabled {
     box-shadow: var(--shadow-light);
 }
 
-#customer-table th, #customer-table td,
+#client-table th, #client-table td,
 #archive-table th, #archive-table td {
     padding: 15px 18px; /* Increased padding */
     text-align: left;
@@ -409,7 +409,7 @@ button:disabled {
     text-overflow: ellipsis;
 }
 
-#customer-table th, #archive-table th {
+#client-table th, #archive-table th {
     background-color: #F0F2F5; /* Light grey header */
     font-weight: 600;
     color: var(--text-dark);
@@ -418,15 +418,15 @@ button:disabled {
     z-index: 1; /* Ensure header stays above scrolling content */
 }
 
-#customer-table th:first-child, #archive-table th:first-child { border-top-left-radius: var(--border-radius); }
-#customer-table th:last-child, #archive-table th:last-child { border-top-right-radius: var(--border-radius); }
+#client-table th:first-child, #archive-table th:first-child { border-top-left-radius: var(--border-radius); }
+#client-table th:last-child, #archive-table th:last-child { border-top-right-radius: var(--border-radius); }
 
-#customer-table tbody tr:last-child td,
+#client-table tbody tr:last-child td,
 #archive-table tbody tr:last-child td {
     border-bottom: none; /* No border for the last row's cells */
 }
 
-#customer-table tbody tr:hover,
+#client-table tbody tr:hover,
 #archive-table tbody tr:hover {
     background-color: #F8F8FA; /* Subtle hover effect */
     transition: background-color var(--transition-speed);

@@ -13,7 +13,7 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const IMAGE_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/promotional_images/`;
 const WEBSITE_BASE_URL = 'https://nags-p.github.io/sahyadriconsanddev.web/';
 const MASTER_TEMPLATE_URL = 'https://raw.githubusercontent.com/Nags-p/sahyadriconsanddev.web/main/email_templates/master-promo.html';
-let masterTemplateHtml = '', allCustomers = [], customerHeaders = [], availableSegments = [];
+let masterTemplateHtml = '', allClients = [], clientHeaders = [], availableSegments = [];
 let selectedProjectFiles = []; // For new uploads
 let imagesToDelete = []; // For existing images marked for deletion
 
@@ -83,24 +83,14 @@ function showPage(pageId, dom, params = null) {
     const activeNav = document.getElementById(navId);
     if (activeNav) activeNav.classList.add('active');
     
-    // Page Specific Data Loading
     if (pageId === 'page-dashboard') loadDashboardData();
-    if (pageId === 'page-notes') fetchNotesList(); // Corrected call
-    if (pageId === 'page-customers') fetchCustomerData(dom);
-    if (pageId === 'page-archive') fetchCampaignArchive(dom);
+    if (pageId === 'page-notes') fetchNotesList();
+    if (pageId === 'page-clients') fetchClientData(dom);
     if (pageId === 'page-inquiries') fetchInquiries('New');
-    if (pageId === 'page-image-manager') fetchImages(dom);
     if (pageId === 'page-projects') fetchAdminProjects(dom);
-    
-    if (pageId === 'page-analytics') {
-        loadAnalyticsPageData(dom, params);
-    }
-    if (pageId === 'page-careers') {
-        fetchCareers(); // Corrected call (no 'dom' parameter)
-    }
-    if (pageId === 'page-blog') {
-        fetchBlogPosts(dom);
-    }
+    if (pageId === 'page-analytics') loadAnalyticsPageData(dom, params);
+    if (pageId === 'page-careers') fetchCareers();
+    if (pageId === 'page-blog') fetchBlogPosts(dom);
 }
 
 // ===================================================================
@@ -1524,16 +1514,16 @@ function renderInquiries(inquiries, status) {
         // --- THIS IS THE CORRECTED LOGIC ---
         if (status === 'New') {
             const addBtn = document.createElement('button');
-            addBtn.innerHTML = '<i class="fas fa-user-plus"></i> Add to Customers & Archive';
+            addBtn.innerHTML = '<i class="fas fa-user-plus"></i> Add to Clients & Archive';
             addBtn.className = 'btn-primary';
             addBtn.addEventListener('click', async () => {
-                if (confirm(`Add ${inquiry.name} to customers? This will also archive the inquiry.`)) {
+                if (confirm(`Add ${inquiry.name} to clients? This will also archive the inquiry.`)) {
                     setLoading(true);
-                    const { data: existing } = await _supabase.from('customers').select('id').eq('email', inquiry.email).single();
+                    const { data: existing } = await _supabase.from('clients').select('id').eq('email', inquiry.email).single();
                     if (existing) {
-                        showStatusMessage(document.getElementById('inquiries-status'), `Customer already exists. Archiving inquiry.`, false);
+                        showStatusMessage(document.getElementById('inquiries-status'), `Client already exists. Archiving inquiry.`, false);
                     } else {
-                         await _supabase.from('customers').insert([{ name: inquiry.name, email: inquiry.email, phone: inquiry.phone, city: inquiry.location, segment: 'New Lead' }]);
+                         await _supabase.from('clients').insert([{ name: inquiry.name, email: inquiry.email, phone: inquiry.phone, city: inquiry.location, segment: 'New Lead' }]);
                     }
                     await _supabase.from('contact_inquiries').update({ status: 'Archived' }).eq('id', inquiry.id);
                     fetchInquiries('New'); // Refresh the 'New' tab
@@ -1562,34 +1552,34 @@ function renderInquiries(inquiries, status) {
     });
 }
 
-async function fetchCustomerData(dom) {
+async function fetchClientData(dom) {
     setLoading(true);
-    dom.customerTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Loading...</td></tr>`;
+    dom.clientTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Loading...</td></tr>`;
     try {
-        const { data, error } = await _supabase.from('customers').select('*').order('created_at', { ascending: false });
+        const { data, error } = await _supabase.from('clients').select('*').order('created_at', { ascending: false });
         if (error) throw error;
-        allCustomers = data;
-        customerHeaders = data.length > 0 ? Object.keys(data[0]).filter(h => h !== 'id' && h !== 'created_at') : ['name', 'email', 'phone', 'city', 'segment'];
-        renderCustomerTable(allCustomers, dom);
+        allClients = data;
+        clientHeaders = data.length > 0 ? Object.keys(data[0]).filter(h => h !== 'id' && h !== 'created_at') : ['name', 'email', 'phone', 'city', 'segment'];
+        renderClientTable(allClients, dom);
     } catch(error) {
-        showStatusMessage(dom.customerStatus, `Error: ${error.message}`, false);
+        showStatusMessage(dom.clientStatus, `Error: ${error.message}`, false);
     }
     setLoading(false);
 }
 
-function renderCustomerTable(customers, dom) {
-    const tBody = dom.customerTableBody;
-    const tHead = dom.customerTableHead;
+function renderClientTable(clients, dom) {
+    const tBody = dom.clientTableBody;
+    const tHead = dom.clientTableHead;
     tBody.innerHTML = '';
     tHead.innerHTML = '';
 
-    if (customers.length === 0) {
-        tBody.innerHTML = `<tr><td colspan="${(customerHeaders.length || 5) + 1}" style="text-align: center;">No customers found.</td></tr>`;
+    if (clients.length === 0) {
+        tBody.innerHTML = `<tr><td colspan="${(clientHeaders.length || 5) + 1}" style="text-align: center;">No clients found.</td></tr>`;
         return;
     }
 
     const headerRow = document.createElement('tr');
-    customerHeaders.forEach(header => {
+    clientHeaders.forEach(header => {
         const th = document.createElement('th');
         th.textContent = header.charAt(0).toUpperCase() + header.slice(1);
         headerRow.appendChild(th);
@@ -1599,11 +1589,11 @@ function renderCustomerTable(customers, dom) {
     headerRow.appendChild(actionsTh);
     tHead.appendChild(headerRow);
 
-    customers.forEach(customer => {
+    clients.forEach(client => {
         const row = document.createElement('tr');
-        customerHeaders.forEach(header => {
+        clientHeaders.forEach(header => {
             const td = document.createElement('td');
-            td.textContent = customer[header] || '';
+            td.textContent = client[header] || '';
             row.appendChild(td);
         });
         
@@ -1613,14 +1603,14 @@ function renderCustomerTable(customers, dom) {
         const editBtn = document.createElement('button');
         editBtn.innerHTML = '<i class="fas fa-edit"></i>';
         editBtn.className = 'btn-info btn-icon';
-        editBtn.title = 'Edit Customer';
-        editBtn.addEventListener('click', () => openEditCustomerModal(customer, dom));
+        editBtn.title = 'Edit Client';
+        editBtn.addEventListener('click', () => openEditClientModal(client, dom));
         
         const deleteBtn = document.createElement('button');
         deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
         deleteBtn.className = 'btn-danger btn-icon';
-        deleteBtn.title = 'Delete Customer';
-        deleteBtn.addEventListener('click', () => deleteCustomerPrompt(customer.id, customer.name || customer.email, dom));
+        deleteBtn.title = 'Delete Client';
+        deleteBtn.addEventListener('click', () => deleteClientPrompt(client.id, client.name || client.email, dom));
 
         actionsTd.appendChild(editBtn);
         actionsTd.appendChild(deleteBtn);
@@ -1632,15 +1622,15 @@ function renderCustomerTable(customers, dom) {
 // ===================================================================
 // --- 6. INITIALIZATION & AUTHENTICATION ---
 // ===================================================================
-function openEditCustomerModal(customer, dom) {
-    dom.editCustomerRowId.value = customer.id;
-    dom.editCustomerFields.innerHTML = '';
-    dom.editCustomerStatus.style.display = 'none';
+function openEditClientModal(client, dom) {
+    dom.editClientRowId.value = client.id;
+    dom.editClientFields.innerHTML = '';
+    dom.editClientStatus.style.display = 'none';
     
-    customerHeaders.forEach(header => {
+    clientHeaders.forEach(header => {
         const label = document.createElement('label');
         label.textContent = header.charAt(0).toUpperCase() + header.slice(1);
-        dom.editCustomerFields.appendChild(label);
+        dom.editClientFields.appendChild(label);
         
         if (header === 'segment') {
             const select = document.createElement('select'); 
@@ -1650,28 +1640,32 @@ function openEditCustomerModal(customer, dom) {
             availableSegments.forEach(s => { 
                 const opt = document.createElement('option'); opt.value = s; opt.textContent = s; select.appendChild(opt); 
             });
-            select.value = customer[header] || '';
-            dom.editCustomerFields.appendChild(select);
+            select.value = client[header] || '';
+            dom.editClientFields.appendChild(select);
         } else {
             const input = document.createElement('input'); 
-            input.type = (header === 'phone' || header === 'city') ? 'text' : (header === 'email' ? 'email' : 'text');
-            input.name = header; input.value = customer[header] || '';
-            dom.editCustomerFields.appendChild(input);
+            input.type = (header === 'email') ? 'email' : 'text';
+            input.name = header; 
+            input.value = client[header] || '';
+            dom.editClientFields.appendChild(input);
         }
     });
-    dom.editCustomerModalOverlay.classList.add('active');
+    dom.editClientModalOverlay.classList.add('active');
 }
 
-function closeEditCustomerModal(dom) { dom.editCustomerModalOverlay.classList.remove('active'); }
+function closeEditClientModal(dom) { 
+    dom.editClientModalOverlay.classList.remove('active'); 
+}
 
-async function deleteCustomerPrompt(id, customerIdentifier, dom) {
-    if (confirm(`Are you sure you want to delete ${customerIdentifier || 'this customer'}?`)) {
+async function deleteClientPrompt(id, clientIdentifier, dom) {
+    if (confirm(`Are you sure you want to delete ${clientIdentifier || 'this client'}?`)) {
         setLoading(true);
-        await _supabase.from('customers').delete().eq('id', id);
-        fetchCustomerData(dom);
+        await _supabase.from('clients').delete().eq('id', id);
+        fetchClientData(dom);
         setLoading(false);
     }
 }
+
 
 function openRecipientsModal(recipients, subject, dom) {
     dom.recipientsModalTitle.textContent = `Recipients for "${subject}"`;
@@ -1718,19 +1712,30 @@ document.addEventListener('DOMContentLoaded', () => {
         campaignForm: document.getElementById('campaign-form'),
         campaignStatus: document.getElementById('campaign-status'),
         segmentContainer: document.getElementById('segment-container'),
-        customerTableBody: document.querySelector('#customer-table tbody'),
-        customerTableHead: document.querySelector('#customer-table thead'),
-        customerSearch: document.getElementById('customer-search'),
-        customerStatus: document.getElementById('customer-status'),
+        clientTableBody: document.querySelector('#client-table tbody'),
+        clientTableHead: document.querySelector('#client-table thead'),
+        clientSearch: document.getElementById('client-search'),
+        clientStatus: document.getElementById('client-status'),
         archiveTableBody: document.querySelector('#archive-table tbody'),
         archiveTableHead: document.querySelector('#archive-table thead'),
-        editCustomerModalOverlay: document.getElementById('edit-customer-modal-overlay'),
-        editCustomerForm: document.getElementById('edit-customer-form'),
-        editCustomerRowId: document.getElementById('edit-customer-rowid'),
-        editCustomerFields: document.getElementById('edit-customer-fields'),
+        editclientModalOverlay: document.getElementById('edit-client-modal-overlay'),
+        editclientForm: document.getElementById('edit-client-form'),
+        editclientRowId: document.getElementById('edit-client-rowid'),
+        editclientFields: document.getElementById('edit-client-fields'),
         editModalClose: document.getElementById('edit-modal-close'),
         editModalCancel: document.getElementById('edit-modal-cancel'),
-        editCustomerStatus: document.getElementById('edit-customer-status'),
+        editclientStatus: document.getElementById('edit-client-status'),
+        clientTableBody: document.querySelector('#client-table tbody'),
+        clientTableHead: document.querySelector('#client-table thead'),
+        clientSearch: document.getElementById('client-search'),
+        clientStatus: document.getElementById('client-status'),
+        editClientModalOverlay: document.getElementById('edit-client-modal-overlay'),
+        editClientForm: document.getElementById('edit-client-form'),
+        editClientRowId: document.getElementById('edit-client-rowid'),
+        editClientFields: document.getElementById('edit-client-fields'),
+        editModalClose: document.getElementById('edit-modal-close'),
+        editModalCancel: document.getElementById('edit-modal-cancel'),
+        editClientStatus: document.getElementById('edit-client-status'),
         recipientsModalOverlay: document.getElementById('recipients-modal-overlay'),
         recipientsModalTitle: document.getElementById('recipients-modal-title'),
         recipientsModalClose: document.getElementById('recipients-modal-close'),
@@ -1776,7 +1781,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             dom.campaignLoader.textContent = 'Fetching dashboard data...';
             const [segmentsRes, imagesRes, templateRes] = await Promise.all([
-                _supabase.from('customers').select('segment'),
+                _supabase.from('clients').select('segment'),
                 _supabase.storage.from('promotional_images').list('', { limit: 100, offset: 0, sortBy: { column: 'created_at', order: 'desc' } }),
                 fetch(MASTER_TEMPLATE_URL).then(res => res.text())
             ]);
@@ -1955,12 +1960,12 @@ imageUploadInput.addEventListener('change', (e) => {
     
     window.addEventListener('hashchange', handleHashChange);
     
-    dom.customerSearch.addEventListener('keyup', () => {
-        const searchTerm = dom.customerSearch.value.toLowerCase();
-        const filteredCustomers = allCustomers.filter(customer =>
-            Object.values(customer).some(val => String(val).toLowerCase().includes(searchTerm))
+    dom.clientSearch.addEventListener('keyup', () => {
+        const searchTerm = dom.clientSearch.value.toLowerCase();
+        const filteredclients = allclients.filter(client =>
+            Object.values(client).some(val => String(val).toLowerCase().includes(searchTerm))
         );
-        renderCustomerTable(filteredCustomers, dom);
+        renderClientTable(filteredclients, dom);
     });
     
     document.getElementById('btn-preview').addEventListener('click', () => {
@@ -1986,7 +1991,7 @@ imageUploadInput.addEventListener('change', (e) => {
         e.preventDefault();
         const segs = getSelectedSegments(dom);
         if (segs.length === 0) { alert('Please select at least one segment.'); return; }
-        if (!confirm(`Send campaign to ${segs.includes('All') ? "All Customers" : segs.length + " segment(s)"}?`)) return;
+        if (!confirm(`Send campaign to ${segs.includes('All') ? "All clients" : segs.length + " segment(s)"}?`)) return;
 
         setLoading(true);
         showStatusMessage(dom.campaignStatus, "Preparing campaign...", true);
@@ -2017,23 +2022,28 @@ imageUploadInput.addEventListener('change', (e) => {
         }
     });
 
-    dom.editModalClose.addEventListener('click', () => closeEditCustomerModal(dom));
-    dom.editModalCancel.addEventListener('click', () => closeEditCustomerModal(dom));
+    dom.editModalClose.addEventListener('click', () => closeEditClientModal(dom));
+    dom.editModalCancel.addEventListener('click', () => closeEditClientModal(dom));
     dom.recipientsModalClose.addEventListener('click', () => closeRecipientsModal(dom));
 
-    dom.editCustomerForm.addEventListener('submit', async function(e) {
+    dom.editClientForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         setLoading(true);
-        const id = dom.editCustomerRowId.value;
-        const updatedCustomerData = {};
-        dom.editCustomerFields.querySelectorAll('input, select').forEach(input => { updatedCustomerData[input.name] = input.value; });
-        const { error } = await _supabase.from('customers').update(updatedCustomerData).eq('id', id);
+        const id = dom.editClientRowId.value;
+        const updatedClientData = {}; // This is the correctly spelled variable
+        
+        dom.editClientFields.querySelectorAll('input, select').forEach(input => {
+            updatedClientData[input.name] = input.value; 
+        });
+        
+        const { error } = await _supabase.from('clients').update(updatedClientData).eq('id', id);
+        
         if (error) {
-            showStatusMessage(dom.editCustomerStatus, `Error: ${error.message}`, false);
+            showStatusMessage(dom.editClientStatus, `Error: ${error.message}`, false);
         } else {
-            showStatusMessage(dom.editCustomerStatus, "Customer updated successfully.", true);
-            fetchCustomerData(dom);
-            setTimeout(() => closeEditCustomerModal(dom), 1500);
+            showStatusMessage(dom.editClientStatus, "Client updated successfully.", true);
+            fetchClientData(dom);
+            setTimeout(() => closeEditClientModal(dom), 1500);
         }
         setLoading(false);
     });
@@ -2065,7 +2075,7 @@ imageUploadInput.addEventListener('change', (e) => {
 
     function populateCheckboxes(segments = []) {
         dom.segmentContainer.innerHTML = '';
-        createCheckbox('All', 'All Customers', true);
+        createCheckbox('All', 'All clients', true);
         segments.forEach(segment => createCheckbox(segment, segment));
         dom.segmentContainer.addEventListener('change', (e) => handleSegmentChange(e, dom));
     }
@@ -2256,6 +2266,31 @@ if (btnDeleteNote) {
                 fetchJobPostingsAdmin();
             } else {
                 fetchCareers();
+            }
+        });
+    });
+
+
+    // --- ADD THIS NEW CODE for Promotion Tabs ---
+    const promotionTabs = document.querySelectorAll('#page-promotions .tab-btn');
+    promotionTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Update active button state
+            promotionTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            const targetTabPaneId = `tab-pane-${tab.dataset.tab}`;
+            
+            // Hide all panes and show the target one
+            document.querySelectorAll('#page-promotions .tab-pane').forEach(pane => {
+                pane.classList.toggle('active', pane.id === targetTabPaneId);
+            });
+
+            // Load data for the active tab
+            if (tab.dataset.tab === 'images') {
+                fetchImages(window.dashboardDom);
+            } else if (tab.dataset.tab === 'history') {
+                fetchCampaignArchive(window.dashboardDom);
             }
         });
     });

@@ -42,10 +42,9 @@
                     <li id="nav-inquiries" data-page="page-inquiries"><i class="fas fa-comment-dots"></i> Inquiries <span id="sidebar-inquiry-badge" class="sidebar-badge"></span></li>
                     <li id="nav-projects" data-page="page-projects"><i class="fas fa-building"></i> Projects</li> <!-- ADD THIS LINE -->
                     <li id="nav-analytics" data-page="page-analytics"><i class="fas fa-chart-pie"></i> Analytics</li>
-                    <li id="nav-image-manager" data-page="page-image-manager"><i class="fas fa-images"></i> Image Manager</li>
                     <li id="nav-promotions" data-page="page-promotions"><i class="fas fa-bullhorn"></i> Promotions</li>
-                    <li id="nav-customers" data-page="page-customers"><i class="fas fa-users"></i> Customers</li>
-                    <li id="nav-archive" data-page="page-archive"><i class="fas fa-history"></i> Campaign History</li>
+                    <li id="nav-clients" data-page="page-clients"><i class="fas fa-users"></i> Clients</li>
+                    
                     <li id="nav-blog" data-page="page-blog"><i class="fas fa-newspaper"></i> Blog / Insights</li>
                     <li id="nav-careers" data-page="page-careers"><i class="fas fa-briefcase"></i> Careers <span id="sidebar-career-badge" class="sidebar-badge"></span></li>
                     <li id="nav-notes" data-page="page-notes"><i class="fas fa-sticky-note"></i> Notes</li>
@@ -190,67 +189,92 @@
     </div>
 </div>
 
-            <div id="page-image-manager" class="page">
-                <div class="content-box">
-                    <h2>Image Manager</h2>
-                    <div class="image-manager-actions">
-                        <label for="image-upload-input" class="btn-primary"><i class="fas fa-cloud-upload-alt"></i> Upload New Image</label>
-                        <input type="file" id="image-upload-input" accept="image/jpeg, image/png, image/gif" style="display: none;">
-                        <div id="image-upload-preview" class="image-upload-preview"><span>No Image Selected</span></div>
+            <!-- REPLACE THE ENTIRE CONTENTS of <div id="page-promotions" ...> -->
+
+<div id="page-promotions" class="page">
+    <div class="content-box">
+        <h2>Promotional Campaigns</h2>
+        <p>Compose new email promotions, manage your image assets, and view the history of past campaigns.</p>
+
+        <!-- Horizontal Tab Navigation -->
+        <div class="tab-nav-horizontal">
+            <button class="tab-btn active" data-tab="compose">
+                <i class="fas fa-pencil-alt"></i> Compose
+            </button>
+            <button class="tab-btn" data-tab="images">
+                <i class="fas fa-images"></i> Image Manager
+            </button>
+            <button class="tab-btn" data-tab="history">
+                <i class="fas fa-history"></i> Campaign History
+            </button>
+        </div>
+
+        <!-- Tab Content Area -->
+        <div class="tab-content-horizontal">
+            <!-- 1. Compose Tab Pane -->
+            <div id="tab-pane-compose" class="tab-pane active">
+                <!-- Paste the content from the OLD #page-promotions here -->
+                <form id="campaign-form">
+                    <label for="c-subject"><i class="fas fa-pencil-alt"></i> Email Subject</label><input type="text" id="c-subject" required>
+                    <label for="c-headline"><i class="fas fa-heading"></i> Headline</label><input type="text" id="c-headline" required>
+                    <label for="c-image-list"><i class="fas fa-image"></i> Main Image</label><select id="c-image-list" required><option value="" disabled selected>Loading...</option></select>
+                    <label for="c-body"><i class="fas fa-align-left"></i> Body Text</label><textarea id="c-body" required></textarea>
+                    <label for="c-cta-text"><i class="fas fa-mouse-pointer"></i> Button Text</label><input type="text" id="c-cta-text" value="Learn More" required>
+                    <label for="c-cta-path"><i class="fas fa-link"></i> Button Link</label><div class="link-input-group"><span class="link-prefix">https://nags-p.github.io/sahyadriconsanddev.web/</span><input type="text" id="c-cta-path" required></div>
+                    <h4 style="margin-top: 30px;">Select Segments</h4>
+                    <div id="segment-container"></div>
+                    <div class="button-group">
+                        <button type="button" id="btn-preview" class="btn-info"><i class="fas fa-eye"></i> Preview</button>
+                        <button type="button" id="btn-send-test" class="btn-secondary"><i class="fas fa-paper-plane"></i> Send Test</button>
+                        <button type="submit" id="btn-send-campaign" class="btn-primary"><i class="fas fa-rocket"></i> Send Campaign</button>
                     </div>
-                    <div id="image-manager-status" class="status-message"></div>
-                    <div id="image-grid-container" class="image-grid"></div>
-                </div>
+                    <div class="loader" id="campaign-loader"></div>
+                    <div id="campaign-status" class="status-message"></div>
+                </form>
             </div>
 
-            <div id="page-promotions" class="page">
-                 <div class="content-box">
-                    <form id="campaign-form">
-                        <h2>Compose Promotion</h2>
-                        <label for="c-subject"><i class="fas fa-pencil-alt"></i> Email Subject</label><input type="text" id="c-subject" required>
-                        <label for="c-headline"><i class="fas fa-heading"></i> Headline</label><input type="text" id="c-headline" required>
-                        <label for="c-image-list"><i class="fas fa-image"></i> Main Image</label><select id="c-image-list" required><option value="" disabled selected>Loading...</option></select>
-                        <label for="c-body"><i class="fas fa-align-left"></i> Body Text</label><textarea id="c-body" required></textarea>
-                        <label for="c-cta-text"><i class="fas fa-mouse-pointer"></i> Button Text</label><input type="text" id="c-cta-text" value="Learn More" required>
-                        <label for="c-cta-path"><i class="fas fa-link"></i> Button Link</label><div class="link-input-group"><span class="link-prefix">https://nags-p.github.io/sahyadriconsanddev.web/</span><input type="text" id="c-cta-path" required></div>
-                        <h2>Select Segments</h2>
-                        <div id="segment-container"></div>
-                        <div class="button-group">
-                            <button type="button" id="btn-preview" class="btn-info"><i class="fas fa-eye"></i> Preview</button>
-                            <button type="button" id="btn-send-test" class="btn-secondary"><i class="fas fa-paper-plane"></i> Send Test</button>
-                            <button type="submit" id="btn-send-campaign" class="btn-primary"><i class="fas fa-rocket"></i> Send Campaign</button>
-                        </div>
-                        <div class="loader" id="campaign-loader"></div>
-                        <div id="campaign-status" class="status-message"></div>
-                    </form>
+            <!-- 2. Image Manager Tab Pane -->
+            <div id="tab-pane-images" class="tab-pane">
+                <!-- Paste the content from the OLD #page-image-manager here -->
+                <div class="image-manager-actions">
+                    <label for="image-upload-input" class="btn-primary"><i class="fas fa-cloud-upload-alt"></i> Upload New Image</label>
+                    <input type="file" id="image-upload-input" accept="image/jpeg, image/png, image/gif" style="display: none;">
+                    <div id="image-upload-preview" class="image-upload-preview"><span>No Image Selected</span></div>
                 </div>
+                <div id="image-manager-status" class="status-message"></div>
+                <div id="image-grid-container" class="image-grid"></div>
             </div>
 
-            <div id="page-customers" class="page">
-                <div class="content-box">
-                    <h2>Customer Management</h2>
-                    <input type="text" id="customer-search" placeholder="Search by name, email, city or segment..." class="mb-20">
-                    <div style="overflow-x: auto;">
-                        <table id="customer-table">
-                            <thead></thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                    <div id="customer-status" class="status-message"></div>
+            <!-- 3. History Tab Pane -->
+            <div id="tab-pane-history" class="tab-pane">
+                <!-- Paste the content from the OLD #page-archive here -->
+                <div style="overflow-x: auto;">
+                    <table id="archive-table">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
 
-            <div id="page-archive" class="page">
-                <div class="content-box">
-                    <h2>Campaign History</h2>
-                    <div style="overflow-x: auto;">
-                        <table id="archive-table">
-                            <thead></thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+<!-- Replace your entire #page-clients div with this: -->
+<div id="page-clients" class="page">
+    <div class="content-box">
+        <h2>Client Management</h2>
+        <input type="text" id="client-search" placeholder="Search by name, email, city or segment..." class="mb-20">
+        <div style="overflow-x: auto;">
+            <table id="client-table">
+                <thead></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div id="client-status" class="status-message"></div>
+    </div>
+</div>
+
+            
 
             <!-- BLOG / INSIGHTS PAGE -->
             <div id="page-blog" class="page">
@@ -409,7 +433,7 @@
                 </div>
             </div>
 
-            <!-- REPLACE THE ENTIRE CONTENTS of <div id="page-careers" ...> -->
+<!-- REPLACE THE ENTIRE CONTENTS of <div id="page-careers" ...> -->
 
 <div id="page-careers" class="page">
     <div class="content-box">
@@ -466,24 +490,25 @@
     </div>
 </div>
 
-    <!-- Edit Customer Modal -->
-    <div id="edit-customer-modal-overlay" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Edit Customer</h3>
-                <button type="button" class="modal-close" id="edit-modal-close"><i class="fas fa-times"></i></button>
-            </div>
-            <form id="edit-customer-form">
-                <input type="hidden" id="edit-customer-rowid">
-                <div id="edit-customer-fields"></div>
-                <div class="button-group">
-                    <button type="button" class="btn-secondary" id="edit-modal-cancel"><i class="fas fa-times-circle"></i> Cancel</button>
-                    <button type="submit" class="btn-primary" id="edit-modal-save"><i class="fas fa-save"></i> Save Changes</button>
-                </div>
-                <div id="edit-customer-status" class="status-message"></div>
-            </form>
+    <!-- 3. Update the Modal -->
+<!-- Replace your entire #edit-client-modal-overlay div with this: -->
+<div id="edit-client-modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Client</h3>
+            <button type="button" class="modal-close" id="edit-modal-close"><i class="fas fa-times"></i></button>
         </div>
+        <form id="edit-client-form">
+            <input type="hidden" id="edit-client-rowid">
+            <div id="edit-client-fields"></div>
+            <div class="button-group">
+                <button type="button" class="btn-secondary" id="edit-modal-cancel"><i class="fas fa-times-circle"></i> Cancel</button>
+                <button type="submit" class="btn-primary" id="edit-modal-save"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+            <div id="edit-client-status" class="status-message"></div>
+        </form>
     </div>
+</div>
 
     <!-- Recipients Modal -->
     <div id="recipients-modal-overlay" class="modal-overlay">
