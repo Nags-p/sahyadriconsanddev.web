@@ -73,6 +73,8 @@ function showStatusMessage(element, message, isSuccess) {
     setTimeout(() => { element.style.display = 'none'; }, 5000);
 }
 
+// REPLACE your entire showPage function with this one
+
 function showPage(pageId, dom, params = null) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const targetPage = document.getElementById(pageId);
@@ -83,14 +85,64 @@ function showPage(pageId, dom, params = null) {
     const activeNav = document.getElementById(navId);
     if (activeNav) activeNav.classList.add('active');
     
+    // Page Specific Data Loading
     if (pageId === 'page-dashboard') loadDashboardData();
     if (pageId === 'page-notes') fetchNotesList();
     if (pageId === 'page-clients') fetchClientData(dom);
-    if (pageId === 'page-inquiries') fetchInquiries('New');
     if (pageId === 'page-projects') fetchAdminProjects(dom);
     if (pageId === 'page-analytics') loadAnalyticsPageData(dom, params);
-    if (pageId === 'page-careers') fetchCareers();
     if (pageId === 'page-blog') fetchBlogPosts(dom);
+
+    // --- CONSOLIDATED TAB LOGIC ---
+
+    // Handle default state for Inquiries page
+    if (pageId === 'page-inquiries') {
+        const inquiryTabs = document.querySelectorAll('#page-inquiries .tab-btn');
+        const defaultTab = inquiryTabs[0]; // "New Inquiries" tab
+
+        inquiryTabs.forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('#page-inquiries .tab-pane').forEach(p => p.classList.remove('active')); // Reset panes if they exist
+
+        if (defaultTab) {
+            defaultTab.classList.add('active');
+        }
+        fetchInquiries('New'); // Load default content
+    }
+
+    // Handle default state for Promotions page
+    if (pageId === 'page-promotions') {
+        const promotionTabs = document.querySelectorAll('#page-promotions .tab-btn');
+        const defaultTab = promotionTabs[0]; // "Compose" tab
+        
+        promotionTabs.forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('#page-promotions .tab-pane').forEach(p => p.classList.remove('active'));
+        
+        if (defaultTab) {
+            defaultTab.classList.add('active');
+            const defaultPane = document.getElementById(`tab-pane-${defaultTab.dataset.tab}`);
+            if (defaultPane) {
+                defaultPane.classList.add('active');
+            }
+        }
+    }
+
+    // Handle default state for Careers page
+    if (pageId === 'page-careers') {
+        const careerTabs = document.querySelectorAll('#page-careers .tab-btn');
+        const defaultTab = careerTabs[0]; // "Recent Applications" tab
+
+        careerTabs.forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('#page-careers .tab-pane').forEach(p => p.classList.remove('active'));
+
+        if (defaultTab) {
+            defaultTab.classList.add('active');
+            const defaultPane = document.getElementById(`tab-pane-${defaultTab.dataset.tab}`);
+            if (defaultPane) {
+                defaultPane.classList.add('active');
+            }
+        }
+        fetchCareers(); // Load default content
+    }
 }
 
 // ===================================================================
