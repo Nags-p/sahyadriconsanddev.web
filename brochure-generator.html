@@ -8,54 +8,30 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* --- SETUP --- */
+        /* --- SETUP FOR PRINTING --- */
         @page { size: A4; margin: 0; }
-        body {
+        html, body {
             margin: 0; padding: 0;
             font-family: 'Inter', sans-serif;
-            background: #e0e0e0;
+            background: #e0e0e0; /* Background for screen viewing */
             -webkit-print-color-adjust: exact;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
         }
         #brochure-container {
             width: 210mm;
+            margin: 0 auto; /* Center for screen viewing */
         }
         .page {
             width: 210mm; height: 297mm;
             background: #f8fafc;
-            margin: 0; /* Changed from 20px auto */
+            page-break-after: always; /* This is now safe for browser printing */
             position: relative; overflow: hidden;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             display: flex; flex-direction: column;
             color: #1e293b;
-            page-break-after: always;
         }
-        .footer-strip {
-            position: absolute; bottom: 0; width: 100%; text-align: right;
-            padding: 15px 40px; font-size: 11px; color: #94a3b8;
-            border-top: 1px solid #e2e8f0; box-sizing: border-box;
-            background-color: white;
+        .page:last-child {
+             page-break-after: avoid;
         }
-
-        /* --- UI & STATUS --- */
-        .status-indicator {
-            position: fixed; top: 20px; right: 20px; z-index: 100;
-            background: #2563eb; color: white; padding: 12px 20px;
-            border-radius: 8px; font-size: 16px;
-            font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            display: flex; align-items: center; gap: 10px;
-        }
-        .spinner {
-            border: 3px solid rgba(255,255,255,0.3);
-            border-top-color: #fff;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* --- TYPOGRAPHY & HELPERS --- */
         h1, h2, h3 { font-weight: 700; }
@@ -73,6 +49,12 @@
         .cover-content .est { margin-top: 20px; font-weight: 600; color: #3b82f6; }
 
         /* --- PAGE 2: ABOUT & SERVICES --- */
+        .footer-strip {
+            position: absolute; bottom: 0; width: 100%; text-align: right;
+            padding: 15px 40px; font-size: 11px; color: #94a3b8;
+            border-top: 1px solid #e2e8f0; box-sizing: border-box;
+            background-color: white;
+        }
         .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .service-box { background: white; padding: 20px; border-radius: 8px; display: flex; align-items: center; gap: 15px; border: 1px solid #e2e8f0; }
         .service-box i { font-size: 22px; color: #2563eb; }
@@ -93,7 +75,7 @@
         .project-item img { width: 100%; height: 180px; object-fit: cover; background-color: #f0f0f0; border-radius: 8px 8px 0 0; }
         .project-item {
             background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-            overflow: hidden; transition: transform 0.2s ease;
+            overflow: hidden;
         }
         .project-item a { display: block; text-decoration: none; color: inherit; }
         .project-item-details { padding: 15px; }
@@ -111,12 +93,6 @@
 </head>
 <body>
     
-    <div class="status-indicator" id="status-indicator">
-        <div class="spinner"></div>
-        <span>Generating PDF...</span>
-    </div>
-
-    <!-- This container will be used for PDF generation -->
     <div id="brochure-container">
         <!-- PAGE 1: FRONT COVER -->
         <div class="page bg-white">
@@ -205,8 +181,7 @@
         </div>
     </div>
 
-    <!-- SCRIPTS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- SCRIPTS (The generation logic is now removed) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="brochure-logic.js" defer></script>
 

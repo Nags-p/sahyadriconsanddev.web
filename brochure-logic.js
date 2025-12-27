@@ -1,42 +1,5 @@
 // brochure-logic.js
 
-// This function will be called to start the PDF generation process.
-async function generatePdf() {
-    const statusIndicator = document.getElementById('status-indicator');
-    const content = document.getElementById('brochure-container');
-
-    // --- Configuration for the PDF generator ---
-    const options = {
-        margin: 0,
-        filename: 'Sahyadri_Constructions_Brochure.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    try {
-        // --- Generate and save the PDF ---
-        await html2pdf().set(options).from(content).save();
-
-        // --- Update UI on success ---
-        if (statusIndicator) {
-            statusIndicator.innerHTML = '<i class="fas fa-check-circle"></i> Download Complete';
-            // Optionally, close the window after a delay
-            setTimeout(() => {
-                window.close();
-            }, 3000);
-        }
-    } catch (error) {
-        // --- Update UI on failure ---
-        console.error("PDF Generation Failed:", error);
-        if (statusIndicator) {
-            statusIndicator.style.backgroundColor = '#d9534f'; // Red color for error
-            statusIndicator.innerHTML = 'Error Generating PDF';
-        }
-    }
-}
-
-
 document.addEventListener('DOMContentLoaded', async () => {
     // --- SUPABASE CONFIG ---
     const SUPABASE_URL = 'https://qrnmnulzajmxrsrzgmlp.supabase.co';
@@ -86,17 +49,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             projectGrid.innerHTML = '<p>No featured projects available to display.</p>';
         }
 
-        // --- AUTOMATICALLY START PDF GENERATION ---
-        // A short delay ensures all images are rendered before capturing.
-        setTimeout(generatePdf, 1000);
-
     } catch (err) {
         console.error('Error fetching projects for brochure:', err);
         projectGrid.innerHTML = '<p style="color: red;">Could not load project data.</p>';
-        const statusIndicator = document.getElementById('status-indicator');
-        if (statusIndicator) {
-            statusIndicator.style.backgroundColor = '#d9534f';
-            statusIndicator.innerHTML = 'Failed to load data.';
-        }
     }
 });
