@@ -1589,14 +1589,51 @@ function renderInquiries(inquiries, status) {
         const deleteBtn = document.createElement('button');
         deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete Forever';
         deleteBtn.className = 'btn-danger';
-        deleteBtn.addEventListener('click', async () => {
-             if (confirm(`PERMANENTLY DELETE this inquiry?`)) {
-                setLoading(true);
-                await _supabase.from('contact_inquiries').delete().eq('id', inquiry.id);
-                fetchInquiries(status); // Refresh the current tab (either 'New' or 'Archived')
-                setLoading(false);
-             }
-        });
+        // NEW, COMPLETE DELETE LOGIC
+deleteBtn.addEventListener('click', async () => {
+    if (confirm(`PERMANENTLY DELETE this inquiry? This will also delete any attached files.`)) {
+        setLoading(true);
+        try {
+            // --- FIX STARTS HERE ---
+
+            // Step 1: Check if a file exists and delete it from Storage first
+            if (inquiry.file_url) {
+                // Extract the file path from the full URL.
+                // e.g., "resume_12345.pdf" from "https://.../storage/v1/object/public/contact_uploads/resume_12345.pdf"
+                const filePath = inquiry.file_url.split('/contact_uploads/').pop();
+                
+                if (filePath) {
+                    const { error: storageError } = await _supabase.storage
+                        .from('contact_uploads')
+                        .remove([filePath]);
+
+                    if (storageError) {
+                        // Log a warning but don't stop the process. It's better to delete the DB record.
+                        console.warn(`Could not delete file from storage: ${storageError.message}`);
+                    }
+                }
+            }
+
+            // Step 2: Delete the inquiry record from the database
+            const { error: dbError } = await _supabase
+                .from('contact_inquiries')
+                .delete()
+                .eq('id', inquiry.id);
+
+            if (dbError) throw dbError;
+
+            // Step 3: Refresh the UI
+            fetchInquiries(status);
+            
+            // --- FIX ENDS HERE ---
+
+        } catch (error) {
+            alert(`Error deleting inquiry: ${error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    }
+});
 
         actionsDiv.appendChild(deleteBtn);
         card.appendChild(actionsDiv);
