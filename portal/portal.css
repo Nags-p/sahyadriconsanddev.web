@@ -162,6 +162,8 @@ body {
     background-color: #fee2e2;
     color: var(--danger-dark-color);
     border: 1px solid #fecaca;
+    border-radius: var(--border-radius); /* Added for consistency */
+    cursor: pointer; /* Added for better UX */
 }
 #logout-btn:hover {
     background-color: var(--danger-color);
@@ -197,6 +199,9 @@ body {
     color: var(--text-secondary);
     border-bottom: 3px solid transparent;
     transition: all 0.2s;
+    display: inline-flex; /* Added for icon alignment */
+    align-items: center; /* Added for icon alignment */
+    gap: 8px; /* Added for icon alignment */
 }
 
 .tab-btn:hover {
@@ -232,15 +237,6 @@ body {
     padding: 40px;
     color: var(--text-secondary);
 }
-
-/* Add A4 payslip styles from erp.css here as well */
-.a4-sheet {
-    /* ..
-    
-    . copy all styles for .a4-sheet and its children from erp.css ... */
-}
-
-/* In /portal/portal.css */
 
 /* --- Profile Details Grid --- */
 .details-grid {
@@ -300,14 +296,16 @@ body {
     background-color: var(--card-bg);
     color: var(--primary-color);
     border: 1px solid var(--border-color);
+    border-radius: var(--border-radius); /* Added for consistency */
+    cursor: pointer; /* Added for better UX */
+    transition: all 0.2s; /* Added for hover effect */
 }
 .payslips-table .action-buttons button:hover {
     background-color: var(--primary-color);
     color: white;
+    border-color: var(--primary-color);
 }
 
-
-/* At the end of portal.css */
 
 /* --- ATTENDANCE CALENDAR STYLES --- */
 .calendar-container { max-width: 800px; margin: 0 auto; }
@@ -330,3 +328,149 @@ body {
 .legend-color-box.present { background-color: #dcfce7; }
 .legend-color-box.absent { background-color: #fee2e2; }
 .legend-color-box.leave { background-color: #fef9c3; }
+
+
+/* ==========================================================
+   --- A4 PAYSLIP TEMPLATE STYLES (MISSING BLOCK) ---
+   ========================================================== */
+.a4-sheet {
+    width: 794px;
+    padding: 40px;
+    background: white;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    color: #1e293b;
+    border: 1px solid #e2e8f0;
+}
+
+.slip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #3b82f6;
+    padding-bottom: 15px;
+}
+
+.slip-logo {
+    height: 50px;
+}
+
+.slip-header-info {
+    text-align: right;
+}
+
+.slip-header-info h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.slip-header-info p {
+    margin: 0;
+    color: #64748b;
+}
+
+.slip-section {
+    margin-top: 25px;
+}
+
+.employee-details table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.employee-details td {
+    padding: 8px;
+    width: 50%;
+    vertical-align: top;
+}
+
+.employee-details span {
+    font-weight: normal;
+    color: #475569;
+}
+
+.salary-grid {
+    display: flex;
+    gap: 30px;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 15px 0;
+}
+
+.salary-column {
+    flex: 1;
+}
+
+.salary-column h4 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.salary-column table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.salary-column td {
+    padding: 10px 8px;
+    border-bottom: 1px dashed #cbd5e1;
+}
+
+.salary-column td.amount {
+    text-align: right;
+}
+
+.salary-column .total-row td {
+    border-bottom: none;
+    border-top: 1px solid #334155;
+    padding-top: 10px;
+}
+
+.summary-details table {
+    width: 100%;
+    font-size: 14px;
+    color: #475569;
+}
+.summary-details td {
+    padding: 4px 8px;
+}
+
+.slip-net-pay {
+    margin-top: 25px;
+    background-color: #f1f5f9;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.slip-net-pay p {
+    margin: 0;
+    font-size: 14px;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.slip-net-pay h3 {
+    margin: 5px 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.slip-net-pay .net-words {
+    font-style: italic;
+    font-size: 13px;
+    text-transform: capitalize;
+}
+
+.slip-footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 12px;
+    color: #94a3b8;
+}
