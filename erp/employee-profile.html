@@ -30,6 +30,7 @@
                         <span id="profile-status" class="status-badge">...</span>
                     </div>
                     <div class="profile-header-actions" style="margin-left: auto;">
+                        <button id="edit-profile-btn" class="btn-secondary"><i class="fas fa-edit"></i> Edit Profile</button>
                         <button id="assign-project-btn" class="btn-primary"><i class="fas fa-plus"></i> Assign to Project</button>
                     </div>
                 </div>
@@ -39,6 +40,10 @@
                     <button class="tab-btn active" data-tab="info">Personal Information</button>
                     <button class="tab-btn" data-tab="docs">Documents</button>
                     <button class="tab-btn" data-tab="history">Project History</button>
+                    
+                    <!-- ADD THESE TWO NEW BUTTONS -->
+                    <button class="tab-btn" data-tab="attendance">Attendance & Leave</button>
+                    <button class="tab-btn" data-tab="payroll">Payroll History</button>
                 </div>
 
                 <div class="tab-content-horizontal">
@@ -97,6 +102,18 @@
                     <!-- Tab 3: Project History -->
                     <div id="tab-pane-history" class="tab-pane">
                         <p>Project history feature coming soon.</p>
+                    </div>
+
+
+                    <!-- ADD THESE TWO NEW TAB PANES -->
+                    <div id="tab-pane-attendance" class="tab-pane">
+                        <!-- Attendance data will be loaded here by JS -->
+                        <p>Loading attendance records...</p>
+                    </div>
+
+                    <div id="tab-pane-payroll" class="tab-pane">
+                        <!-- Payroll data will be loaded here by JS -->
+                        <p>Payroll history feature is under development.</p>
                     </div>
                 </div>
 

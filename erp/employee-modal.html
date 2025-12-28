@@ -1,0 +1,62 @@
+<!-- Add Employee Modal -->
+<div id="employee-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-header">
+            <h3 id="modal-title">Add New Employee</h3>
+            <button type="button" class="modal-close" id="modal-close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="employee-form" class="erp-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="employee_id">Employee ID*</label>
+                    <input type="text" id="employee_id" name="employee_id" placeholder="e.g., SH-001" required>
+                </div>
+                <div class="form-group">
+                    <label for="full_name">Full Name*</label>
+                    <input type="text" id="full_name" name="full_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number*</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email">
+                </div>
+                 <div class="form-group">
+                    <label for="date_of_joining">Date of Joining*</label>
+                    <input type="date" id="date_of_joining" name="date_of_joining" required>
+                </div>
+                <div class="form-group">
+                    <label for="date_of_birth">Date of Birth</label>
+                    <input type="date" id="date_of_birth" name="date_of_birth">
+                </div>
+                <div class="form-group">
+                    <label for="designation">Designation</label>
+                    <input type="text" id="designation" name="designation" placeholder="e.g., Site Engineer">
+                </div>
+                <div class="form-group">
+                    <label for="employment_type">Employment Type*</label>
+                    <select id="employment_type" name="employment_type" required>
+                        <option value="Permanent">Permanent</option>
+                        <option value="Contract">Contract</option>
+                        <option value="Daily Wage">Daily Wage</option>
+                        <option value="Intern">Intern</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label for="address">Address</label>
+                    <textarea id="address" name="address" rows="2" placeholder="Enter full residential address"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="emergency_contact_number">Emergency Contact Number</label>
+                    <input type="tel" id="emergency_contact_number" name="emergency_contact_number">
+                </div>
+            </div>
+            <div class="button-group" style="margin-top:20px;">
+                <button type="submit" class="btn-primary" id="save-employee-btn"><i class="fas fa-save"></i> Save Employee</button>
+            </div>
+            <div id="form-status" class="status-message" style="margin-top: 15px;"></div>
+        </form>
+    </div>
+</div>

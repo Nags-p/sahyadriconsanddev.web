@@ -10,13 +10,14 @@ async function loadComponent(elementId, filePath) {
         const html = await response.text();
         element.innerHTML = html;
         
-        // The script inside sidebar.html will run automatically when injected
     } catch (error) {
         console.error(`Failed to load component:`, error);
     }
 }
 
-// Load the sidebar when the DOM is ready
+// Load shared components when the DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     loadComponent('erp-sidebar', 'sidebar.html');
+    // ADD THIS LINE to load the modal into its placeholder
+    loadComponent('employee-modal-placeholder', 'employee-modal.html');
 });

@@ -240,3 +240,24 @@ table[id] tbody tr:last-child td {
         grid-template-columns: 1fr;
     }
 }
+
+/* PASTE THIS AT THE END OF erp/erp.css */
+
+/* Fix for long employee modal form */
+#employee-modal .form-grid {
+    max-height: 60vh; /* Limit height to 60% of the viewport height */
+    overflow-y: auto;   /* Add a vertical scrollbar only when needed */
+    padding-right: 15px; /* Add some space for the scrollbar */
+    margin-right: -15px; /* Counteract the padding to keep alignment */
+}
+
+/* Make textarea resizable only vertically */
+#employee-modal textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+/* New utility class to make a form group span the full width of the grid */
+.form-group.full-width {
+    grid-column: 1 / -1;
+}

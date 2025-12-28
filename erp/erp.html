@@ -6,18 +6,14 @@
     <title>Employee Management - Sahyadri ERP</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Reusing the dashboard styles for consistency -->
     <link rel="stylesheet" href="../dashboard.css">
-    <!-- A new CSS file for ERP-specific styles -->
     <link rel="stylesheet" href="erp.css">
 </head>
 <body>
     <div class="dashboard-layout" id="erp-layout">
-        <!-- We can dynamically load the sidebar later, for now, this is a placeholder -->
         <div class="sidebar" id="erp-sidebar"></div>
         
         <div class="main-content">
-            <!-- Main ERP Page Content -->
             <div id="page-employees" class="page active">
                 <div class="content-box">
                     <div class="analytics-header">
@@ -27,7 +23,6 @@
 
                     <div class="controls-bar" style="display: flex; gap: 15px; margin-bottom: 20px;">
                          <input type="text" id="employee-search" placeholder="Search by name, ID, or phone..." style="flex-grow: 1;">
-                         <!-- Add filters here later -->
                     </div>
 
                     <div style="overflow-x: auto;">
@@ -44,7 +39,6 @@
                                 </tr>
                             </thead>
                             <tbody id="employees-table-body">
-                                <!-- JS will populate this -->
                                 <tr><td colspan="7" style="text-align: center; padding: 20px;">Loading employees...</td></tr>
                             </tbody>
                         </table>
@@ -54,68 +48,20 @@
         </div>
     </div>
     
-    <!-- PASTE THE NEW MODAL CODE HERE -->
-    <!-- Add Employee Modal -->
-    <div id="employee-modal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 700px;">
-            <div class="modal-header">
-                <h3 id="modal-title">Add New Employee</h3>
-                <button type="button" class="modal-close" id="modal-close-btn"><i class="fas fa-times"></i></button>
-            </div>
-            <form id="employee-form" class="erp-form">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="employee_id">Employee ID*</label>
-                        <input type="text" id="employee_id" name="employee_id" placeholder="e.g., SH-001" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="full_name">Full Name*</label>
-                        <input type="text" id="full_name" name="full_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Phone Number*</label>
-                        <input type="tel" id="phone" name="phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email">
-                    </div>
-                     <div class="form-group">
-                        <label for="date_of_joining">Date of Joining*</label>
-                        <input type="date" id="date_of_joining" name="date_of_joining" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="date_of_birth">Date of Birth</label>
-                        <input type="date" id="date_of_birth" name="date_of_birth">
-                    </div>
-                    <div class="form-group">
-                        <label for="designation">Designation</label>
-                        <input type="text" id="designation" name="designation" placeholder="e.g., Site Engineer">
-                    </div>
-                    <div class="form-group">
-                        <label for="employment_type">Employment Type*</label>
-                        <select id="employment_type" name="employment_type" required>
-                            <option value="Permanent">Permanent</option>
-                            <option value="Contract">Contract</option>
-                            <option value="Daily Wage">Daily Wage</option>
-                            <option value="Intern">Intern</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="button-group" style="margin-top:20px;">
-                    <button type="submit" class="btn-primary" id="save-employee-btn"><i class="fas fa-save"></i> Save Employee</button>
-                </div>
-                <div id="form-status" class="status-message" style="margin-top: 15px;"></div>
-            </form>
-        </div>
-    </div>
+    <!-- This div will be filled by loader.js -->
+    <div id="employee-modal-placeholder"></div>
 
+    <!-- REPLACE ALL SCRIPT TAGS AT THE BOTTOM of erp.html WITH THIS BLOCK -->
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../config.js" defer></script>
-    <script src="erp.js" defer></script>
     <script src="loader.js" defer></script>
+    
+    <!-- 1. Logic for the modal MUST be loaded BEFORE the page script that uses it -->
+    <script src="employee-modal-logic.js" defer></script>
+    
+    <!-- 2. Page-specific logic that CALLS the modal functions -->
     <script src="erp.js" defer></script>
 </body>
 </html>

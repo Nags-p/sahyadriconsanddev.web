@@ -1,11 +1,14 @@
 // erp/employee-profile.js
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const { createClient } = supabase;
-    const _supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+    // This check ensures _supabase is globally available for the modal logic script.
+    if (!window._supabase) {
+        const { createClient } = supabase;
+        window._supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+    }
 
     // --- State Variable ---
-    let currentEmployee = null; // To store the full employee object
+    let currentEmployee = null;
 
     const { data: { session } } = await _supabase.auth.getSession();
     if (!session) {
@@ -62,7 +65,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         statusBadge.style.background = employee.is_active ? '#dcfce7' : '#fee2e2';
         statusBadge.style.color = employee.is_active ? '#15803d' : '#b91c1c';
         const infoContainer = document.getElementById('tab-pane-info');
-        infoContainer.innerHTML = `<div class="detail-item"><strong>Phone:</strong> <span>${employee.phone}</span></div><div class="detail-item"><strong>Email:</strong> <span>${employee.email || 'N/A'}</span></div><div class="detail-item"><strong>Date of Joining:</strong> <span>${formatDate(employee.date_of_joining)}</span></div><div class="detail-item"><strong>Date of Birth:</strong> <span>${formatDate(employee.date_of_birth)}</span></div><div class="detail-item"><strong>Employment Type:</strong> <span>${employee.employment_type}</span></div>`;
+        infoContainer.innerHTML = `<div class="detail-item"><strong>Phone:</strong> <span>${employee.phone}</span></div>
+            <div class="detail-item"><strong>Email:</strong> <span>${employee.email || 'N/A'}</span></div>
+            <div class="detail-item"><strong>Date of Joining:</strong> <span>${formatDate(employee.date_of_joining)}</span></div>
+            <div class="detail-item"><strong>Date of Birth:</strong> <span>${formatDate(employee.date_of_birth)}</span></div>
+            <div class="detail-item"><strong>Employment Type:</strong> <span>${employee.employment_type}</span></div>
+            <div class="detail-item"><strong>Address:</strong> <span>${employee.address || 'N/A'}</span></div>
+            <div class="detail-item"><strong>Emergency Contact:</strong> <span>${employee.emergency_contact_number || 'N/A'}</span></div>`;
 
         // ==========================================================
         // --- NEW LOGIC TO LOAD AND DISPLAY PROFILE PICTURE ---
@@ -95,6 +104,57 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         loadProjectHistory();
         loadDocuments();
+    }
+
+    // PASTE THIS SNIPPET in erp/employee-profile.js (e.g., after the loadDocuments function)
+
+    // --- NEW: Function to load Attendance Data ---
+    async function loadAttendanceData() {
+        const attendanceContainer = document.getElementById('tab-pane-attendance');
+        attendanceContainer.innerHTML = '<p>Loading attendance records...</p>';
+
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const startDate = thirtyDaysAgo.toISOString().split('T')[0];
+
+        const { data, error } = await _supabase
+            .from('attendance')
+            .select('attendance_date, status')
+            .eq('employee_id', employeeDbId)
+            .gte('attendance_date', startDate)
+            .order('attendance_date', { ascending: false });
+
+        if (error) {
+            attendanceContainer.innerHTML = `<p style="color:red;">Error loading attendance: ${error.message}</p>`;
+            return;
+        }
+
+        if (data.length === 0) {
+            attendanceContainer.innerHTML = '<p>No attendance records found for the last 30 days.</p>';
+            return;
+        }
+
+        let tableHtml = `<table id="attendance-history-table">
+                            <thead><tr><th>Date</th><th>Status</th></tr></thead>
+                            <tbody>`;
+        data.forEach(record => {
+            tableHtml += `<tr><td>${formatDate(record.attendance_date)}</td><td>${record.status}</td></tr>`;
+        });
+        tableHtml += `</tbody></table>`;
+        attendanceContainer.innerHTML = tableHtml;
+    }
+
+    // --- NEW: Placeholder for Payroll History ---
+    async function loadPayrollData() {
+        const payrollContainer = document.getElementById('tab-pane-payroll');
+        // This is a placeholder as the payroll feature is not yet built.
+        payrollContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                <i class="fas fa-file-invoice-dollar" style="font-size: 2rem; color: #94a3b8; margin-bottom: 15px;"></i>
+                <h4 style="margin:0;">Payroll History Coming Soon</h4>
+                <p style="color: var(--text-secondary);">This section will display past salary payments and allow downloading payslips.</p>
+            </div>
+        `;
     }
 
     async function loadProjectHistory() {
@@ -286,6 +346,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (e.target === assignmentModal) closeAssignmentModal();
     });
     assignmentForm.addEventListener('submit', handleAssignmentSubmit);
+
+    // PASTE THIS SNIPPET in erp/employee-profile.js
+
+    // --- Event Listeners ---
+    // ... existing event listeners for docs, assignments, etc. ...
+    
+    // ADD THIS NEW EVENT LISTENER
+    // --- THIS IS THE UPDATED PART ---
+    const editProfileBtn = document.getElementById('edit-profile-btn');
+    if (editProfileBtn) {
+        editProfileBtn.addEventListener('click', () => {
+            // Check if employee data has been loaded
+            if (currentEmployee) {
+                // Call the global openModal function from employee-modal-logic.js
+                // Pass the current employee object to pre-fill the form.
+                // Pass the loadProfileData function as a callback to refresh this page on success.
+                openModal(currentEmployee, loadProfileData);
+            } else {
+                alert("Employee data not loaded yet. Please wait a moment and try again.");
+            }
+        });
+    }
+
+
     
     // --- Initial Load ---
     loadProfileData();
