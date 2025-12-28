@@ -553,6 +553,10 @@ section {
 /* =======================
    5. WHY CHOOSE US
    ======================= */
+
+   #why-choose-us {
+    background-color: var(--light-gray);
+    }
 .why-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -685,6 +689,7 @@ section {
     background: white;
     box-shadow: var(--shadow-md);
     cursor: pointer;
+    width: 450px;
 }
 
 .project-item img {
@@ -935,7 +940,7 @@ section {
    CONTACT
    ======================= */
 #contact {
-    background: white;
+    background: rgb(211, 211, 211);
 }
 
 .contact-content {
