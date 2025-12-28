@@ -65,13 +65,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         statusBadge.style.background = employee.is_active ? '#dcfce7' : '#fee2e2';
         statusBadge.style.color = employee.is_active ? '#15803d' : '#b91c1c';
         const infoContainer = document.getElementById('profile-details-container');
-        infoContainer.innerHTML = `<div class="detail-item"><strong>Phone:</strong> <span>${employee.phone}</span></div>
+        infoContainer.innerHTML = `
+            <!-- Contact Info -->
+            <div class="detail-item"><strong>Phone:</strong> <span>${employee.phone || 'N/A'}</span></div>
             <div class="detail-item"><strong>Email:</strong> <span>${employee.email || 'N/A'}</span></div>
+            <div class="detail-item"><strong>Emergency Contact:</strong> <span>${employee.emergency_contact_number || 'N/A'}</span></div>
+            
+            <!-- Job Info -->
             <div class="detail-item"><strong>Date of Joining:</strong> <span>${formatDate(employee.date_of_joining)}</span></div>
+            <div class="detail-item"><strong>Employment Type:</strong> <span>${employee.employment_type || 'N/A'}</span></div>
             <div class="detail-item"><strong>Date of Birth:</strong> <span>${formatDate(employee.date_of_birth)}</span></div>
-            <div class="detail-item"><strong>Employment Type:</strong> <span>${employee.employment_type}</span></div>
-            <div class="detail-item"><strong>Address:</strong> <span>${employee.address || 'N/A'}</span></div>
-            <div class="detail-item"><strong>Emergency Contact:</strong> <span>${employee.emergency_contact_number || 'N/A'}</span></div>`;
+            
+            <!-- Address Info -->
+            <div class="detail-item detail-item-full"><strong>Address:</strong> <span>${employee.address || 'N/A'}</span></div>
+
+            <!-- Bank Info -->
+            <div class="detail-item"><strong>Bank Account Holder:</strong> <span>${employee.bank_account_holder_name || 'N/A'}</span></div>
+            <div class="detail-item"><strong>Bank Account Number:</strong> <span>${employee.bank_account_number || 'N/A'}</span></div>
+            <div class="detail-item"><strong>Bank IFSC Code:</strong> <span>${employee.bank_ifsc_code || 'N/A'}</span></div>
+        `;
+        // ====================================================================
 
         // ==========================================================
         // --- LOGIC TO LOAD AND DISPLAY PROFILE PICTURE ---
