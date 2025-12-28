@@ -2104,7 +2104,7 @@ imageUploadInput.addEventListener('change', (e) => {
     
     dom.clientSearch.addEventListener('keyup', () => {
         const searchTerm = dom.clientSearch.value.toLowerCase();
-        const filteredclients = allclients.filter(client =>
+        const filteredclients = allClients.filter(client =>
             Object.values(client).some(val => String(val).toLowerCase().includes(searchTerm))
         );
         renderClientTable(filteredclients, dom);

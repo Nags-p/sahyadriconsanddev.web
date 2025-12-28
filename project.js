@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             .from('projects')
             .select('*')
             .eq('id', projectId)
+            .eq('is_active', true)
             .single();
 
         if (error || !project) {
