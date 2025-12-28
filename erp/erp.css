@@ -395,3 +395,152 @@ table[id] tbody tr:last-child td {
 .legend-color-box.present { background-color: #00fe4c; }
 .legend-color-box.absent { background-color: #ff1b02; }
 .legend-color-box.leave { background-color: #343f66; }
+
+
+/* ==========================================================
+   --- A4 PAYSLIP TEMPLATE STYLES (REPLACE OLD STYLES) ---
+   ========================================================== */
+
+/* This container mimics the A4 aspect ratio at 96 DPI.
+   Width: 210mm * (96/25.4) = 794px */
+.a4-sheet {
+    width: 794px;
+    padding: 40px;
+    background: white;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    color: #1e293b;
+    border: 1px solid #e2e8f0; /* Visible border for debugging if needed */
+}
+
+.slip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #3b82f6;
+    padding-bottom: 15px;
+}
+
+.slip-logo {
+    height: 50px;
+}
+
+.slip-header-info {
+    text-align: right;
+}
+
+.slip-header-info h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.slip-header-info p {
+    margin: 0;
+    color: #64748b;
+}
+
+.slip-section {
+    margin-top: 25px;
+}
+
+.employee-details table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.employee-details td {
+    padding: 8px;
+    width: 50%;
+    vertical-align: top;
+}
+
+.employee-details span {
+    font-weight: normal;
+    color: #475569;
+}
+
+.salary-grid {
+    display: flex;
+    gap: 30px;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 15px 0;
+}
+
+.salary-column {
+    flex: 1;
+}
+
+.salary-column h4 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.salary-column table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.salary-column td {
+    padding: 10px 8px;
+    border-bottom: 1px dashed #cbd5e1;
+}
+
+.salary-column td.amount {
+    text-align: right;
+}
+
+.salary-column .total-row td {
+    border-bottom: none;
+    border-top: 1px solid #334155;
+    padding-top: 10px;
+}
+
+.summary-details table {
+    width: 100%;
+    font-size: 14px;
+    color: #475569;
+}
+.summary-details td {
+    padding: 4px 8px;
+}
+
+.slip-net-pay {
+    margin-top: 25px;
+    background-color: #f1f5f9;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.slip-net-pay p {
+    margin: 0;
+    font-size: 14px;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.slip-net-pay h3 {
+    margin: 5px 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.slip-net-pay .net-words {
+    font-style: italic;
+    font-size: 13px;
+    text-transform: capitalize;
+}
+
+.slip-footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 12px;
+    color: #94a3b8;
+}

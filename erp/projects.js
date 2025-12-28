@@ -24,7 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function formatDate(dateString) {
             if (!dateString) return 'N/A';
-            const date = new Date(dateString.replace(/-/g, '/'));
+            const date = new Date(dateString); // Directly parse the ISO string
+            // Add a check for invalid dates
+            if (isNaN(date.getTime())) {
+                return 'Invalid Date';
+            }
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();

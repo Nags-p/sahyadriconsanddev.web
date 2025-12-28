@@ -197,6 +197,31 @@
                             <option value="Intern">Intern</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label for="gross_salary">Gross Monthly Salary (₹)</label>
+                        <input type="number" id="gross_salary" name="gross_salary" placeholder="e.g., 30000" min="0" step="100">
+                    </div>
+                    <!-- ============================================= -->
+                <!-- === PASTE THE NEW BANK FIELDS HERE === -->
+                <!-- ============================================= -->
+                <div class="form-group full-width">
+                    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 10px 0;">
+                </div>
+                <div class="form-group">
+                    <label for="bank_account_holder_name">Bank Account Holder Name</label>
+                    <input type="text" id="bank_account_holder_name" name="bank_account_holder_name">
+                </div>
+                <div class="form-group">
+                    <label for="bank_account_number">Bank Account Number</label>
+                    <input type="text" id="bank_account_number" name="bank_account_number">
+                </div>
+                <div class="form-group">
+                    <label for="bank_ifsc_code">Bank IFSC Code</label>
+                    <input type="text" id="bank_ifsc_code" name="bank_ifsc_code">
+                </div>
+                <div class="form-group full-width">
+                     <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 10px 0;">
+                </div>
                     <div class="form-group full-width">
                         <label for="address">Address</label>
                         <textarea id="address" name="address" rows="2" placeholder="Enter full residential address"></textarea>
@@ -213,6 +238,74 @@
             </form>
         </div>
     </div>
+
+
+    <!-- ========================================================== -->
+    <!-- === ADD THE HIDDEN PAYSLIP TEMPLATE HERE (SAME AS PAYROLL.HTML) === -->
+    <!-- ========================================================== -->
+    <div style="position: absolute; left: -9999px; top: auto;">
+        <div id="payslip-template" class="a4-sheet">
+            <div class="slip-header">
+                <img src="../images/logo.png" class="slip-logo" alt="Logo">
+                <div class="slip-header-info">
+                    <h2>Salary Slip</h2>
+                    <p>For the Month of <span id="slip-month-year"></span></p>
+                </div>
+            </div>
+            <div class="slip-section employee-details">
+                <table>
+                    <tr>
+                        <td><strong>Employee Name:</strong> <span id="slip-employee-name"></span></td>
+                        <td><strong>Designation:</strong> <span id="slip-designation"></span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Employee ID:</strong> <span id="slip-employee-id"></span></td>
+                        <td><strong>Date of Joining:</strong> <span id="slip-doj"></span></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="slip-section salary-grid">
+                <div class="salary-column">
+                    <h4>Earnings</h4>
+                    <table>
+                        <tr><td>Gross Salary</td><td class="amount" id="slip-gross"></td></tr>
+                        <tr class="total-row"><td><strong>Total Earnings</strong></td><td class="amount"><strong id="slip-total-earnings"></strong></td></tr>
+                    </table>
+                </div>
+                <div class="salary-column">
+                    <h4>Deductions</h4>
+                    <table>
+                        <tr><td>Professional Tax</td><td class="amount">₹0.00</td></tr>
+                        <tr><td>Other Deductions</td><td class="amount" id="slip-deductions"></td></tr>
+                        <tr class="total-row"><td><strong>Total Deductions</strong></td><td class="amount"><strong id="slip-total-deductions"></strong></td></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="slip-section summary-details">
+                 <table>
+                    <tr>
+                        <td><strong>Total Days in Month:</strong> <span id="slip-total-days"></span></td>
+                        <td><strong>Payable Days:</strong> <span id="slip-payable-days"></span></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="slip-net-pay">
+                <p>Net Salary Payable</p>
+                <h3 id="slip-net-salary"></h3>
+                <p class="net-words" id="slip-net-words"></p>
+            </div>
+            <div class="slip-footer">
+                This is a computer-generated salary slip and does not require a signature.
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================================== -->
+    <!-- === ADD THE PDF GENERATION SCRIPTS HERE === -->
+    <!-- ========================================================== -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../config.js" defer></script>

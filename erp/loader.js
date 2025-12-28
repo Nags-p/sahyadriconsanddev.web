@@ -18,6 +18,4 @@ async function loadComponent(elementId, filePath) {
 // Load shared components when the DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     loadComponent('erp-sidebar', 'sidebar.html');
-    // ADD THIS LINE to load the modal into its placeholder
-    loadComponent('employee-modal-placeholder', 'employee-modal.html');
 });

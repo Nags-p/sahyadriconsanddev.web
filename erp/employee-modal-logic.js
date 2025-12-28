@@ -7,18 +7,11 @@ const employeeForm = document.getElementById('employee-form');
 const formStatus = document.getElementById('form-status');
 const modalTitle = document.getElementById('modal-title');
 
-// Store the callback function to refresh the page data after a successful save
 let _onSuccessCallback = null;
 
-// --- 2. DEFINE MODAL FUNCTIONS (These are now globally accessible) ---
-
-/**
- * Opens the universal employee modal.
- * @param {object|null} employee - The employee object to edit, or null to add a new one.
- * @param {function|null} callbackOnSuccess - The function to call after a successful save (e.g., to refresh a table).
- */
+// --- 2. DEFINE MODAL FUNCTIONS ---
 function openModal(employee = null, callbackOnSuccess = null) {
-    _onSuccessCallback = callbackOnSuccess; // Store the callback
+    _onSuccessCallback = callbackOnSuccess;
 
     formStatus.style.display = 'none';
     employeeForm.reset();
@@ -28,6 +21,7 @@ function openModal(employee = null, callbackOnSuccess = null) {
 
     if (employee) {
         modalTitle.textContent = "Edit Employee";
+        // Personal & Job Info
         document.getElementById('employee_id').value = employee.employee_id;
         document.getElementById('full_name').value = employee.full_name;
         document.getElementById('phone').value = employee.phone;
@@ -38,6 +32,13 @@ function openModal(employee = null, callbackOnSuccess = null) {
         document.getElementById('employment_type').value = employee.employment_type;
         document.getElementById('address').value = employee.address || '';
         document.getElementById('emergency_contact_number').value = employee.emergency_contact_number || '';
+        document.getElementById('gross_salary').value = employee.gross_salary || '';
+
+        // Bank Info
+        document.getElementById('bank_account_holder_name').value = employee.bank_account_holder_name || '';
+        document.getElementById('bank_account_number').value = employee.bank_account_number || '';
+        document.getElementById('bank_ifsc_code').value = employee.bank_ifsc_code || '';
+        
         employeeForm.dataset.employeeId = employee.id;
     } else {
         modalTitle.textContent = "Add New Employee";
@@ -48,7 +49,7 @@ function openModal(employee = null, callbackOnSuccess = null) {
 
 function closeModal() {
     employeeModal.classList.remove('active');
-    _onSuccessCallback = null; // Clear callback when closing
+    _onSuccessCallback = null;
 }
 
 async function handleFormSubmit(event) {
@@ -61,54 +62,37 @@ async function handleFormSubmit(event) {
     const employeeData = Object.fromEntries(formData.entries());
     const employeeDbId = employeeForm.dataset.employeeId;
     
-    // Sanitize data
-    if (!employeeData.email) employeeData.email = null;
-    if (!employeeData.date_of_birth) employeeData.date_of_birth = null;
-    if (!employeeData.designation) employeeData.designation = null;
-    if (!employeeData.address) employeeData.address = null;
-    if (!employeeData.emergency_contact_number) employeeData.emergency_contact_number = null;
+    // Sanitize data (set empty strings to null)
+    Object.keys(employeeData).forEach(key => {
+        if (employeeData[key] === '') {
+            employeeData[key] = null;
+        }
+    });
+    // Ensure salary is a number
+    employeeData.gross_salary = employeeData.gross_salary ? parseFloat(employeeData.gross_salary) : null;
 
-    // ==========================================================
-    // --- THIS IS THE CORRECTED LOGIC ---
-    // ==========================================================
     let result;
     
-    // This assumes _supabase is globally available from a script loaded before this one
     if (employeeDbId) {
-        // When UPDATING, chain .select() to get the updated data back for confirmation.
-        result = await _supabase
-            .from('employees')
-            .update(employeeData)
-            .eq('id', employeeDbId)
-            .select();
+        result = await _supabase.from('employees').update(employeeData).eq('id', employeeDbId).select();
     } else {
-        // When INSERTING, .select() is also useful to get the newly created record.
-        result = await _supabase
-            .from('employees')
-            .insert([employeeData])
-            .select();
+        result = await _supabase.from('employees').insert([employeeData]).select();
     }
 
-    const error = result.error;
-    const data = result.data;
-    // ==========================================================
-    // --- END OF CORRECTION ---
-    // ==========================================================
-
+    const { data, error } = result;
 
     if (error || !data || data.length === 0) {
-        const errorMessage = error ? error.message : "Operation failed. No rows were updated. Please check permissions (RLS).";
+        const errorMessage = error ? error.message : "Operation failed. No data was returned, check permissions (RLS).";
         formStatus.textContent = `Error: ${errorMessage}`;
         formStatus.className = 'status-message error';
         formStatus.style.display = 'block';
         saveBtn.disabled = false;
         saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
     } else {
-        closeModal();
-        // If a callback was provided, execute it to refresh the page data
         if (_onSuccessCallback) {
             _onSuccessCallback();
         }
+        closeModal();
     }
 }
 

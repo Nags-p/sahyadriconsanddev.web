@@ -235,14 +235,158 @@ function renderCalendar(year, month, attendanceMap) {
     // --- Placeholder for Payroll History ---
     async function loadPayrollData() {
         const payrollContainer = document.getElementById('tab-pane-payroll');
-        // This is a placeholder as the payroll feature is not yet built.
-        payrollContainer.innerHTML = `
-            <div style="text-align: center; padding: 40px; border: 1px dashed #e2e8f0; border-radius: 8px;">
-                <i class="fas fa-file-invoice-dollar" style="font-size: 2rem; color: #94a3b8; margin-bottom: 15px;"></i>
-                <h4 style="margin:0;">Payroll History Coming Soon</h4>
-                <p style="color: var(--text-secondary);">This section will display past salary payments and allow downloading payslips.</p>
-            </div>
+        payrollContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Loading payroll history...</p>';
+
+        const { data: history, error } = await _supabase
+            .from('payroll_history')
+            .select('*')
+            .eq('employee_id', employeeDbId)
+            .order('payroll_month', { ascending: false }); // Show most recent first
+
+        if (error) {
+            payrollContainer.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+            return;
+        }
+
+        if (!history || history.length === 0) {
+            payrollContainer.innerHTML = `
+                <div style="text-align: center; padding: 40px; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                    <i class="fas fa-file-invoice-dollar" style="font-size: 2rem; color: #94a3b8; margin-bottom: 15px;"></i>
+                    <h4 style="margin:0;">No Payroll History Found</h4>
+                    <p style="color: var(--text-secondary);">There are no processed payroll records for this employee yet.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // If data exists, build the table
+        let tableHtml = `
+            <div style="overflow-x: auto;">
+                <table id="payroll-history-table">
+                    <thead>
+                        <tr>
+                            <th>Payroll Month</th>
+                            <th>Payable Days</th>
+                            <th>Gross Salary</th>
+                            <th>Net Salary Paid</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
         `;
+
+        history.forEach(record => {
+            const payrollMonth = new Date(record.payroll_month).toLocaleString('default', { month: 'long', year: 'numeric' });
+            tableHtml += `
+                <tr>
+                    <td><strong>${payrollMonth}</strong></td>
+                    <td>${record.payable_days} / ${record.total_days}</td>
+                    <td>₹${parseFloat(record.gross_salary_at_time).toLocaleString('en-IN')}</td>
+                    <td><strong>₹${parseFloat(record.net_salary).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></td>
+                    <td class="action-buttons">
+                        <button class="btn-secondary download-slip-btn" data-record-id="${record.id}" title="Download Payslip">
+                            <i class="fas fa-download"></i> Download Slip
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        tableHtml += `</tbody></table></div>`;
+        payrollContainer.innerHTML = tableHtml;
+
+        // Add event listeners to all the new download buttons
+        document.querySelectorAll('.download-slip-btn').forEach(button => {
+            button.addEventListener('click', handleDownloadSingleSlip);
+        });
+    }
+
+    // --- ADD THIS NEW HELPER FUNCTION a- a single payslip ---
+    async function handleDownloadSingleSlip(event) {
+        const button = event.currentTarget;
+        const recordId = button.dataset.recordId;
+
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+
+        try {
+            // 1. Fetch the specific payroll record AND the employee's details at that time
+            const { data: record, error } = await _supabase
+                .from('payroll_history')
+                .select(`
+                    *,
+                    employees (employee_id, full_name, designation, date_of_joining)
+                `)
+                .eq('id', recordId)
+                .single();
+
+            if (error || !record) throw new Error(error?.message || "Record not found.");
+
+            // 2. Reuse the PDF generation logic from payroll.js (slightly adapted)
+            const template = document.getElementById('payslip-template'); // Assuming template is in employee-profile.html
+            
+            // --- This part is almost identical to payroll.js ---
+            document.getElementById('slip-month-year').textContent = new Date(record.payroll_month).toLocaleString('default', { month: 'long', year: 'numeric' });
+            document.getElementById('slip-employee-name').textContent = record.employees.full_name;
+            document.getElementById('slip-employee-id').textContent = record.employees.employee_id || 'N/A';
+            document.getElementById('slip-designation').textContent = record.employees.designation || 'N/A';
+            document.getElementById('slip-doj').textContent = new Date(record.employees.date_of_joining).toLocaleDateString('en-GB');
+            
+            const grossSalary = parseFloat(record.gross_salary_at_time);
+            const deductions = parseFloat(record.deductions);
+            const netSalary = parseFloat(record.net_salary);
+
+            const grossSalaryFormatted = `₹${grossSalary.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('slip-gross').textContent = grossSalaryFormatted;
+            document.getElementById('slip-total-earnings').textContent = grossSalaryFormatted;
+            
+            const deductionsFormatted = `₹${deductions.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('slip-deductions').textContent = deductionsFormatted;
+            document.getElementById('slip-total-deductions').textContent = deductionsFormatted;
+
+            document.getElementById('slip-total-days').textContent = record.total_days;
+            document.getElementById('slip-payable-days').textContent = record.payable_days;
+            
+            document.getElementById('slip-net-salary').textContent = `₹${netSalary.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            
+            // --- Re-use the numberToWords helper ---
+            // We need to define it or make it globally available if it's not already
+            if (typeof numberToWords !== 'function') {
+                 window.numberToWords = function(num) { /* Add the full numberToWords function code here */ 
+                    const a = ['','one ','two ','three ','four ', 'five ','six ','seven ','eight ','nine ','ten ','eleven ','twelve ','thirteen ','fourteen ','fifteen ','sixteen ','seventeen ','eighteen ','nineteen '];
+                    const b = ['', '', 'twenty','thirty','forty','fifty', 'sixty','seventy','eighty','ninety'];
+                    const transform = function(n) { let str = ''; let rem; if (n < 20) { str = a[n]; } else { rem = n % 10; str = b[Math.floor(n / 10)] + (rem > 0 ? '-' : '') + a[rem]; } return str; };
+                    const inWords = function(num) { if (num === 0) return 'zero'; let str = ''; const crore = Math.floor(num / 10000000); num %= 10000000; const lakh = Math.floor(num / 100000); num %= 100000; const thousand = Math.floor(num / 1000); num %= 1000; const hundred = Math.floor(num / 100); num %= 100; if (crore > 0) str += transform(crore) + 'crore '; if (lakh > 0) str += transform(lakh) + 'lakh '; if (thousand > 0) str += transform(thousand) + 'thousand '; if (hundred > 0) str += transform(hundred) + 'hundred '; if (num > 0) str += 'and ' + transform(num); return str.trim(); };
+                    return inWords(num);
+                };
+            }
+            document.getElementById('slip-net-words').textContent = `(In Words: Rupees ${window.numberToWords(Math.round(netSalary))} Only)`;
+
+            const canvas = await html2canvas(template, { scale: 3 });
+            const imgData = canvas.toDataURL('image/png');
+            
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const margin = 10;
+            const contentWidth = pdfWidth - (margin * 2);
+            const contentHeight = (canvas.height * contentWidth) / canvas.width;
+            
+            pdf.addImage(imgData, 'PNG', margin, margin, contentWidth, contentHeight);
+            
+            const monthStr = new Date(record.payroll_month).toLocaleString('default', { month: 'short', year: 'numeric' });
+            const fileName = `Payslip_${record.employees.full_name.replace(/ /g, '_')}_${monthStr.replace(/ /g, '_')}.pdf`;
+            pdf.save(fileName);
+            // --- End of PDF logic ---
+
+        } catch (err) {
+            console.error("Error generating single payslip:", err);
+            alert("Could not generate payslip. " + err.message);
+        } finally {
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-download"></i> Download Slip';
+        }
     }
 
     async function loadProjectHistory() {
@@ -414,28 +558,34 @@ function renderCalendar(year, month, attendanceMap) {
     }
     
     // --- ** FIX: UPDATED TAB SWITCHING LOGIC ** ---
+    // --- ** FIX: UPDATED TAB SWITCHING LOGIC ** ---
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabPanes = document.querySelectorAll('.tab-pane');
+
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
+            // Deactivate all tabs and panes
             tabButtons.forEach(btn => btn.classList.remove('active'));
             tabPanes.forEach(pane => pane.classList.remove('active'));
-            button.classList.add('active');
             
+            // Activate the clicked tab and its corresponding pane
+            button.classList.add('active');
             const targetPane = document.getElementById(`tab-pane-${button.dataset.tab}`);
             if (targetPane) {
                 targetPane.classList.add('active');
             }
 
-            // Load content for the clicked tab
+            // --- ON-DEMAND DATA LOADING ---
             const tabName = button.dataset.tab;
-            if (tabName === 'docs') {
+            
+            // Only load data if the content hasn't been loaded yet (check for placeholder)
+            if (tabName === 'docs' && docsTableBody.innerHTML.includes('Loading')) {
                 loadDocuments();
-            } else if (tabName === 'history') {
+            } else if (tabName === 'history' && (historyContainer.innerHTML.includes('Loading') || historyContainer.innerHTML.includes('coming soon'))) {
                 loadProjectHistory();
-            } else if (tabName === 'attendance') {
+            } else if (tabName === 'attendance' && document.getElementById('tab-pane-attendance').innerHTML.includes('Loading')) {
                 loadAttendanceData(calendarDate); 
-            } else if (tabName === 'payroll') {
+            } else if (tabName === 'payroll' && document.getElementById('tab-pane-payroll').innerHTML.includes('development')) {
                 loadPayrollData();
             }
         });
