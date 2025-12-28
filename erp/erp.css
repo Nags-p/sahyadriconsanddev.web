@@ -1,0 +1,242 @@
+/* ERP-specific styles can go here */
+body {
+    background-color: #f8fafc; /* A light grey background for the whole page */
+}
+
+/* Styles for the "Add Employee" form modal */
+.erp-form {
+    padding: 20px 30px 30px 30px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--brand-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ADD THESE NEW STYLES TO THE BOTTOM OF erp.css */
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #e0f2fe;
+    color: var(--brand-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    flex-shrink: 0;
+}
+
+.profile-header-info h2 {
+    margin: 0 0 5px 0;
+    font-size: 1.8rem;
+}
+
+.profile-header-info p {
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+.profile-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding-top: 20px;
+}
+
+.detail-item {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.detail-item strong {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.detail-item span {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Styles for Attendance Page */
+.attendance-status-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.attendance-status-group label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.attendance-remarks {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+}
+
+/* ADD THIS TO THE BOTTOM OF erp/erp.css */
+
+/* Styles for the Report Summary Section */
+.report-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+/* Re-styling the stat cards for the report summary */
+.report-summary .stat-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+}
+
+.report-summary .stat-card h3 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.report-summary .stat-card p {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--brand-blue);
+}
+
+/* ADD THIS TO THE BOTTOM OF erp/erp.css */
+
+/* ==========================================================
+   --- Universal ERP Table Styles ---
+   ========================================================== */
+
+/* This targets all tables within the ERP that have an ID */
+table[id] {
+    width: 100%;
+    border-collapse: collapse; /* Removes space between borders */
+    margin-top: 15px;
+    font-size: 0.9rem;
+}
+
+/* Style for the table header (thead) */
+table[id] thead th {
+    background-color: #f8fafc; /* Light grey header */
+    border-bottom: 2px solid #e2e8f0; /* Thicker line below header */
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+/* Style for the table body cells (tbody td) */
+table[id] tbody td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e2e8f0; /* Standard line between rows */
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+/* Style for every other row (zebra striping) for better readability */
+table[id] tbody tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+/* Style for the last row in the body to remove the bottom border */
+table[id] tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ADD THIS TO THE BOTTOM OF erp/erp.css */
+
+/* Styles for Document Management Tab */
+.document-manager {
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* 1/3 for upload form, 2/3 for list */
+    gap: 30px;
+    padding-top: 20px;
+}
+
+.upload-form-container {
+    background-color: #f8fafc;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.upload-form-container h4 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+#file-upload {
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    width: 100%;
+    background: #fff;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 992px) {
+    .document-manager {
+        grid-template-columns: 1fr;
+    }
+}

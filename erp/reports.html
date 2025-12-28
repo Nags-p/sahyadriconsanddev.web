@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Sahyadri ERP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../dashboard.css">
+    <link rel="stylesheet" href="erp.css">
+</head>
+<body>
+    <div class="dashboard-layout" id="erp-layout">
+        <div class="sidebar" id="erp-sidebar"></div>
+        
+        <div class="main-content">
+            <div class="page active">
+                <div class="content-box">
+                    <div class="analytics-header">
+                        <h2>Reports</h2>
+                    </div>
+
+                    <!-- Report: Monthly Attendance Summary -->
+                    <div class="report-container">
+                        <h3>Monthly Attendance Summary</h3>
+                        <div class="controls-bar" style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 25px;">
+                            <div class="form-group">
+                                <label for="report-month">Month & Year</label>
+                                <input type="month" id="report-month">
+                            </div>
+                            <div class="form-group" style="flex-grow: 1;">
+                                <label for="report-employee">Employee</label>
+                                <select id="report-employee">
+                                    <option value="">-- Select Employee --</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="align-self: flex-end;">
+                                <button id="generate-report-btn" class="btn-primary">Generate</button>
+                            </div>
+                        </div>
+
+                        <div id="report-output">
+                            <!-- Report will be displayed here -->
+                            <p id="report-placeholder">Please select filters and click "Generate".</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config.js" defer></script>
+    <script src="loader.js" defer></script>
+    <script src="reports.js" defer></script>
+</body>
+</html>

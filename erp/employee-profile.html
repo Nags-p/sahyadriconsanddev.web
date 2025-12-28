@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Profile - Sahyadri ERP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../dashboard.css">
+    <link rel="stylesheet" href="erp.css">
+</head>
+<body>
+    <div class="dashboard-layout" id="erp-layout">
+        <div class="sidebar" id="erp-sidebar"></div>
+        
+        <div class="main-content">
+            <div class="content-box">
+                <a href="erp.html" class="back-link" style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; text-decoration: none; color: var(--brand-blue); font-weight: 500;">
+                    <i class="fas fa-arrow-left"></i> Back to Employee List
+                </a>
+
+                <!-- Profile Header -->
+                <div class="profile-header">
+                    <div id="profile-avatar" class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-header-info">
+                        <h2 id="profile-name">Loading...</h2>
+                        <p id="profile-designation">...</p>
+                        <span id="profile-status" class="status-badge">...</span>
+                    </div>
+                    <div class="profile-header-actions" style="margin-left: auto;">
+                        <button id="assign-project-btn" class="btn-primary"><i class="fas fa-plus"></i> Assign to Project</button>
+                    </div>
+                </div>
+
+                <!-- Profile Tabs -->
+                <div class="tab-nav-horizontal" style="margin-top: 30px;">
+                    <button class="tab-btn active" data-tab="info">Personal Information</button>
+                    <button class="tab-btn" data-tab="docs">Documents</button>
+                    <button class="tab-btn" data-tab="history">Project History</button>
+                </div>
+
+                <div class="tab-content-horizontal">
+                    <!-- Tab 1: Personal Info -->
+                    <div id="tab-pane-info" class="tab-pane active profile-details-grid">
+                        <p>Loading details...</p>
+                    </div>
+
+                    <!-- Tab 2: Documents -->
+                    <div id="tab-pane-docs" class="tab-pane">
+                        <div class="document-manager">
+                            <!-- Upload Form Section -->
+                            <div class="upload-form-container">
+                                <h4>Upload New Document</h4>
+                                <form id="document-upload-form">
+                                    <div class="form-group">
+                                        <label for="doc-type">Document Type</label>
+                                        <select id="doc-type" required>
+                                            <option value="Aadhar">Aadhar Card</option>
+                                            <option value="PAN">PAN Card</option>
+                                            <option value="Contract">Employment Contract</option>
+                                            <option value="Bank Details">Bank Details</option>
+                                            <option value="Photo">Profile Photo</option>
+                                            <!-- Add more types as needed -->
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="file-upload">Select File</label>
+                                        <input type="file" id="file-upload" required>
+                                    </div>
+                                    <button type="submit" class="btn-primary"><i class="fas fa-upload"></i> Upload</button>
+                                    <div id="upload-status" class="status-message"></div>
+                                </form>
+                            </div>
+
+                            <!-- File List Section -->
+                            <div class="file-list-container">
+                                <h4>Uploaded Documents</h4>
+                                <table id="documents-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Document Type</th>
+                                            <th>Uploaded At</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="documents-table-body">
+                                        <!-- JS will populate this -->
+                                        <tr><td colspan="3" style="text-align:center;">Loading documents...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Project History -->
+                    <div id="tab-pane-history" class="tab-pane">
+                        <p>Project history feature coming soon.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Assign Project Modal -->
+    <div id="assignment-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>Assign Project</h3>
+                <button type="button" class="modal-close" id="assignment-modal-close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="assignment-form" class="erp-form">
+                <div class="form-group">
+                    <label for="project-select">Select Project*</label>
+                    <select id="project-select" required>
+                        <option value="">Loading projects...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="role-on-project">Role on this Project</label>
+                    <input type="text" id="role-on-project" placeholder="e.g., Site Engineer">
+                </div>
+                 <div class="button-group" style="margin-top:20px;">
+                    <button type="submit" class="btn-primary"><i class="fas fa-check"></i> Assign</button>
+                </div>
+                <div id="assignment-form-status" class="status-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config.js" defer></script>
+    <script src="loader.js" defer></script>
+    <script src="employee-profile.js" defer></script>
+    
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!-- erp/sidebar.html -->
+<div class="sidebar-header">
+    <h1>ERP Panel</h1>
+</div>
+<nav class="sidebar-nav">
+    <ul>
+        <li data-page="dashboard.html"><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+        <li data-page="erp.html"><a href="erp.html"><i class="fas fa-users"></i> Employees</a></li>
+        <li data-page="projects.html"><a href="projects.html"><i class="fas fa-building"></i> Projects</a></li>
+        <li data-page="attendance.html"><a href="attendance.html"><i class="fas fa-calendar-check"></i> Attendance</a></li>
+        <li data-page="reports.html"><a href="reports.html"><i class="fas fa-chart-pie"></i> Reports</a></li>
+        <li data-page="payroll.html"><a href="payroll.html"><i class="fas fa-file-invoice-dollar"></i> Payroll</a></li>
+        <li class="sidebar-divider"></li> <!-- A visual separator -->
+        <li><a href="../dashboard.html"><i class="fas fa-arrow-left"></i> Back to Main Dashboard</a></li>
+    </ul>
+</nav>
+
+<script>
+    // This script will run inside the sidebar to highlight the active link
+    document.addEventListener('DOMContentLoaded', () => {
+        const currentPage = window.location.pathname.split('/').pop();
+        const navItems = document.querySelectorAll('.sidebar-nav li');
+        
+        navItems.forEach(item => {
+            if (item.getAttribute('data-page') === currentPage) {
+                // Find the anchor tag inside and apply the active class to the parent LI
+                item.classList.add('active');
+            }
+        });
+    });
+</script>
+
+<style>
+    /* Simple style for the divider */
+    .sidebar-divider {
+        margin: 15px 25px;
+        height: 1px;
+        padding: 0;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    /* Make the entire li clickable */
+    .sidebar-nav li a {
+        display: flex; /* Use flex to align icon and text */
+        align-items: center;
+        gap: 15px; /* Creates space between icon and text */
+        width: 100%;
+        height: 100%;
+        text-decoration: none;
+        color: inherit;
+        padding: 15px 25px; /* Re-apply padding to the anchor */
+        box-sizing: border-box;
+    }
+    /* Remove default padding from li to make 'a' tag fill the space */
+    .sidebar-nav li {
+        padding: 0 !important;
+        display: flex; /* Make li a flex container for the anchor */
+    }
+</style>
