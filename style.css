@@ -492,41 +492,6 @@ section {
     margin: 0;
 }
 
-/* Team Section */
-.team-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 30px;
-}
-
-.team-card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    text-align: center;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid #f1f5f9;
-}
-
-.team-img-wrapper img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    margin: 0 auto 15px;
-    object-fit: cover;
-}
-
-.team-card h3 {
-    font-size: 1.1rem;
-    margin-bottom: 5px;
-    color: var(--brand-navy);
-}
-
-.team-card span {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-}
-
 /* =======================
    PROCESS
    ======================= */
@@ -714,9 +679,8 @@ section {
 }
 
 .project-item {
-    position: static;
+    position: relative;
     border-radius: 16px;
-    width: 425px;
     overflow: hidden;
     background: white;
     box-shadow: var(--shadow-md);
@@ -876,74 +840,6 @@ section {
     background: white;
     border-radius: 12px;
     border: 1px dashed #e2e8f0;
-}
-
-/* =======================
-   CALCULATOR
-   ======================= */
-#calculator {
-    background: white;
-}
-
-.calculator-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 40px;
-    align-items: stretch;
-}
-
-.calculator-form {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 30px;
-}
-
-.calculator-form form label {
-    font-weight: 600;
-    font-size: 0.9rem;
-    display: block;
-    margin-bottom: 6px;
-    color: var(--brand-navy);
-}
-
-.calculator-form form input,
-.calculator-form form select {
-    margin-bottom: 18px;
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-}
-
-.calculator-finish-options {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 18px;
-    font-size: 0.95rem;
-}
-
-.calc-result-card {
-    margin-top: 20px;
-    background: white;
-    border-radius: 12px;
-    border: 1px dashed #cbd5e1;
-    padding: 20px;
-}
-
-.calculator-info {
-    background: var(--brand-navy);
-    color: white;
-    border-radius: 16px;
-    padding: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.calculator-info ul {
-    list-style: disc;
-    padding-left: 20px;
-    margin: 20px 0;
 }
 
 /* =======================
@@ -1413,23 +1309,6 @@ section {
     .job-card .btn { width: 100%; }
     .project-info-grid { grid-template-columns: 1fr; }
     .project-details-card { order: -1; }
-}
-
-/* Blog Dashboard Styles */
-.blog-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.5fr);
-    gap: 24px;
-    margin-top: 20px;
-}
-.blog-list-panel table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-.blog-list-panel th, .blog-list-panel td { padding: 10px 8px; border-bottom: 1px solid #e2e8f0; text-align: left; }
-.blog-list-panel th { background: #f8fafc; font-weight: 600; color: #0f172a; }
-.blog-editor-panel { border-left: 1px solid #e2e8f0; padding-left: 20px; }
-
-@media (max-width: 992px) {
-    .blog-layout { grid-template-columns: 1fr; }
-    .blog-editor-panel { border-left: none; padding-left: 0; padding-top: 20px; border-top: 1px solid #e2e8f0; }
 }
 
 /* ==================================================
@@ -1953,4 +1832,46 @@ section {
 
 .job-description-list li {
     margin-bottom: 8px; /* Space between points */
+}
+
+/* =======================
+   MOBILE HERO FIX
+   ======================= */
+@media (max-width: 768px) {
+    #hero {
+        padding-top: calc(var(--nav-height) + 60px);
+        padding-bottom: 80px;
+        text-align: left;
+    }
+    .hero-grid {
+        text-align: left;
+    }
+    .hero-text h1 {
+        font-size: 2.5rem;
+        line-height: 1.2;
+    }
+    .hero-text p {
+        font-size: 1.05rem;
+        max-width: 100%;
+    }
+    .hero-buttons {
+        justify-content: flex-start;
+    }
+    .hero-dot {
+        display: none !important; /* Forcefully hide the dot */
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-text h1 {
+        font-size: 2.2rem;
+    }
+    .hero-buttons {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .hero-buttons .btn {
+        width: 80%;
+        text-align: center;
+    }
 }
