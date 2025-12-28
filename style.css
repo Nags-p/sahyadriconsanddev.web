@@ -689,7 +689,7 @@ section {
     background: white;
     box-shadow: var(--shadow-md);
     cursor: pointer;
-    width: 450px;
+    width: 420px;
 }
 
 .project-item img {
