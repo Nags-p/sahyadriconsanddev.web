@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard</title>
+    <script>
+        // This script runs before anything else on the page.
+        // It checks if the session exists. If not, it redirects to the login page immediately.
+        if (!sessionStorage.getItem('employeeSession')) {
+            window.location.href = 'index.html';
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="portal.css">
+    
+</head>
+<body>
+
+    <header class="portal-header">
+        <div class="header-content">
+            <img src="../images/logo.png" alt="Company Logo" class="header-logo">
+            <div class="user-info">
+                <span id="welcome-message">Welcome...</span>
+                <button id="logout-btn" class="btn-secondary"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="portal-main">
+        <div class="portal-container">
+            <!-- Tab Navigation -->
+            <div class="tab-nav">
+                <button class="tab-btn active" data-tab="profile"><i class="fas fa-user"></i> My Profile</button>
+                <button class="tab-btn" data-tab="attendance"><i class="fas fa-calendar-check"></i> Attendance</button>
+                <button class="tab-btn" data-tab="payslips"><i class="fas fa-file-invoice-dollar"></i> Payslips</button>
+            </div>
+
+            <!-- Tab Content Area -->
+            <div class="tab-content">
+                <!-- My Profile Tab -->
+                <div id="tab-profile" class="tab-pane active">
+                    <h3>My Profile</h3>
+                    <div id="profile-details" class="details-grid">
+                        <p class="loading-placeholder">Loading your profile information...</p>
+                    </div>
+                </div>
+
+                <!-- Attendance Tab -->
+                <div id="tab-attendance" class="tab-pane">
+                    <h3>My Attendance</h3>
+                    <div id="attendance-calendar">
+                        <p class="loading-placeholder">Loading your attendance calendar...</p>
+                    </div>
+                </div>
+
+                <!-- Payslips Tab -->
+                <div id="tab-payslips" class="tab-pane">
+                    <h3>My Payslips</h3>
+                    <div id="payslips-history">
+                        <p class="loading-placeholder">Loading your payroll history...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- HIDDEN PAYSLIP TEMPLATE FOR PDF GENERATION -->
+    <div style="position: absolute; left: -9999px; top: auto;">
+        <!-- Paste the A4 payslip template from erp/payroll.html here -->
+        <div id="payslip-template" class="a4-sheet">
+             <!-- The full A4 payslip template HTML goes here -->
+        </div>
+    </div>
+
+
+    <!-- SCRIPTS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config.js"></script>
+    <script src="portal.js" defer></script>
+</body>
+</html>
