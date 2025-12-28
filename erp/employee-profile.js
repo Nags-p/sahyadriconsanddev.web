@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         statusBadge.textContent = employee.is_active ? 'Active' : 'Inactive';
         statusBadge.style.background = employee.is_active ? '#dcfce7' : '#fee2e2';
         statusBadge.style.color = employee.is_active ? '#15803d' : '#b91c1c';
-        const infoContainer = document.getElementById('tab-pane-info');
+        const infoContainer = document.getElementById('profile-details-container');
         infoContainer.innerHTML = `<div class="detail-item"><strong>Phone:</strong> <span>${employee.phone}</span></div>
             <div class="detail-item"><strong>Email:</strong> <span>${employee.email || 'N/A'}</span></div>
             <div class="detail-item"><strong>Date of Joining:</strong> <span>${formatDate(employee.date_of_joining)}</span></div>
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="detail-item"><strong>Emergency Contact:</strong> <span>${employee.emergency_contact_number || 'N/A'}</span></div>`;
 
         // ==========================================================
-        // --- NEW LOGIC TO LOAD AND DISPLAY PROFILE PICTURE ---
+        // --- LOGIC TO LOAD AND DISPLAY PROFILE PICTURE ---
         // ==========================================================
         const { data: photoDoc } = await _supabase
             .from('employee_documents')
@@ -101,50 +101,138 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         // If no photo is found, the default icon from the HTML will be shown automatically.
         // ==========================================================
-
-        loadProjectHistory();
-        loadDocuments();
+        
+        // ** FIX: DO NOT load these here. They will be loaded on tab click. **
+        // loadProjectHistory();
+        // loadDocuments();
     }
 
-    // PASTE THIS SNIPPET in erp/employee-profile.js (e.g., after the loadDocuments function)
+    // --- Function to load Attendance Data ---
+    // --- NEW: Function to load Attendance Calendar ---
+let calendarDate = new Date(); // State for the calendar's current month
 
-    // --- NEW: Function to load Attendance Data ---
-    async function loadAttendanceData() {
-        const attendanceContainer = document.getElementById('tab-pane-attendance');
-        attendanceContainer.innerHTML = '<p>Loading attendance records...</p>';
+async function loadAttendanceData(date) {
+    const attendanceContainer = document.getElementById('tab-pane-attendance');
+    attendanceContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Loading attendance calendar...</p>';
 
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const startDate = thirtyDaysAgo.toISOString().split('T')[0];
+    const year = date.getFullYear();
+    const month = date.getMonth(); // 0-indexed (0 for Jan)
 
-        const { data, error } = await _supabase
-            .from('attendance')
-            .select('attendance_date, status')
-            .eq('employee_id', employeeDbId)
-            .gte('attendance_date', startDate)
-            .order('attendance_date', { ascending: false });
+    const startDate = new Date(year, month, 1).toISOString().split('T')[0];
+    const endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
 
-        if (error) {
-            attendanceContainer.innerHTML = `<p style="color:red;">Error loading attendance: ${error.message}</p>`;
-            return;
-        }
+    // 1. Fetch this month's attendance data
+    const { data, error } = await _supabase
+        .from('attendance')
+        .select('attendance_date, status')
+        .eq('employee_id', employeeDbId)
+        .gte('attendance_date', startDate)
+        .lte('attendance_date', endDate);
 
-        if (data.length === 0) {
-            attendanceContainer.innerHTML = '<p>No attendance records found for the last 30 days.</p>';
-            return;
-        }
-
-        let tableHtml = `<table id="attendance-history-table">
-                            <thead><tr><th>Date</th><th>Status</th></tr></thead>
-                            <tbody>`;
-        data.forEach(record => {
-            tableHtml += `<tr><td>${formatDate(record.attendance_date)}</td><td>${record.status}</td></tr>`;
-        });
-        tableHtml += `</tbody></table>`;
-        attendanceContainer.innerHTML = tableHtml;
+    if (error) {
+        attendanceContainer.innerHTML = `<p style="color:red;">Error loading attendance: ${error.message}</p>`;
+        return;
     }
 
-    // --- NEW: Placeholder for Payroll History ---
+    // 2. Create a Map for quick lookups (e.g., '2025-12-29' -> 'Present')
+    const attendanceMap = new Map(data.map(rec => [rec.attendance_date, rec.status]));
+
+    // 3. Render the calendar
+    renderCalendar(year, month, attendanceMap);
+}
+
+function renderCalendar(year, month, attendanceMap) {
+    const attendanceContainer = document.getElementById('tab-pane-attendance');
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const today = new Date();
+
+    let calendarHTML = `
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <div class="calendar-nav">
+                    <button id="prev-month-btn" title="Previous Month"><i class="fas fa-chevron-left"></i></button>
+                </div>
+                <h4>${monthNames[month]} ${year}</h4>
+                <div class="calendar-nav">
+                    <button id="next-month-btn" title="Next Month"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+            <div class="calendar-grid">
+    `;
+
+    // Day names header
+    dayNames.forEach(day => {
+        calendarHTML += `<div class="day-name">${day}</div>`;
+    });
+
+    // Empty cells for the first week
+    for (let i = 0; i < firstDay; i++) {
+        calendarHTML += `<div class="calendar-day empty"></div>`;
+    }
+
+    // Date cells
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const status = attendanceMap.get(dateStr);
+        
+        let statusClass = '';
+        if (status === 'Present') statusClass = 'present';
+        else if (status === 'Absent') statusClass = 'absent';
+        else if (status === 'Leave') statusClass = 'leave';
+
+        let todayClass = '';
+        if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+            todayClass = 'today';
+        }
+
+        calendarHTML += `<div class="calendar-day ${statusClass} ${todayClass}" title="${dateStr}: ${status || 'No Record'}">${day}</div>`;
+    }
+
+    calendarHTML += `</div>`; // Close .calendar-grid
+
+    // --- NEW: HTML for the legend ---
+    const legendHTML = `
+        <div class="calendar-legend">
+            <div class="legend-item">
+                <span class="legend-color-box present"></span>
+                <span>Present</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color-box absent"></span>
+                <span>Absent</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color-box leave"></span>
+                <span>Leave</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color-box" style="background-color: #f8fafc;"></span>
+                <span>No Record</span>
+            </div>
+        </div>
+    `;
+    
+    calendarHTML += `</div>`; // Close .calendar-container
+    
+    attendanceContainer.innerHTML = calendarHTML + legendHTML;
+
+    // Add event listeners for navigation
+    document.getElementById('prev-month-btn').addEventListener('click', () => {
+        calendarDate.setMonth(calendarDate.getMonth() - 1);
+        loadAttendanceData(calendarDate);
+    });
+
+    document.getElementById('next-month-btn').addEventListener('click', () => {
+        calendarDate.setMonth(calendarDate.getMonth() + 1);
+        loadAttendanceData(calendarDate);
+    });
+}
+
+    // --- Placeholder for Payroll History ---
     async function loadPayrollData() {
         const payrollContainer = document.getElementById('tab-pane-payroll');
         // This is a placeholder as the payroll feature is not yet built.
@@ -325,7 +413,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
     
-    // --- Tab Switching Logic ---
+    // --- ** FIX: UPDATED TAB SWITCHING LOGIC ** ---
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabPanes = document.querySelectorAll('.tab-pane');
     tabButtons.forEach(button => {
@@ -333,7 +421,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             tabButtons.forEach(btn => btn.classList.remove('active'));
             tabPanes.forEach(pane => pane.classList.remove('active'));
             button.classList.add('active');
-            document.getElementById(`tab-pane-${button.dataset.tab}`).classList.add('active');
+            
+            const targetPane = document.getElementById(`tab-pane-${button.dataset.tab}`);
+            if (targetPane) {
+                targetPane.classList.add('active');
+            }
+
+            // Load content for the clicked tab
+            const tabName = button.dataset.tab;
+            if (tabName === 'docs') {
+                loadDocuments();
+            } else if (tabName === 'history') {
+                loadProjectHistory();
+            } else if (tabName === 'attendance') {
+                loadAttendanceData(calendarDate); 
+            } else if (tabName === 'payroll') {
+                loadPayrollData();
+            }
         });
     });
     
@@ -347,13 +451,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     assignmentForm.addEventListener('submit', handleAssignmentSubmit);
 
-    // PASTE THIS SNIPPET in erp/employee-profile.js
-
-    // --- Event Listeners ---
-    // ... existing event listeners for docs, assignments, etc. ...
-    
-    // ADD THIS NEW EVENT LISTENER
-    // --- THIS IS THE UPDATED PART ---
+    // --- Event listener for Edit Profile button ---
     const editProfileBtn = document.getElementById('edit-profile-btn');
     if (editProfileBtn) {
         editProfileBtn.addEventListener('click', () => {

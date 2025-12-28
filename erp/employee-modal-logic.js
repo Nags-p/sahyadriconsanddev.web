@@ -68,18 +68,37 @@ async function handleFormSubmit(event) {
     if (!employeeData.address) employeeData.address = null;
     if (!employeeData.emergency_contact_number) employeeData.emergency_contact_number = null;
 
-    let error;
+    // ==========================================================
+    // --- THIS IS THE CORRECTED LOGIC ---
+    // ==========================================================
+    let result;
+    
     // This assumes _supabase is globally available from a script loaded before this one
     if (employeeDbId) {
-        const { error: updateError } = await _supabase.from('employees').update(employeeData).eq('id', employeeDbId);
-        error = updateError;
+        // When UPDATING, chain .select() to get the updated data back for confirmation.
+        result = await _supabase
+            .from('employees')
+            .update(employeeData)
+            .eq('id', employeeDbId)
+            .select();
     } else {
-        const { error: insertError } = await _supabase.from('employees').insert([employeeData]);
-        error = insertError;
+        // When INSERTING, .select() is also useful to get the newly created record.
+        result = await _supabase
+            .from('employees')
+            .insert([employeeData])
+            .select();
     }
 
-    if (error) {
-        formStatus.textContent = `Error: ${error.message}`;
+    const error = result.error;
+    const data = result.data;
+    // ==========================================================
+    // --- END OF CORRECTION ---
+    // ==========================================================
+
+
+    if (error || !data || data.length === 0) {
+        const errorMessage = error ? error.message : "Operation failed. No rows were updated. Please check permissions (RLS).";
+        formStatus.textContent = `Error: ${errorMessage}`;
         formStatus.className = 'status-message error';
         formStatus.style.display = 'block';
         saveBtn.disabled = false;
