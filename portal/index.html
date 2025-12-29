@@ -50,73 +50,99 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../config.js"></script> 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const { createClient } = supabase;
-            const _supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+    document.addEventListener('DOMContentLoaded', () => {
+        const { createClient } = supabase;
+        const _supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
 
-            const loginForm = document.getElementById('employee-login-form');
-            const loginStatus = document.getElementById('login-status');
-            const submitButton = loginForm.querySelector('button[type="submit"]');
+        const loginForm = document.getElementById('employee-login-form');
+        const loginStatus = document.getElementById('login-status');
+        const submitButton = loginForm.querySelector('button[type="submit"]');
 
-            // 1. Check if a user session already exists
-            _supabase.auth.getSession().then(({ data: { session } }) => {
-                if (session) {
-                    window.location.href = 'dashboard.html';
-                }
-            });
-
-            // 2. Handle the login form submission
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const employeeId = document.getElementById('employee-id').value.trim();
-                const password = document.getElementById('password').value;
-                
-                submitButton.disabled = true;
-                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
-                loginStatus.style.display = 'none';
-
-                try {
-                    // Step A: Find the employee's email using their Employee ID.
-                    // This query is anonymous but is safe as it only reveals an email if the ID is known.
-                    const { data: employee, error: findError } = await _supabase
-                        .from('employees')
-                        .select('email, id') // Select the UUID id as well
-                        .eq('employee_id', employeeId)
-                        .single();
-
-                    if (findError || !employee || !employee.email) {
-                        throw new Error("Invalid Employee ID or Password.");
-                    }
-
-                    // Step B: Use the retrieved email and the entered password to sign in.
-                    const { data: sessionData, error: signInError } = await _supabase.auth.signInWithPassword({
-                        email: employee.email,
-                        password: password,
+        // Check if a Supabase session already exists
+        _supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                if (!sessionStorage.getItem('employeeSession')) {
+                    _supabase.from('employees').select('id, full_name, employee_id').eq('id', session.user.id).single().then(({data, error}) => {
+                        if (data) {
+                             sessionStorage.setItem('employeeSession', JSON.stringify(data));
+                             window.location.href = 'dashboard.html';
+                        } else {
+                             _supabase.auth.signOut();
+                        }
                     });
-
-                    if (signInError) {
-                        throw new Error("Invalid Employee ID or Password.");
-                    }
-                    
-                    // We must ensure the logged-in user's UUID matches the employee record's UUID.
-                    if (sessionData.user.id !== employee.id) {
-                        await _supabase.auth.signOut(); // Log them out immediately
-                        throw new Error("Authentication mismatch. Please contact HR.");
-                    }
-
-                    // Step C: Redirect on success. The session is now managed by Supabase.
+                } else {
                     window.location.href = 'dashboard.html';
-
-                } catch (error) {
-                    loginStatus.textContent = error.message;
-                    loginStatus.className = 'status-message error';
-                    loginStatus.style.display = 'block';
-                    
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
                 }
-            });
+            }
         });
-    </script>
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const employeeId = document.getElementById('employee-id').value.trim();
+            const password = document.getElementById('password').value;
+            
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+            loginStatus.style.display = 'none';
+
+            try {
+                // --- STEP 1: Find the employee record by their Employee ID ---
+                const { data: employee, error: findError } = await _supabase
+                    .from('employees')
+                    .select('id, email, full_name, employee_id') 
+                    .eq('employee_id', employeeId)
+                    .single();
+
+                // --- NEW: Specific Error Check 1 ---
+                if (findError || !employee) {
+                    // This error means the Employee ID was not found in your 'employees' table.
+                    throw new Error(`No employee record found with ID: "${employeeId}". Please check the ID.`);
+                }
+                
+                // If the employee record is found, but they don't have an email set.
+                if (!employee.email) {
+                    throw new Error("This employee does not have an email address configured for login. Please contact HR.");
+                }
+
+                // --- STEP 2: Use the found email to sign in with Supabase Auth ---
+                const { data: sessionData, error: signInError } = await _supabase.auth.signInWithPassword({
+                    email: employee.email,
+                    password: password,
+                });
+
+                // --- NEW: Specific Error Check 2 ---
+                if (signInError) {
+                    // This error means the password was incorrect for the found user.
+                    throw new Error("The password you entered is incorrect.");
+                }
+                
+                // Security check to ensure data integrity
+                if (sessionData.user.id !== employee.id) {
+                    await _supabase.auth.signOut();
+                    throw new Error("Authentication mismatch. Please contact HR.");
+                }
+
+                // --- STEP 3: Store session data and redirect on success ---
+                const sessionPayload = {
+                    id: employee.id,
+                    full_name: employee.full_name,
+                    employee_id: employee.employee_id
+                };
+                sessionStorage.setItem('employeeSession', JSON.stringify(sessionPayload));
+                
+                window.location.href = 'dashboard.html';
+
+            } catch (error) {
+                // Display the new, more specific error message to the user
+                loginStatus.textContent = error.message;
+                loginStatus.className = 'status-message error';
+                loginStatus.style.display = 'block';
+                
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+            }
+        });
+    });
+</script>
 </body>
 </html>
