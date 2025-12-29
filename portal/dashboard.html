@@ -34,6 +34,7 @@
             <div class="tab-nav">
                 <button class="tab-btn active" data-tab="profile"><i class="fas fa-user"></i> My Profile</button>
                 <button class="tab-btn" data-tab="attendance"><i class="fas fa-calendar-check"></i> Attendance</button>
+                <button class="tab-btn" data-tab="leaves"><i class="fas fa-person-walking-luggage"></i> My Leaves</button>
                 <button class="tab-btn" data-tab="payslips"><i class="fas fa-file-invoice-dollar"></i> Payslips</button>
             </div>
 
@@ -47,11 +48,62 @@
                     </div>
                 </div>
 
-                <!-- Attendance Tab -->
+                <!-- Inside the "Attendance Tab" -->
                 <div id="tab-attendance" class="tab-pane">
                     <h3>My Attendance</h3>
-                    <div id="attendance-calendar">
-                        <p class="loading-placeholder">Loading your attendance calendar...</p>
+                    
+                    <!-- ========================================================== -->
+                    <!-- === NEW: CONTAINER FOR STATS AND CALENDAR === -->
+                    <!-- ========================================================== -->
+                    <div class="attendance-layout">
+                        <div id="attendance-summary" class="attendance-summary-container">
+                            <!-- JS will populate these stats -->
+                        </div>
+                        <div id="attendance-calendar">
+                            <p class="loading-placeholder">Loading your attendance calendar...</p>
+                        </div>
+                    </div>
+                    <!-- ========================================================== -->
+                    
+                </div>
+
+
+                <!-- ADD THIS NEW LEAVES TAB PANE -->
+                <div id="tab-leaves" class="tab-pane">
+                    <h3>My Leaves</h3>
+                    <div class="leaves-layout">
+                        <!-- Left Side: Balances and Apply Form -->
+                        <div class="leave-actions-container">
+                            <h4>Leave Balances</h4>
+                            <div id="leave-balances-container">Loading balances...</div>
+                            
+                            <h4 style="margin-top: 30px;">Apply for Leave</h4>
+                            <form id="leave-apply-form" class="erp-form" style="padding: 0;">
+                               <div class="form-group">
+                                   <label for="leave-type">Leave Type</label>
+                                   <select id="leave-type" required></select>
+                               </div>
+                               <div class="form-group">
+                                   <label for="start-date">Start Date</label>
+                                   <input type="date" id="start-date" required>
+                               </div>
+                               <div class="form-group">
+                                   <label for="end-date">End Date</label>
+                                   <input type="date" id="end-date" required>
+                               </div>
+                               <div class="form-group">
+                                   <label for="reason">Reason (Optional)</label>
+                                   <textarea id="reason" rows="3"></textarea>
+                               </div>
+                               <button type="submit" class="btn-primary">Submit Request</button>
+                               <div id="apply-status" class="status-message"></div>
+                            </form>
+                        </div>
+                        <!-- Right Side: History -->
+                        <div class="leave-history-container">
+                            <h4>My Leave History</h4>
+                            <div id="leave-history-table">Loading history...</div>
+                        </div>
                     </div>
                 </div>
 

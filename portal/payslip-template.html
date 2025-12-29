@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .a4-sheet { width: 794px; padding: 40px; background: white; box-sizing: border-box; font-family: 'Inter', sans-serif; color: #1e293b; }
+        .slip-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #3b82f6; padding-bottom: 15px; }
+        .slip-logo { height: 50px; }
+        .slip-header-info { text-align: right; }
+        .slip-header-info h2 { margin: 0; font-size: 28px; font-weight: bold; }
+        .slip-header-info p { margin: 0; color: #64748b; }
+        .slip-section { margin-top: 25px; }
+        .employee-details table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .employee-details td { padding: 8px; width: 50%; vertical-align: top; }
+        .employee-details span { font-weight: normal; color: #475569; }
+        .salary-grid { display: flex; gap: 30px; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding: 15px 0; }
+        .salary-column { flex: 1; }
+        .salary-column h4 { margin: 0 0 10px 0; font-size: 16px; font-weight: 600; }
+        .salary-column table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .salary-column td { padding: 10px 8px; border-bottom: 1px dashed #cbd5e1; }
+        .salary-column td.amount { text-align: right; }
+        .salary-column .total-row td { border-bottom: none; border-top: 1px solid #334155; padding-top: 10px; }
+        .summary-details table { width: 100%; font-size: 14px; color: #475569; }
+        .summary-details td { padding: 4px 8px; }
+        .slip-net-pay { margin-top: 25px; background-color: #f1f5f9; padding: 20px; border-radius: 8px; text-align: center; }
+        .slip-net-pay p { margin: 0; font-size: 14px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+        .slip-net-pay h3 { margin: 5px 0; font-size: 24px; font-weight: 700; color: #1e293b; }
+        .slip-net-pay .net-words { font-style: italic; font-size: 13px; text-transform: capitalize; }
+        .slip-footer { margin-top: 40px; text-align: center; font-size: 12px; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div id="payslip-template" class="a4-sheet">
+        <div class="slip-header">
+            <img src="../images/logo.png" class="slip-logo" alt="Logo">
+            <div class="slip-header-info">
+                <h2>Salary Slip</h2>
+                <p>For the Month of <span id="slip-month-year"></span></p>
+            </div>
+        </div>
+        <div class="slip-section employee-details">
+            <table>
+                <tr>
+                    <td><strong>Employee Name:</strong> <span id="slip-employee-name"></span></td>
+                    <td><strong>Designation:</strong> <span id="slip-designation"></span></td>
+                </tr>
+                <tr>
+                    <td><strong>Employee ID:</strong> <span id="slip-employee-id"></span></td>
+                    <td><strong>Date of Joining:</strong> <span id="slip-doj"></span></td>
+                </tr>
+            </table>
+        </div>
+        <div class="slip-section salary-grid">
+            <div class="salary-column">
+                <h4>Earnings</h4>
+                <table>
+                    <tr><td>Basic & DA</td><td class="amount" id="slip-basic"></td></tr>
+                    <tr><td>House Rent Allowance (HRA)</td><td class="amount" id="slip-hra"></td></tr>
+                    <tr><td>Special Allowance</td><td class="amount" id="slip-special"></td></tr>
+                    <tr class="total-row">
+                        <td><strong>Total Earnings</strong></td>
+                        <td class="amount"><strong id="slip-total-earnings"></strong></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="salary-column">
+                <h4>Deductions</h4>
+                <table>
+                    <tr><td>Provident Fund (PF)</td><td class="amount" id="slip-pf"></td></tr>
+                    <tr><td>Employee State Insurance (ESI)</td><td class="amount" id="slip-esi"></td></tr>
+                    <tr><td>Professional Tax</td><td class="amount" id="slip-ptax"></td></tr>
+                    <tr class="total-row">
+                        <td><strong>Total Deductions</strong></td>
+                        <td class="amount"><strong id="slip-total-deductions"></strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="slip-section summary-details">
+             <table>
+                <tr>
+                    <td><strong>Total Days in Month:</strong> <span id="slip-total-days"></span></td>
+                    <td><strong>Payable Days:</strong> <span id="slip-payable-days"></span></td>
+                </tr>
+            </table>
+        </div>
+        <div class="slip-net-pay">
+            <p>Net Salary Payable</p>
+            <h3 id="slip-net-salary"></h3>
+            <p class="net-words" id="slip-net-words"></p>
+        </div>
+        <div class="slip-footer">
+            This is a computer-generated salary slip and does not require a signature.
+        </div>
+    </div>
+</body>
+</html>

@@ -474,3 +474,161 @@ body {
     font-size: 12px;
     color: #94a3b8;
 }
+
+/* ==========================================================
+   --- PORTAL ATTENDANCE MODULE ENHANCEMENTS ---
+   ========================================================== */
+
+.attendance-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr; /* Fixed width for stats, flexible for calendar */
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.attendance-summary-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.stat-card-mini {
+    background-color: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary-color);
+    padding: 15px;
+    border-radius: var(--border-radius);
+}
+
+.stat-card-mini h4 {
+    margin: 0 0 8px 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.stat-card-mini p {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Color coding for different stats */
+.stat-card-mini.present { border-left-color: #22c55e; } /* Green */
+.stat-card-mini.leave { border-left-color: #f59e0b; }   /* Amber */
+.stat-card-mini.absent { border-left-color: #ef4444; }  /* Red */
+
+@media (max-width: 992px) {
+    .attendance-layout {
+        grid-template-columns: 1fr; /* Stack on smaller screens */
+    }
+    .attendance-summary-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+}
+
+/* ==========================================================
+   --- PORTAL LEAVE MODULE STYLES (REFINED) ---
+   ========================================================== */
+
+.leaves-layout {
+    display: grid;
+    /* This creates the two-column layout */
+    grid-template-columns: 350px 1fr; 
+    gap: 40px; /* Increased gap for better spacing */
+    align-items: flex-start; /* Aligns items to the top of their grid cell */
+}
+
+/* Container for the left column (balances and form) */
+.leave-actions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px; /* Space between "Leave Balances" and "Apply for Leave" */
+}
+
+/* Container for the right column (history) */
+.leave-history-container {
+    /* No special styles needed, it will fill the remaining space */
+}
+
+/* Titles like "Leave Balances" and "Apply for Leave" */
+.leave-actions-container h4,
+.leave-history-container h4 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Styling for the individual balance cards (e.g., "Casual Leave: 12") */
+.leave-balances-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #f8fafc; /* Light background for the whole group */
+    border-radius: var(--border-radius);
+    padding: 15px;
+}
+
+.balance-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: white;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.balance-card span { 
+    font-weight: 500; 
+    color: var(--text-secondary);
+}
+
+.balance-card .balance-value { 
+    font-size: 1.5rem; 
+    font-weight: 700; 
+    color: var(--primary-color); 
+}
+
+/* Styling for the "Apply for Leave" form */
+#leave-apply-form .form-group {
+    margin-bottom: 15px;
+}
+#leave-apply-form label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+#leave-apply-form input,
+#leave-apply-form select,
+#leave-apply-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+
+#leave-apply-form button { 
+    width: 100%; 
+    padding: 12px;
+}
+
+/* Styling for the history table on the right */
+.leave-history-container table { 
+    width: 100%; 
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 992px) {
+    .leaves-layout {
+        grid-template-columns: 1fr; /* Stack the columns on top of each other */
+    }
+}

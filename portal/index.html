@@ -46,10 +46,9 @@
     <!-- In /portal/index.html -->
     <!-- (Your HTML body remains the same) -->
 
-    <!-- SCRIPTS -->
+    <!-- In /portal/index.html -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../config.js"></script> 
-    <!-- In /portal/index.html -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const { createClient } = supabase;
@@ -59,18 +58,14 @@
             const loginStatus = document.getElementById('login-status');
             const submitButton = loginForm.querySelector('button[type="submit"]');
 
-            // REMOVED the initial session check from this page.
-            // If a user is already logged in and lands here,
-            // portal.js (on dashboard.html) will handle the redirect.
-            // This is cleaner, but let's keep it simple. If they are logged in,
-            // they shouldn't be on index.html anyway. A better approach is below.
+            // 1. Check if a user session already exists
+            _supabase.auth.getSession().then(({ data: { session } }) => {
+                if (session) {
+                    window.location.href = 'dashboard.html';
+                }
+            });
 
-            // Let's use a simpler logic for the login page itself.
-            if (sessionStorage.getItem('employeeSession')) {
-                window.location.href = 'dashboard.html';
-                return; // Stop execution if already logged in
-            }
-
+            // 2. Handle the login form submission
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const employeeId = document.getElementById('employee-id').value.trim();
@@ -81,23 +76,35 @@
                 loginStatus.style.display = 'none';
 
                 try {
-                    const { data, error } = await _supabase.rpc('employee_portal_login', {
-                        p_employee_id: employeeId,
-                        p_password: password
+                    // Step A: Find the employee's email using their Employee ID.
+                    // This query is anonymous but is safe as it only reveals an email if the ID is known.
+                    const { data: employee, error: findError } = await _supabase
+                        .from('employees')
+                        .select('email, id') // Select the UUID id as well
+                        .eq('employee_id', employeeId)
+                        .single();
+
+                    if (findError || !employee || !employee.email) {
+                        throw new Error("Invalid Employee ID or Password.");
+                    }
+
+                    // Step B: Use the retrieved email and the entered password to sign in.
+                    const { data: sessionData, error: signInError } = await _supabase.auth.signInWithPassword({
+                        email: employee.email,
+                        password: password,
                     });
 
-                    if (error || !data || data.length === 0) {
+                    if (signInError) {
                         throw new Error("Invalid Employee ID or Password.");
                     }
                     
-                    const employee = data[0];
+                    // We must ensure the logged-in user's UUID matches the employee record's UUID.
+                    if (sessionData.user.id !== employee.id) {
+                        await _supabase.auth.signOut(); // Log them out immediately
+                        throw new Error("Authentication mismatch. Please contact HR.");
+                    }
 
-                    sessionStorage.setItem('employeeSession', JSON.stringify({
-                        id: employee.id,
-                        employee_id: employee.employee_id,
-                        full_name: employee.full_name
-                    }));
-                    
+                    // Step C: Redirect on success. The session is now managed by Supabase.
                     window.location.href = 'dashboard.html';
 
                 } catch (error) {
