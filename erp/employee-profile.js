@@ -84,6 +84,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="detail-item"><strong>Bank Account Number:</strong> <span>${employee.bank_account_number || 'N/A'}</span></div>
             <div class="detail-item"><strong>Bank IFSC Code:</strong> <span>${employee.bank_ifsc_code || 'N/A'}</span></div>
         `;
+
+        loadLeaveBalancesForAdmin(employee.id);
         // ====================================================================
 
         // ==========================================================
@@ -153,6 +155,34 @@ async function loadAttendanceData(date) {
     // 3. Render the calendar
     renderCalendar(year, month, attendanceMap);
 }
+
+async function loadLeaveBalancesForAdmin(employeeId) {
+        const container = document.getElementById('admin-leave-balances-container');
+        container.innerHTML = '<p>Loading balances...</p>';
+
+        const { data, error } = await _supabase.rpc('get_employee_leave_balances', {
+            p_employee_id: employeeId
+        });
+
+        if (error) {
+            container.innerHTML = `<p style="color:red">Error: ${error.message}</p>`;
+            return;
+        }
+
+        // Render the balances in a simple table for the admin
+        let tableHtml = `<table class="payslips-table"><thead><tr><th>Leave Type</th><th>Remaining</th><th>Taken / Total</th></tr></thead><tbody>`;
+        data.forEach(balance => {
+            tableHtml += `
+                <tr>
+                    <td>${balance.leave_type_name}</td>
+                    <td><strong>${balance.remaining_balance}</strong></td>
+                    <td>${balance.leaves_taken} / ${balance.total_allotted}</td>
+                </tr>
+            `;
+        });
+        tableHtml += `</tbody></table>`;
+        container.innerHTML = tableHtml;
+    }
 
 function renderCalendar(year, month, attendanceMap) {
     const attendanceContainer = document.getElementById('tab-pane-attendance');

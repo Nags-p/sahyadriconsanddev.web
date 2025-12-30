@@ -44,7 +44,7 @@ async function enforceAdminAccess() {
     const userRole = session.user.app_metadata?.role;
 
     // 3. Define who is allowed to access the ERP.
-    const allowedRoles = ['Admin', 'Editor'];
+    const allowedRoles = ['Super Admin', 'Admin', 'Editor'];
 
     // 4. If the user's role is NOT in the allowed list, log them out and redirect.
     if (!allowedRoles.includes(userRole)) {

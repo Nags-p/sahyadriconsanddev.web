@@ -1967,7 +1967,7 @@ async function handleUserSession() {
     if (session) {
         // --- NEW SECURITY CHECK ---
         const userRole = session.user.app_metadata?.role;
-        const allowedRoles = ['Admin', 'Editor'];
+        const allowedRoles = ['Super Admin', 'Admin', 'Editor'];
 
         // If the user's role is NOT in the allowed list, log them out and redirect.
         if (!allowedRoles.includes(userRole)) {

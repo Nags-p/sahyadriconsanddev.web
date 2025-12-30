@@ -1,3 +1,7 @@
+/* ==========================================================
+   PORTAL.CSS (CLEANED VERSION)
+   ========================================================== */
+
 :root {
     --primary-color: #3b82f6; /* Blue */
     --primary-dark-color: #2563eb;
@@ -11,40 +15,91 @@
     --border-radius: 8px;
 }
 
+/* ==========================================================
+   --- Global Body & Font Styles ---
+   ========================================================== */
+
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
     background-color: var(--bg-light);
     font-family: 'Inter', sans-serif;
     margin: 0;
 }
 
-.login-container {
+/* ==========================================================
+   --- LOGIN PAGE UI STYLES ---
+   ========================================================== */
+
+.login-page-wrapper {
+    display: grid;
+    grid-template-columns: 400px 1fr;
     width: 100%;
-    max-width: 400px;
-    padding: 40px;
+    max-width: 1000px;
+    margin: 20px;
     background-color: var(--card-bg);
-    border-radius: var(--border-radius);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-    text-align: center;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
-.login-container img {
-    max-width: 150px;
-    margin-bottom: 20px;
+/* Special body style ONLY for the login page to center the wrapper */
+body:has(.login-page-wrapper) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
-.login-container h1 {
+
+/* --- Left Side: Brand Panel --- */
+.brand-panel {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: white;
+    padding: 50px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+}
+
+.brand-logo {
+    width: 120px;
+    height: auto;
+    margin-bottom: 30px;
+}
+
+.brand-panel h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 15px 0;
+}
+
+.brand-panel p {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.7;
+}
+
+/* --- Right Side: Login Form --- */
+.login-container {
+    padding: 50px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-container h2 {
     font-size: 1.8rem;
     color: var(--text-primary);
+    margin-top: 0;
     margin-bottom: 8px;
+    text-align: left;
 }
 
-.login-container p {
+.login-container .login-subtitle {
+    text-align: left;
+    margin-bottom: 40px;
     color: var(--text-secondary);
-    margin-bottom: 30px;
 }
 
 .login-form .form-group {
@@ -111,6 +166,7 @@ body {
     font-size: 0.9rem;
     display: none;
 }
+
 .status-message.error {
     background-color: #fee2e2;
     color: var(--danger-dark-color);
@@ -120,9 +176,6 @@ body {
 /* ==========================================================
    --- PORTAL DASHBOARD STYLES ---
    ========================================================== */
-body {
-    display: block; /* Override login page's flex styles */
-}
 
 .portal-header {
     background-color: var(--card-bg);
@@ -162,9 +215,11 @@ body {
     background-color: #fee2e2;
     color: var(--danger-dark-color);
     border: 1px solid #fecaca;
-    border-radius: var(--border-radius); /* Added for consistency */
-    cursor: pointer; /* Added for better UX */
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s;
 }
+
 #logout-btn:hover {
     background-color: var(--danger-color);
     color: white;
@@ -199,9 +254,9 @@ body {
     color: var(--text-secondary);
     border-bottom: 3px solid transparent;
     transition: all 0.2s;
-    display: inline-flex; /* Added for icon alignment */
-    align-items: center; /* Added for icon alignment */
-    gap: 8px; /* Added for icon alignment */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .tab-btn:hover {
@@ -216,6 +271,7 @@ body {
 .tab-pane {
     display: none;
 }
+
 .tab-pane.active {
     display: block;
     animation: fadeIn 0.4s;
@@ -269,7 +325,7 @@ body {
     grid-column: 1 / -1;
 }
 
-/* --- Payslip History Table --- */
+/* --- Shared Table Styles (for Payslips & Leaves) --- */
 .payslips-table {
     width: 100%;
     border-collapse: collapse;
@@ -296,16 +352,16 @@ body {
     background-color: var(--card-bg);
     color: var(--primary-color);
     border: 1px solid var(--border-color);
-    border-radius: var(--border-radius); /* Added for consistency */
-    cursor: pointer; /* Added for better UX */
-    transition: all 0.2s; /* Added for hover effect */
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s;
 }
+
 .payslips-table .action-buttons button:hover {
     background-color: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
 }
-
 
 /* --- ATTENDANCE CALENDAR STYLES --- */
 .calendar-container { max-width: 800px; margin: 0 auto; }
@@ -329,159 +385,10 @@ body {
 .legend-color-box.absent { background-color: #fee2e2; }
 .legend-color-box.leave { background-color: #fef9c3; }
 
-
-/* ==========================================================
-   --- A4 PAYSLIP TEMPLATE STYLES (MISSING BLOCK) ---
-   ========================================================== */
-.a4-sheet {
-    width: 794px;
-    padding: 40px;
-    background: white;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-    color: #1e293b;
-    border: 1px solid #e2e8f0;
-}
-
-.slip-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #3b82f6;
-    padding-bottom: 15px;
-}
-
-.slip-logo {
-    height: 50px;
-}
-
-.slip-header-info {
-    text-align: right;
-}
-
-.slip-header-info h2 {
-    margin: 0;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.slip-header-info p {
-    margin: 0;
-    color: #64748b;
-}
-
-.slip-section {
-    margin-top: 25px;
-}
-
-.employee-details table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-}
-
-.employee-details td {
-    padding: 8px;
-    width: 50%;
-    vertical-align: top;
-}
-
-.employee-details span {
-    font-weight: normal;
-    color: #475569;
-}
-
-.salary-grid {
-    display: flex;
-    gap: 30px;
-    border-top: 1px solid #e2e8f0;
-    border-bottom: 1px solid #e2e8f0;
-    padding: 15px 0;
-}
-
-.salary-column {
-    flex: 1;
-}
-
-.salary-column h4 {
-    margin: 0 0 10px 0;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.salary-column table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-}
-
-.salary-column td {
-    padding: 10px 8px;
-    border-bottom: 1px dashed #cbd5e1;
-}
-
-.salary-column td.amount {
-    text-align: right;
-}
-
-.salary-column .total-row td {
-    border-bottom: none;
-    border-top: 1px solid #334155;
-    padding-top: 10px;
-}
-
-.summary-details table {
-    width: 100%;
-    font-size: 14px;
-    color: #475569;
-}
-.summary-details td {
-    padding: 4px 8px;
-}
-
-.slip-net-pay {
-    margin-top: 25px;
-    background-color: #f1f5f9;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.slip-net-pay p {
-    margin: 0;
-    font-size: 14px;
-    color: #475569;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.slip-net-pay h3 {
-    margin: 5px 0;
-    font-size: 24px;
-    font-weight: 700;
-    color: #1e293b;
-}
-
-.slip-net-pay .net-words {
-    font-style: italic;
-    font-size: 13px;
-    text-transform: capitalize;
-}
-
-.slip-footer {
-    margin-top: 40px;
-    text-align: center;
-    font-size: 12px;
-    color: #94a3b8;
-}
-
-/* ==========================================================
-   --- PORTAL ATTENDANCE MODULE ENHANCEMENTS ---
-   ========================================================== */
-
+/* --- PORTAL ATTENDANCE MODULE ENHANCEMENTS --- */
 .attendance-layout {
     display: grid;
-    grid-template-columns: 250px 1fr; /* Fixed width for stats, flexible for calendar */
+    grid-template-columns: 250px 1fr;
     gap: 30px;
     align-items: flex-start;
 }
@@ -515,48 +422,25 @@ body {
     color: var(--text-primary);
 }
 
-/* Color coding for different stats */
-.stat-card-mini.present { border-left-color: #22c55e; } /* Green */
-.stat-card-mini.leave { border-left-color: #f59e0b; }   /* Amber */
-.stat-card-mini.absent { border-left-color: #ef4444; }  /* Red */
+.stat-card-mini.present { border-left-color: #22c55e; }
+.stat-card-mini.leave { border-left-color: #f59e0b; }
+.stat-card-mini.absent { border-left-color: #ef4444; }
 
-@media (max-width: 992px) {
-    .attendance-layout {
-        grid-template-columns: 1fr; /* Stack on smaller screens */
-    }
-    .attendance-summary-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    }
-}
-
-/* ==========================================================
-   --- PORTAL LEAVE MODULE STYLES (REFINED) ---
-   ========================================================== */
-
+/* --- PORTAL LEAVE MODULE STYLES --- */
 .leaves-layout {
     display: grid;
-    /* This creates the two-column layout */
     grid-template-columns: 350px 1fr; 
-    gap: 40px; /* Increased gap for better spacing */
-    align-items: flex-start; /* Aligns items to the top of their grid cell */
+    gap: 40px;
+    align-items: flex-start;
 }
 
-/* Container for the left column (balances and form) */
 .leave-actions-container {
     display: flex;
     flex-direction: column;
-    gap: 30px; /* Space between "Leave Balances" and "Apply for Leave" */
+    gap: 30px;
 }
 
-/* Container for the right column (history) */
-.leave-history-container {
-    /* No special styles needed, it will fill the remaining space */
-}
-
-/* Titles like "Leave Balances" and "Apply for Leave" */
-.leave-actions-container h4,
-.leave-history-container h4 {
+.leave-history-container h4, .leave-actions-container h4 {
     margin: 0 0 10px 0;
     font-size: 1.2rem;
     color: var(--text-primary);
@@ -564,12 +448,11 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
-/* Styling for the individual balance cards (e.g., "Casual Leave: 12") */
 .leave-balances-container {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    background: #f8fafc; /* Light background for the whole group */
+    background: #f8fafc;
     border-radius: var(--border-radius);
     padding: 15px;
 }
@@ -595,19 +478,9 @@ body {
     color: var(--primary-color); 
 }
 
-/* Styling for the "Apply for Leave" form */
-#leave-apply-form .form-group {
-    margin-bottom: 15px;
-}
-#leave-apply-form label {
-    font-size: 0.85rem;
-    font-weight: 500;
-    margin-bottom: 5px;
-}
-
-#leave-apply-form input,
-#leave-apply-form select,
-#leave-apply-form textarea {
+#leave-apply-form .form-group { margin-bottom: 15px; }
+#leave-apply-form label { font-size: 0.85rem; font-weight: 500; margin-bottom: 5px; }
+#leave-apply-form input, #leave-apply-form select, #leave-apply-form textarea {
     width: 100%;
     padding: 10px;
     border: 1px solid var(--border-color);
@@ -615,20 +488,30 @@ body {
     font-size: 0.95rem;
     box-sizing: border-box;
 }
+#leave-apply-form button { width: 100%; padding: 12px; }
+.leave-history-container table { width: 100%; }
 
-#leave-apply-form button { 
-    width: 100%; 
-    padding: 12px;
-}
-
-/* Styling for the history table on the right */
-.leave-history-container table { 
-    width: 100%; 
-}
-
-/* Responsive adjustments for smaller screens */
+/* --- RESPONSIVE STYLES --- */
 @media (max-width: 992px) {
-    .leaves-layout {
-        grid-template-columns: 1fr; /* Stack the columns on top of each other */
+    .attendance-layout, .leaves-layout {
+        grid-template-columns: 1fr;
+    }
+    .attendance-summary-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .login-page-wrapper {
+        grid-template-columns: 1fr;
+    }
+    .brand-panel {
+        padding: 40px 30px;
+        text-align: center;
+        align-items: center;
+    }
+    .login-container {
+        padding: 40px 30px;
     }
 }

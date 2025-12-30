@@ -1,11 +1,11 @@
-// portal/portal.js - The Main Orchestrator (Corrected)
+// portal/portal.js - The Main Orchestrator (Logout Fix)
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // --- 1. INITIALIZE SUPABASE CLIENT ---
+    // 1. Initialize Supabase Client
     const { createClient } = supabase;
     const _supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
     
-    // --- 2. AUTHENTICATION & INITIALIZATION ---
+    // 2. Authentication Check & Initialization
     let employeeSession = null;
 
     async function checkAuthAndInitialize() {
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         runApp();
     }
 
-    // --- 3. MAIN APP LOGIC ---
+    // 3. Main App Logic
     function runApp() {
         const welcomeMessage = document.getElementById('welcome-message');
         const logoutBtn = document.getElementById('logout-btn');
@@ -34,11 +34,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tabPanes = document.querySelectorAll('.tab-pane');
 
         // ==========================================================
-        // --- THIS IS THE FIX (PART 1) ---
-        // Initialize all modules that have event listeners ONCE at the start.
+        // --- THIS IS THE FIX ---
+        // All event listeners are now correctly placed inside runApp
         // ==========================================================
-        initializeLeaveTab(_supabase, employeeSession);
-
 
         function handleLogout() {
             sessionStorage.removeItem('employeeSession');
@@ -46,11 +44,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = 'index.html';
         }
 
-        // --- EVENT LISTENERS & INITIALIZATION ---
+        // --- ATTACH ALL EVENT LISTENERS ONCE ---
         
         welcomeMessage.textContent = `Welcome, ${employeeSession.full_name || 'Employee'}`;
-        logoutBtn.addEventListener('click', handleLogout);
+        logoutBtn.addEventListener('click', handleLogout); // Correctly attached here
         
+        // Initialize the leave form listeners
+        initializeLeaveTab(_supabase, employeeSession);
+
         tabButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const tabName = e.currentTarget.dataset.tab;
@@ -60,10 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 e.currentTarget.classList.add('active');
                 document.getElementById(`tab-${tabName}`).classList.add('active');
                 
-                // ==========================================================
-                // --- THIS IS THE FIX (PART 2) ---
-                // The switch statement now only calls data loading functions.
-                // ==========================================================
+                // Call the correct data loading function for the selected tab
                 switch (tabName) {
                     case 'profile':
                         loadProfileData(_supabase, employeeSession);
@@ -72,7 +70,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         loadAttendanceData(_supabase, employeeSession, calendarDate);
                         break;
                     case 'leaves':
-                        // Just load the data. Do not re-attach event listeners.
                         loadLeaveData(_supabase, employeeSession);
                         break;
                     case 'payslips':
@@ -82,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
         
-        // Trigger a click on the default tab to load its content
+        // Trigger the first tab to load its content
         document.querySelector('.tab-btn.active').click();
     }
     

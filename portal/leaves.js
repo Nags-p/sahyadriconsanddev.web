@@ -1,4 +1,4 @@
-// portal/leaves.js
+// portal/leaves.js (Updated with dynamic balances)
 
 function initializeLeaveTab(supabase, employeeSession) {
     const leaveApplyForm = document.getElementById('leave-apply-form');
@@ -12,7 +12,6 @@ function initializeLeaveTab(supabase, employeeSession) {
         leaveApplyForm.addEventListener('submit', (e) => handleLeaveApply(e, supabase, employeeSession));
     }
 
-    // --- NEW: Event Listeners for the Edit Modal ---
     if (leaveEditForm) {
         leaveEditForm.addEventListener('submit', (e) => handleLeaveUpdate(e, supabase));
     }
@@ -30,22 +29,44 @@ function initializeLeaveTab(supabase, employeeSession) {
 }
 
 async function loadLeaveData(supabase, employeeSession) {
-    loadLeaveBalances(supabase);
+    loadLeaveBalances(supabase, employeeSession); // Pass employeeSession
     loadLeaveHistory(supabase, employeeSession);
     loadLeaveTypesForForm(supabase);
 }
 
-async function loadLeaveBalances(supabase) {
-    // ... this function remains unchanged
+// ==========================================================
+// --- THIS IS THE UPDATED FUNCTION ---
+// ==========================================================
+async function loadLeaveBalances(supabase, employeeSession) {
     const container = document.getElementById('leave-balances-container');
-    container.innerHTML = 'Loading balances...';
-    const { data, error } = await supabase.from('leave_types').select('name, default_balance');
-    if (error) { container.innerHTML = `<p style="color:red">Error loading balances</p>`; return; }
-    container.innerHTML = data.map(lt => `<div class="balance-card"><span>${lt.name}</span><span class="balance-value">${lt.default_balance}</span></div>`).join('');
+    container.innerHTML = 'Calculating balances...';
+
+    // Call the new database function
+    const { data, error } = await supabase.rpc('get_employee_leave_balances', {
+        p_employee_id: employeeSession.id
+    });
+
+    if (error) {
+        container.innerHTML = `<p style="color:red">Error loading balances: ${error.message}</p>`;
+        return;
+    }
+
+    // Render the new, detailed balance cards
+    container.innerHTML = data.map(balance => `
+        <div class="balance-card">
+            <span>${balance.leave_type_name}</span>
+            <div style="text-align: right;">
+                <span class="balance-value">${balance.remaining_balance}</span>
+                <small style="display: block; color: #94a3b8; font-size: 0.75rem;">
+                    (${balance.leaves_taken} taken of ${balance.total_allotted})
+                </small>
+            </div>
+        </div>
+    `).join('');
 }
+// ==========================================================
 
 async function loadLeaveHistory(supabase, employeeSession) {
-    // --- THIS FUNCTION IS UPDATED ---
     const container = document.getElementById('leave-history-table');
     container.innerHTML = 'Loading history...';
     const { data, error } = await supabase.from('leave_requests').select(`*, leave_types(name)`).eq('employee_id', employeeSession.id).order('created_at', { ascending: false });
@@ -70,7 +91,6 @@ async function loadLeaveHistory(supabase, employeeSession) {
 }
 
 async function loadLeaveTypesForForm(supabase, targetSelectId = 'leave-type') {
-    // --- THIS FUNCTION IS UPDATED to populate both forms ---
     const select = document.getElementById(targetSelectId);
     const { data } = await supabase.from('leave_types').select('id, name');
     if (data) {
@@ -79,7 +99,6 @@ async function loadLeaveTypesForForm(supabase, targetSelectId = 'leave-type') {
 }
 
 async function handleLeaveApply(e, supabase, employeeSession) {
-    // ... this function remains unchanged
     e.preventDefault();
     const form = e.target;
     const statusEl = document.getElementById('apply-status');
@@ -98,12 +117,14 @@ async function handleLeaveApply(e, supabase, employeeSession) {
         statusEl.textContent = 'Leave request submitted successfully!';
         statusEl.className = 'status-message success';
         form.reset();
+        // Refresh BOTH history and balances on new submission
         loadLeaveHistory(supabase, employeeSession);
+        loadLeaveBalances(supabase, employeeSession);
     }
     statusEl.style.display = 'block';
 }
 
-// --- NEW FUNCTIONS FOR THE EDIT MODAL ---
+// --- Functions for the Edit Modal ---
 
 function handleHistoryTableClick(e, supabase, employeeSession) {
     const editButton = e.target.closest('.edit-leave-btn');
@@ -120,19 +141,15 @@ function openLeaveEditModal(request, supabase) {
     document.getElementById('edit-start-date').value = request.start_date;
     document.getElementById('edit-end-date').value = request.end_date;
     document.getElementById('edit-reason').value = request.reason || '';
-
-    // Populate and set the leave type dropdown
     const leaveTypeSelect = document.getElementById('edit-leave-type');
     loadLeaveTypesForForm(supabase, 'edit-leave-type').then(() => {
         leaveTypeSelect.value = request.leave_type_id;
     });
-    
     modal.classList.add('active');
 }
 
 function closeLeaveEditModal() {
-    const modal = document.getElementById('leave-edit-modal');
-    modal.classList.remove('active');
+    document.getElementById('leave-edit-modal').classList.remove('active');
 }
 
 async function handleLeaveUpdate(e, supabase) {
@@ -149,11 +166,7 @@ async function handleLeaveUpdate(e, supabase) {
         reason: form.querySelector('#edit-reason').value 
     };
 
-    const { error } = await supabase
-        .from('leave_requests')
-        .update(updatedRequest)
-        .eq('id', requestId);
-
+    const { error } = await supabase.from('leave_requests').update(updatedRequest).eq('id', requestId);
     if (error) {
         statusEl.textContent = `Error: ${error.message}`;
         statusEl.className = 'status-message error';
@@ -161,29 +174,25 @@ async function handleLeaveUpdate(e, supabase) {
         statusEl.textContent = 'Update successful!';
         statusEl.className = 'status-message success';
         loadLeaveHistory(supabase, employeeSession);
-        setTimeout(closeLeaveEditModal, 1500); // Close modal after 1.5s
+        loadLeaveBalances(supabase, employeeSession);
+        setTimeout(closeLeaveEditModal, 1500);
     }
     statusEl.style.display = 'block';
 }
 
 async function handleLeaveDelete(supabase) {
     const requestId = document.getElementById('edit-request-id').value;
-    if (!confirm("Are you sure you want to cancel this leave request?")) {
-        return;
-    }
+    if (!confirm("Are you sure you want to cancel this leave request?")) return;
     
     const employeeSession = JSON.parse(sessionStorage.getItem('employeeSession'));
 
-    const { error } = await supabase
-        .from('leave_requests')
-        .delete()
-        .eq('id', requestId);
-
+    const { error } = await supabase.from('leave_requests').delete().eq('id', requestId);
     if (error) {
         alert(`Error deleting request: ${error.message}`);
     } else {
         alert("Leave request cancelled successfully.");
         loadLeaveHistory(supabase, employeeSession);
+        loadLeaveBalances(supabase, employeeSession);
         closeLeaveEditModal();
     }
 }
