@@ -1,4 +1,4 @@
-// portal/portal.js - The Main Orchestrator
+// portal/portal.js - The Main Orchestrator (Corrected)
 
 document.addEventListener('DOMContentLoaded', async () => {
     // --- 1. INITIALIZE SUPABASE CLIENT ---
@@ -33,6 +33,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tabButtons = document.querySelectorAll('.tab-btn');
         const tabPanes = document.querySelectorAll('.tab-pane');
 
+        // ==========================================================
+        // --- THIS IS THE FIX (PART 1) ---
+        // Initialize all modules that have event listeners ONCE at the start.
+        // ==========================================================
+        initializeLeaveTab(_supabase, employeeSession);
+
+
         function handleLogout() {
             sessionStorage.removeItem('employeeSession');
             _supabase.auth.signOut();
@@ -48,24 +55,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             btn.addEventListener('click', (e) => {
                 const tabName = e.currentTarget.dataset.tab;
                 
-                // UI updates for tabs
                 tabButtons.forEach(b => b.classList.remove('active'));
                 tabPanes.forEach(p => p.classList.remove('active'));
                 e.currentTarget.classList.add('active');
                 document.getElementById(`tab-${tabName}`).classList.add('active');
                 
-                // This is the orchestrator logic. It calls functions from the other files.
+                // ==========================================================
+                // --- THIS IS THE FIX (PART 2) ---
+                // The switch statement now only calls data loading functions.
+                // ==========================================================
                 switch (tabName) {
                     case 'profile':
                         loadProfileData(_supabase, employeeSession);
                         break;
                     case 'attendance':
-                        // The attendance.js file manages its own date state
                         loadAttendanceData(_supabase, employeeSession, calendarDate);
                         break;
                     case 'leaves':
-                        // We only need to initialize the leave tab once
-                        initializeLeaveTab(_supabase, employeeSession);
+                        // Just load the data. Do not re-attach event listeners.
+                        loadLeaveData(_supabase, employeeSession);
                         break;
                     case 'payslips':
                         loadPayslipsData(_supabase, employeeSession);

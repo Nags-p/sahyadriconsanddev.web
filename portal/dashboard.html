@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="portal.css">
+    <link rel="stylesheet" href="../dashboard.css">
 </head>
 <body>
 
@@ -106,6 +107,43 @@
             </div>
         </div>
     </main>
+
+    <!-- ========================================================== -->
+<!-- NEW: LEAVE EDIT/DELETE MODAL -->
+<!-- ========================================================== -->
+<div id="leave-edit-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3>Edit Leave Request</h3>
+            <button type="button" class="modal-close" id="leave-edit-modal-close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="leave-edit-form" class="erp-form">
+            <input type="hidden" id="edit-request-id">
+            <div class="form-group">
+                <label for="edit-leave-type">Leave Type</label>
+                <select id="edit-leave-type" required></select>
+            </div>
+            <div class="form-group">
+                <label for="edit-start-date">Start Date</label>
+                <input type="date" id="edit-start-date" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-end-date">End Date</label>
+                <input type="date" id="edit-end-date" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-reason">Reason (Optional)</label>
+                <textarea id="edit-reason" rows="3"></textarea>
+            </div>
+            <div class="button-group" style="margin-top:20px; justify-content: space-between;">
+                <button type="button" id="delete-leave-btn" class="btn-danger"><i class="fas fa-trash-alt"></i> Cancel Request</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+            <div id="edit-status" class="status-message"></div>
+        </form>
+    </div>
+</div>
+<!-- ========================================================== -->
 
     <!-- HIDDEN PAYSLIP TEMPLATE (remains unchanged) -->
 

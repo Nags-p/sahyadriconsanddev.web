@@ -1959,19 +1959,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function handleUserSession() {
-        const { data: { session } } = await _supabase.auth.getSession();
-        if (session) {
-            const userRole = (session.user.app_metadata && session.user.app_metadata.role) || 'Viewer';
-            document.body.className = `is-${userRole.toLowerCase().replace(' ', '-')}`;
-            dom.userEmailDisplay.textContent = session.user.user_metadata.display_name || session.user.email;
-            dom.userRoleDisplay.textContent = userRole;
-            initializeDashboard();
-        } else {
-            dom.loginOverlay.style.display = 'flex';
-            dom.dashboardLayout.style.display = 'none';
+    // Replace the entire handleUserSession function in /dashboard.js
+
+async function handleUserSession() {
+    const { data: { session } } = await _supabase.auth.getSession();
+
+    if (session) {
+        // --- NEW SECURITY CHECK ---
+        const userRole = session.user.app_metadata?.role;
+        const allowedRoles = ['Admin', 'Editor'];
+
+        // If the user's role is NOT in the allowed list, log them out and redirect.
+        if (!allowedRoles.includes(userRole)) {
+            console.warn(`Access Denied: User with role '${userRole || 'None'}' attempted to access the Main Admin Panel.`);
+            await _supabase.auth.signOut();
+            // Redirect to the main website's homepage, not the login form,
+            // as they are not an authorized admin.
+            window.location.href = 'index.html'; 
+            return; // Stop further execution
         }
+        // --- END OF SECURITY CHECK ---
+
+        // If the security check passes, proceed with initializing the dashboard.
+        document.body.className = `is-${userRole.toLowerCase().replace(' ', '-')}`;
+        dom.userEmailDisplay.textContent = session.user.user_metadata.display_name || session.user.email;
+        dom.userRoleDisplay.textContent = userRole;
+        initializeDashboard();
+
+    } else {
+        // If there is no session at all, show the login overlay.
+        dom.loginOverlay.style.display = 'flex';
+        dom.dashboardLayout.style.display = 'none';
     }
+}
 
     
     
