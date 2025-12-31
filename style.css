@@ -1880,3 +1880,16 @@ section {
         text-align: center;
     }
 }
+
+/* style.css */
+/* ... (all your existing CSS) ... */
+
+/* =======================
+   CAREERS PAGE HERO OVERRIDE
+   ======================= */
+#hero.hero-careers::before {
+    background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.8)),
+        url('images/hero-background2.jpg');
+    background-size: cover;
+    background-position: center;
+}asfdgfgvb
