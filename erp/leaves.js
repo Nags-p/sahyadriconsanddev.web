@@ -116,21 +116,23 @@ async function handleAction(newStatus) {
             if(empError) throw empError;
 
             // ==========================================================
-            // --- NEW, SIMPLIFIED, AND CORRECT LOOPING LOGIC ---
+            // --- ROBUST DATE ITERATION LOGIC ---
             // ==========================================================
             const attendanceRecords = [];
-            
-            // Use UTC to prevent timezone shifts.
-            const startDate = new Date(request.start_date + 'T12:00:00Z'); // Use noon UTC
-            const endDate = new Date(request.end_date + 'T12:00:00Z');   // Use noon UTC
 
-            // Clone the start date for the loop
+            // Manually parse strings to avoid timezone interpretation issues.
+            const [startYear, startMonth, startDay] = request.start_date.split('-').map(Number);
+            const [endYear, endMonth, endDay] = request.end_date.split('-').map(Number);
+            
+            // Create unambiguous UTC dates. JS months are 0-indexed.
+            const startDate = new Date(Date.UTC(startYear, startMonth - 1, startDay));
+            const endDate = new Date(Date.UTC(endYear, endMonth - 1, endDay));
+
             let loopDate = new Date(startDate);
 
             while (loopDate <= endDate) {
                 attendanceRecords.push({
                     employee_id: emp.employee_id,
-                    // Format the date to YYYY-MM-DD string
                     attendance_date: loopDate.toISOString().split('T')[0],
                     status: 'Leave',
                     remarks: `Approved leave (${request.leave_types.name})`,
@@ -138,8 +140,8 @@ async function handleAction(newStatus) {
                     leave_request_id: requestId
                 });
                 
-                // Increment the day
-                loopDate.setDate(loopDate.getDate() + 1);
+                // Safely increment the day in UTC.
+                loopDate.setUTCDate(loopDate.getUTCDate() + 1);
             }
             // ==========================================================
             
